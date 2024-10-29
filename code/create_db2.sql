@@ -1,8 +1,7 @@
--- Búðu til gagnagrunn ef hann er ekki til
-ATTACH DATABASE 'rotten_tomatoes.db' AS rt_db;
+drop table if EXISTS rotten_tomatoes_movies;
 
 -- Búðu til töfluna fyrir CSV gögnin
-CREATE TABLE IF NOT EXISTS rt_db.rotten_tomatoes_movies (
+CREATE TABLE IF NOT EXISTS rotten_tomatoes_movies (
     rotten_tomatoes_link TEXT,
     movie_title TEXT,
     movie_info TEXT,
@@ -27,3 +26,8 @@ CREATE TABLE IF NOT EXISTS rt_db.rotten_tomatoes_movies (
     tomatometer_rotten_critics_count INTEGER
 );
 
+.mode csv 
+.import --skip 1 data/rotten_tomatoes_movies2.csv rotten_tomatoes_movies
+.headers on 
+.mode col 
+select count(*) from rotten_tomatoes_movies limit 10;
