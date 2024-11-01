@@ -1,35 +1,35 @@
-Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country,LogoURL
-Arsenal ,Arsenal,London ,Emirates Stadium ,60361,51.555,-0.108611,England,https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg
-Aston Villa ,Aston Villa,Birmingham ,Villa Park ,42785,52.509167,-1.884722,England,https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Aston_Villa_FC_new_crest.svg/150px-Aston_Villa_FC_new_crest.svg.png
+Team,FDCOUK,City,Stadium,Capacity,Latitude,Longitude,Country,
+Arsenal ,Arsenal,London ,Emirates Stadium ,60361,51.555,-0.108611,England,
+Aston Villa ,Aston Villa,Birmingham ,Villa Park ,42785,52.509167,-1.884722,England,
 Blackburn Rovers ,Blackburn,Blackburn ,Ewood Park ,31154,53.728611,-2.489167,England,
-Bournemouth,Bournemouth,Bournemouth,Vitality Stadium,11379,50.7352,-1.8388,England,https://upload.wikimedia.org/wikipedia/en/thumb/e/e5/AFC_Bournemouth_%282013%29.svg/150px-AFC_Bournemouth_%282013%29.svg.png
+Bournemouth,Bournemouth,Bournemouth,Vitality Stadium,11379,50.7352,-1.8388,England,
 Bolton Wanderers ,Bolton,Bolton ,Reebok Stadium ,28100,53.580556,-2.535556,England,
-Chelsea ,Chelsea,London ,Stamford Bridge ,42449,51.481667,-0.191111,England,https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg
-Everton ,Everton,Liverpool ,Goodison Park ,40157,53.438889,-2.966389,England,https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg
+Chelsea ,Chelsea,London ,Stamford Bridge ,42449,51.481667,-0.191111,England,
+Everton ,Everton,Liverpool ,Goodison Park ,40157,53.438889,-2.966389,England,
 Fulham ,Fulham,London ,Craven Cottage ,25700,51.475,-0.221667,England,
-Liverpool ,Liverpool,Liverpool ,Anfield ,45276,53.430819,-2.960828,England,https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg
-Manchester City ,Man City,Manchester ,Etihad Stadium,47405,53.482989,-2.200292,England,https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg
-Manchester United ,Man United,Stretford ,Old Trafford ,75811,53.463056,-2.291389,England,https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg
-Newcastle United ,Newcastle,Newcastle upon Tyne ,Sports Direct Arena,52409,54.975556,-1.621667,England,https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg
-Norwich City ,Norwich,Norwich ,Carrow Road ,27010,52.622128,1.308653,England,https://upload.wikimedia.org/wikipedia/hif/4/41/Norwich_City.png?20150612201529
-Queens Park Rangers ,QPR,London ,Loftus Road ,18439,51.509167,-0.232222,England,https://upload.wikimedia.org/wikipedia/en/thumb/3/31/Queens_Park_Rangers_crest.svg/185px-Queens_Park_Rangers_crest.svg.png
+Liverpool ,Liverpool,Liverpool ,Anfield ,45276,53.430819,-2.960828,England,
+Manchester City ,Man City,Manchester ,Etihad Stadium,47405,53.482989,-2.200292,England,
+Manchester United ,Man United,Stretford ,Old Trafford ,75811,53.463056,-2.291389,England,
+Newcastle United ,Newcastle,Newcastle upon Tyne ,Sports Direct Arena,52409,54.975556,-1.621667,England,
+Norwich City ,Norwich,Norwich ,Carrow Road ,27010,52.622128,1.308653,England,
+Queens Park Rangers ,QPR,London ,Loftus Road ,18439,51.509167,-0.232222,England,
 Stoke City ,Stoke,Stoke-on-Trent ,Britannia Stadium ,27740,52.988333,-2.175556,England,
-Sheffield United,Sheffield United,Sheffield,Bramall Lane,32050,53.3688,-1.4692,England,https://upload.wikimedia.org/wikipedia/en/thumb/9/9c/Sheffield_United_FC_logo.svg/190px-Sheffield_United_FC_logo.svg.png
+Sheffield United,Sheffield United,Sheffield,Bramall Lane,32050,53.3688,-1.4692,England,
 Sunderland ,Sunderland,Sunderland ,Stadium of Light ,48707,54.9144,-1.3882,England,
 Swansea City ,Swansea,Swansea ,Liberty Stadium ,20520,51.6422,-3.9351,England,
-Tottenham Hotspur ,Tottenham,London ,White Hart Lane ,36230,51.603333,-0.065833,England,https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg
+Tottenham Hotspur ,Tottenham,London ,White Hart Lane ,36230,51.603333,-0.065833,England,
 West Bromwich Albion ,West Brom,West Bromwich ,The Hawthorns ,27877,52.509167,-1.963889,England,
 Wigan Athletic ,Wigan,Wigan ,DW Stadium ,25133,53.547778,-2.653889,England,
-Wolverhampton Wanderers ,Wolves,Wolverhampton ,Molineux Stadium ,27828,52.590278,-2.130278,England,https://upload.wikimedia.org/wikipedia/en/f/fc/Wolverhampton_Wanderers.svg
+Wolverhampton Wanderers ,Wolves,Wolverhampton ,Molineux Stadium ,27828,52.590278,-2.130278,England,
 Barnsley ,Barnsley,Barnsley ,Oakwell ,23009,53.552222,-1.4675,England,
 Birmingham City ,Birmingham,Birmingham ,St Andrew's Stadium ,30079,52.475703,-1.868189,England,
 Blackpool ,Blackpool,Blackpool ,Bloomfield Road ,16220,53.804722,-3.048056,England,
-Brighton & Hove Albion ,Brighton,Brighton ,American Express Community Stadium ,22374,50.861822,-0.083278,England,https://upload.wikimedia.org/wikipedia/en/f/fd/Brighton_%26_Hove_Albion_logo.svg
+Brighton & Hove Albion ,Brighton,Brighton ,American Express Community Stadium ,22374,50.861822,-0.083278,England,
 Bristol City ,Bristol City,Bristol ,Ashton Gate ,21497,51.44,-2.620278,England,
-Burnley ,Burnley,Burnley ,Turf Moor ,22546,53.789167,-2.230278,England,https://upload.wikimedia.org/wikipedia/sco/0/02/Burnley_FC_badge.png
+Burnley ,Burnley,Burnley ,Turf Moor ,22546,53.789167,-2.230278,England,
 Cardiff City ,Cardiff,Cardiff ,Cardiff City Stadium ,26828,51.472778,-3.203056,England,
 Coventry City ,Coventry,Coventry ,Ricoh Arena ,32609,52.448056,-1.495556,England,
-Crystal Palace ,Crystal Palace,London ,Selhurst Park ,26309,51.398333,-0.085556,England,https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/Crystal_Palace_FC_logo_%282022%29.svg/175px-Crystal_Palace_FC_logo_%282022%29.svg.png
+Crystal Palace ,Crystal Palace,London ,Selhurst Park ,26309,51.398333,-0.085556,England,
 Derby County ,Derby,Derby ,Pride Park Stadium ,33597,52.915,-1.447222,England,
 Doncaster Rovers ,Doncaster,Doncaster ,Keepmoat Stadium ,15231,53.509722,-1.113889,England,
 Hull City ,Hull,Kingston upon Hull ,KC Stadium ,25404,53.746111,-0.367778,England,
