@@ -2,7 +2,7 @@
 
 ## Uppsetning Gagnagrunns 
 
-**1. rotten_tomatoes_movies**
+### 1. rotten_tomatoes_movies
 
 Við lesum gögnin úr csv skránni okkar sem heitir **rotten_tomatoes_movies2.csv** sem hægt er að finna í data möppunni. 
 Það þarf að hlaða niður þeirri skrá á viðeigandi stað (hentugast að hafa data möppu). 
@@ -78,7 +78,7 @@ sqlite> select * from rotten_tomatoes_movies limit 10;
 ```
 til að skoða töfluna. 
 
-**2. rotten_tomatoes_movies_dicaprio_winslet**
+### 2. rotten_tomatoes_movies_dicaprio_winslet
 
 Nú getum við síað gögnin okkar og búið til nýja töflu sem inniheldur aðeins myndir sem að Leonardo Dicaprio eða Kate Winslet léku í: 
 
@@ -107,7 +107,7 @@ sqlite> select * from rotten_tomatoes_movies_dicaprio_winslet limit 10;
 
 líkt og áðan 
 
-**3. movie_actors**
+### 3. movie_actors
 
 Til að gera þriðju töfluna okkar, movie_actors notum við forritið **create_actor.py** í code möppunni.
 Til að búa til töfluna getum keyrt skipunina: 
@@ -118,7 +118,7 @@ python3 code/create_actor.py
 Þá ætti að verða til þriðja taflan í rotten_tomatoes.db filenum okkar sem heitir movie_actors. Athugið að actor_id dálkurinn er bara með NA gildum, en það er í lagi því að við eigum eftir að setja inn viðeigandi id í þann dálk seinna. 
 
 
-**4. actors_info**
+### 4. actors_info
 
 Til að gera seinustu töfluna notum við python pakka sem heitir Cinemagoer (eð. IMDbPY), sem er pakki til að sækja gögn frá gagnagrunni IMDb. Forritið sem við notum heitir **create_actors_info** og er að finna í code möppunni. Þegar búið er að hlaða niður forritinu og downloada Cinemagoer pakkanum er hægt að búa til forritið með því að keyra skipunina: 
 
