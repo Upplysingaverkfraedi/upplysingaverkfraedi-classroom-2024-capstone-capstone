@@ -1,47 +1,36 @@
-import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output
-import plotly.graph_objects as go
-import numpy as np
+# app.py
 
-app = dash.Dash(__name__)
+from shiny import App, ui, render
 
-app.layout = html.Div([
-    html.Div([
-        html.Label('Number of observations:'),
-        dcc.Slider(
-            id='obs',
-            min=10,
-            max=500,
-            value=100,
-            marks={str(i): str(i) for i in range(10, 501, 50)},
-            step=1
+# Define the UI layout
+app_ui = ui.page_fluid(
+    ui.h2("Empty Shiny Dashboard"),
+    ui.layout_sidebar(
+        ui.sidebar(
+            # Sidebar for inputs (add your input elements here)
+            ui.input_text("sample_input", "Enter text:", placeholder="Type something here..."),
+            ui.input_slider("sample_slider", "Select a number:", min=0, max=100, value=50),
+        ),
+        # Main content area for outputs
+        ui.div(
+            ui.output_text("output_text"),
+            ui.output_text_verbatim("output_text_verbatim")
         )
-    ], style={'width': '25%', 'display': 'inline-block', 'padding': '20px'}),
-    html.Div([
-        dcc.Graph(id='distPlot')
-    ], style={'width': '70%', 'display': 'inline-block', 'vertical-align': 'top'})
-])
-
-@app.callback(
-    Output('distPlot', 'figure'),
-    [Input('obs', 'value')]
-)
-def update_figure(obs):
-    x = np.random.randn(obs)
-    fig = go.Figure(data=[go.Histogram(
-        x=x,
-        marker=dict(color='darkgray', line=dict(color='white', width=1))
-    )])
-    fig.update_layout(
-        xaxis_title='Value',
-        yaxis_title='Frequency',
-        bargap=0.2,
-        bargroupgap=0.1,
-        plot_bgcolor='white',
-        paper_bgcolor='white'
     )
-    return fig
+)
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# Define server logic
+def server(input, output, session):
+    # Add reactive elements and render functions as needed
+    @output
+    @render.text
+    def output_text():
+        return f"You entered: {input.sample_input()}"
+
+    @output
+    @render.text
+    def output_text_verbatim():
+        return f"Slider value is: {input.sample_slider()}"
+
+# Create the Shiny app
+app = App(app_ui, server)
