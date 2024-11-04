@@ -8,7 +8,6 @@ import os
 def load_urls_from_github(github_url):
     response = requests.get(github_url)
     if response.status_code == 200:
-        # Split lines and filter out empty or commented lines
         urls = [line.strip() for line in response.text.splitlines() if line.strip() and not line.startswith('#')]
         return urls
     else:
@@ -24,19 +23,33 @@ def fetch_html(url):
         print(f"Failed to retrieve data from {url}")
         return None
 
-# Parse HTML using regex to extract beer names and prices
+# Parse HTML using regex to extract beer names and prices separately
 def parse_html(html):
+    # Regex pattern for beer name and price
     beer_pattern = (
         r'<span id="ctl00_ctl01_Label_ProductName" class="product-info-text">([^<]+)</span>.*?'
         r'<span id="ctl00_ctl01_Label_ProductPrice" class="money">([\d.,]+)</span>'
     )
-    matches = re.findall(beer_pattern, html, re.DOTALL)
 
-    if not matches:
+    # Regex pattern for volume in ml
+    volume_pattern = r'<span[^>]*id="ctl00_ctl01_Label_ProductBottleVolumeMobile"[^>]*>(\d+)\s*ml</span>'
+
+    # Find matches for beer name and price
+    beer_matches = re.findall(beer_pattern, html, re.DOTALL)
+    
+    # Find match for volume
+    volume_match = re.search(volume_pattern, html, re.DOTALL)
+
+    if not beer_matches:
         print("No beer names or prices found in the HTML.")
         return []
 
-    beers_data = [{"Name": name.strip(), "Price (ISK)": price.replace(".", "").replace(",", "")} for name, price in matches]
+    # If volume is found, extract it, otherwise set as 'Unknown'
+    volume_ml = volume_match.group(1).strip() if volume_match else 'Unknown'
+
+    # Process beer matches into a list of dictionaries, including volume
+    beers_data = [{"Name": name.strip(), "Price (ISK)": price.replace(".", "").replace(",", ""), "ml": volume_ml} for name, price in beer_matches]
+    
     return beers_data
 
 # Save the results to a single CSV file
@@ -46,10 +59,10 @@ def save_results(all_beers_data, output_dir):
         return
     
     os.makedirs(output_dir, exist_ok=True)
-    filename = f"beer_prices_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    filename = f"beer_prices_.csv"
     filepath = os.path.join(output_dir, filename)
 
-    df = pd.DataFrame(all_beers_data, columns=["Name", "Price (ISK)"])
+    df = pd.DataFrame(all_beers_data, columns=["Name", "Price (ISK)", "ml"])
     df.to_csv(filepath, index=False)
     print(f"Prices saved to {filepath}")
 
