@@ -1,58 +1,122 @@
 # Capstone verkefni 
 
-## Verkefni
-Verkefnið er tvíþætt:
+## Uppsetning Gagnagrunns 
 
-- **Skýrsla** – Þið þurfið að skila tæknilegri skýrslu þar sem þið útskýrið hvernig þið nálguðust gagnaöflun, meðhöndlun gagna, og hvaða niðurstöður þið teljið markverðastar. Þetta þarf að vera á `HTML` formi, t.d. með [RPubs](https://rpubs.com/) fyrir RMarkdown.
-- **Mælaborð og kynning** – Þið þurfið að hanna mælaborð og halda kynningu þar sem þið útskýrið mælaborðið og niðurstöðurnar fyrir bekknum. Mælaborðið getur t.d. verið hýst á [shinyapps.io](https://www.shinyapps.io/).
+Við lesum gögnin úr csv skránni okkar sem heitir **rotten_tomatoes_movies2.csv** sem hægt er að finna í data möppunni. 
 
-## Mælaborð
-Mælaborðið er hannað fyrir samnemendur ykkar í upplýsingaverkfræði. Munið að það þarf að:
-- **Sannfæra áhorfendur**: Sýnið þeim hvernig það gagnast.
-- **Skýrt viðmót**: Þið þurfið að tryggja að það sé auðvelt í notkun og framsetningin á gögnum sé skýr.
+Það þarf að hlaða niður þeirri skrá á viðeigandi stað (hentugast að hafa data möppu). 
 
-## Skipulag
-Það eru ný teymi með 3-4 einstaklingum. Þið þurfið að skrá ykkur í Canvas og samþykkja GitHub Classroom verkefni með því að nota teymisnafnið ykkar.
+Til þessu að búa til sql töflu úr csv skránni okkar notum við forritið **create_db2.sql** sem er að finna í code möppunni. 
 
-Í tímanum þann 21. október voru lyfturæður um möguleg capstone verkefni. Þið þurfið að velja eitt þeirra verkefna til að vinna með (aðeins eitt teymi má vinna með hvert efni).
+Hlaða þarf þeirri skrá, og helst hafa hana í code möppu. 
 
-## Skil og kynning
-- **Skil á skýrslu**: `PDF` (eða `html`) þarf að vera komið inn á Canvas og GitHub repo fyrir lok dags 18. nóvember (mánudagur).
-- **Kynning á mælaborði**: Þið kynnið mælaborðið í tíma þann 21. nóvember (fimmtudagur). **Skyldumæting**.
+Við búum til töfluna með því að keyra eftirfarandi skipun á terminal/cmd: 
 
-## Frjálst val á framsetningu
-Þið getið verið skapandi með framsetningu. Það er mikilvægt að myndirnar og mælaborðið hjálpi til við að segja sögu um gögnin sem fangar athygli áhorfenda.
+```
+sqlite3 data/rotten_tomatoes.db < code/create_db2.sql
+```
 
-### Atriði sem skýrslan þarf að innihalda:
-- **Lýsing á gagnaöflun** – Hvaðan komu gögnin og hvernig voru þau fengin?
-- **Gagnavinnsla** – Hvernig voru gögnin meðhöndluð? Notið REGEX til að laga texta.
-- **Markverðustu niðurstöður** – Hverjar voru helstu niðurstöður?
-- **Mælaborðið** – Hvað gerðuð þið og hver var tilgangur þess?
+Nú verður til rotten_tomatoes.db skjal í data möppunni ykkar sem inniheldur töfluna rotten_tomatoes_movies. 
+Til að skoða töfluna betur er hægt að keyra: 
 
-## GitHub Repo
-Þið þurfið að skila öllum skrám í GitHub repo teymisins. 
+```
+sqlite3 data/rotten_tomatoes.db 
+```
+í terminal/cmd og síðan:
+```
+sqlite> select * from rotten_tomatoes_movies limit 10; 
+```
+Þá ættuð þið að sjá fyrstu tíu línurnar í töflunni. 
 
-Munið að `README` skráin þarf að innihalda: 
-- **TL;DR** – Stutt lýsing á verkefninu og niðurstöðum.
-- **Strúktur** – Lýsing á möppum og mikilvægum skrám.
-- **Keyrsluuppsetning** – Hvernig kóði og gagnagrunnur eru settir upp á öðrum tölvum. Öll lykilorð og notendanöfn skulu vera geymd með umhverfisbreytum.
+Síðan þurfum við að bæta við dálkinum movie_id í töfluna okkar. Það er einfaldlega dálkur sem gefur hverri kvikmynd id númer sem hægt er að nýta seinna meir til að gera fleiri töflur. Það eru nokkrar leiðir til að gera þetta en ég gerði þetta í R. Ég keyrði bútinn: 
 
-## Einkunnagjöf
-Einkunn verður byggð á:
-- **Gagnafrásögn** – Hversu skýr og aðgengileg er kynningin?
-- **Mælaborðið** – Hversu notendavænt og skýrt er það?
+```
+library(DBI)
+library(RSQLite)
 
----
+# Tengist SQLite gagnagrunninum
+conn <- dbConnect(RSQLite::SQLite(), "Documents/GitHub/capstone-the-north/data/rotten_tomatoes.db")
 
-## Viðvörun: Ekki vista lykilorð í GitHub repo
+# Les gögnin inn úr töflunni í gagnagrunninum til að skoða gögnin ef þú vilt
+rotten_tomatoes_data <- dbReadTable(conn, "rotten_tomatoes_movies")
 
-Að vista lykilorð, notendanöfn eða aðrar viðkvæmar upplýsingar í GitHub repo sem er opinber (public)
-er mjög alvarlegt öryggisbrot. Hér eru nokkrar ástæður fyrir því að það má aldrei gera þetta:
+# Býr til nýjan dálk með einkvæmum ID fyrir hverja mynd
+rotten_tomatoes_data$movie_id <- seq.int(nrow(rotten_tomatoes_data))
 
-1. **Öryggisbrestur** – Opnar fyrir öryggisbrot.
-2. **Kostnaður** – Þriðji aðili gæti misnotað gögnin.
-3. **Git útgáfusaga** – Það er erfitt að fjarlægja viðkvæmar upplýsingar úr útgáfusögunni.
-4. **Orðspor** – Slíkar villur geta skaðað orðspor þitt sem forritari.
+# Fjarlægir gamla útgáfu af töflunni ef hún er til
+if ("rotten_tomatoes_movies" %in% dbListTables(conn)) {
+  dbRemoveTable(conn, "rotten_tomatoes_movies")
+}
+
+# Skrifar uppfærðu gögnin með movie_id dálknum aftur inn í gagnagrunninn
+dbWriteTable(conn, "rotten_tomatoes_movies", rotten_tomatoes_data, overwrite = TRUE)
+
+# Lokar tengingunni
+dbDisconnect(conn)
+```
+Til að keyra þennan bút í R þarf að hafa bókasöfnin DBI og RSQLite. Hægt að er að downloada þeim í console með því að keyra: 
+
+```
+install.packages(RBI)
+```
+og 
+
+```
+install.packages(RSQLite)
+```
+
+Passið að "path/to" sé rétt slóð til að forritið nái að lesa gögnin. En eftir þessa keyrslu ætti dálkurinn movie_id að vera komin inní töfluna ykkar. 
+
+Til að vera viss um að dálkurinn sé kominn inní töfluna er hægt að fara aftur í terminal/cmd og keyra: 
+
+```
+sqlite3 data/rotten_tomatoes.db 
+```
+
+```
+sqlite> select * from rotten_tomatoes_movies limit 10; 
+```
+til að skoða töfluna. 
+
+Nú getum við síað gögnin okkar og búið til nýja töflu sem inniheldur aðeins myndir sem að Leonardo Dicaprio eða Kate Winslet léku í: 
+
+Til þess að gera það þarf að hlaða niður forritinu leo_kate.sql. Það forrit er staðsett í code möppunni. 
+
+Þegar búið er að hlaða því niður á viðeigandi stað er hægt að búa til töfluna með því að keyra skipunina: 
+
+```
+sqlite3 data/rotten_tomatoes.db < leo_kate.sql
+```
+inná terminal/cmd. 
+
+Nú ætti að verða til tvær töflur inná rotten_tomatoes.db sem heita rotten_tomatoes_movies_dicaprio_winslet og rotten_tomatoes_movies. 
+Til að vera viss um að báðar töflur séu til staðar er hægt að gera 
+
+```
+sqlite3 data/rotten_tomatoes.db
+sqlite> .tables
+```
+Þá ættuð þið að sjá báðar töflur. Síðan til að sjá innihald töflunnar getið þið gert: 
+
+```
+sqlite3 data/rotten_tomatoes.db
+sqlite> select * from rotten_tomatoes_movies_dicaprio_winslet limit 10;
+```
+
+líkt og áðan 
+
+
+
+
+
+
+
+
+Nauðsynleg bókasöfn: 
+
+```
+import sqlite3
+```
 
 
   
