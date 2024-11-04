@@ -4,11 +4,16 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# Load URLs from the provided file
-def load_urls(file_path):
-    with open(file_path, 'r') as file:
-        urls = [line.strip() for line in file if line.strip() and not line.startswith('#')]
-    return urls
+# Load URLs from a GitHub file link
+def load_urls_from_github(github_url):
+    response = requests.get(github_url)
+    if response.status_code == 200:
+        # Split lines and filter out empty or commented lines
+        urls = [line.strip() for line in response.text.splitlines() if line.strip() and not line.startswith('#')]
+        return urls
+    else:
+        print(f"Failed to retrieve URL list from {github_url}")
+        return []
 
 # Fetch the HTML from a URL
 def fetch_html(url):
@@ -49,9 +54,9 @@ def save_results(all_beers_data, output_dir):
     print(f"Prices saved to {filepath}")
 
 if __name__ == "__main__":
-    # Path to the file containing URLs
-    url_file = r'C:\Users\halld\Downloads\Háskóli_Íslands\Fjórða_ár_Haust_2024\IÐN302G\LokaverkefniStormlands\capstone-thestormlands\REGEX_Linkar.txt'
-    urls = load_urls(url_file)
+    # GitHub raw URL for the file containing URLs
+    github_url = 'https://raw.githubusercontent.com/Upplysingaverkfraedi/capstone-thestormlands/REGEX_Vinbudin_Kronur/REGEX_Linkar.txt'
+    urls = load_urls_from_github(github_url)
 
     output_dir = './data'
     all_beers_data = []
