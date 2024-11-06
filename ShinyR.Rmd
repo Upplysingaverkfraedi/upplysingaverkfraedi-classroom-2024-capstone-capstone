@@ -30,7 +30,7 @@ library(ggimage)
 
 *Tengjast gagnagrunninum*
 ```{r}
-con <- dbConnect(RSQLite::SQLite(), "C:/Users/jakob/Documents/GitHub/capstone-thereach/premier_league.db")
+con <- dbConnect(RSQLite::SQLite(), "C:/Users/jakob/Desktop/capstone-thereach/premier_league.db")
 
 # Skoða hvaða töflur eru í gagnagrunninum
 dbListTables(con)
@@ -121,9 +121,9 @@ ui <- fluidPage(
   # Tabs
   tabsetPanel(
     tabPanel("Heim",
-             h2("Welcome to the Premier League Analysis"),
-             p("Explore various statistics and insights from the 2019/20 season."),
-             p("Use the navigation tabs to access different analyses, including league tables, team locations, player efficiency, and betting statistics.")
+             h2("Rýni inn í tímabilið 2019/20"),
+             p("Gröf og ýmsar töflur varaðandi frammistöðu leikmanna og liða á tilteknu tímabili"),
+             p("Notið takkana til að flakka á milli niðurstaðna og grafa")
     ),
     tabPanel("Síðustu ár",
       sidebarLayout(
@@ -248,7 +248,7 @@ tabPanel("Liðin",
 server <- function(input, output, session) {
   
   # Open database connection at the start of the server
-  con <- dbConnect(RSQLite::SQLite(), "C:/Users/jakob/Documents/GitHub/capstone-thereach/premier_league.db")
+  con <- dbConnect(RSQLite::SQLite(), "C:/Users/jakob/Desktop/capstone-thereach/premier_league.db")
   
   # Close the database connection when the app stops
   onStop(function() {
@@ -269,7 +269,7 @@ server <- function(input, output, session) {
   
   # Set logo URL for each team in the filtered Stadiums_data
   Stadiums_data <- Stadiums_data %>%
-    mutate(Logo_url = paste0("C:/Users/jakob/Documents/GitHub/capstone-thereach/Logos/", str_replace_all(Team, " ", "_"), ".png"))
+    mutate(Logo_url = paste0("C:/Users/jakob/Desktop/capstone-thereach/Logos/", str_replace_all(Team, " ", "_"), ".png"))
   
   # Check if all images exist and issue a warning if not
   missing_logos <- Stadiums_data %>% filter(!file.exists(Logo_url))
