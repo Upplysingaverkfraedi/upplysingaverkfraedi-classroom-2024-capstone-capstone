@@ -54,6 +54,19 @@ leo_movies <- rotten_tomatoes_leo_kate %>%
     short_movie_info = gsub("^(([^.]*\\.){2}).*", "\\1", movie_info)
   )
 
+# Setur upp gögn fyrir content_rating fyrir Leonardo og Kate
+leo_movies_count <- leo_movies %>% group_by(content_rating) %>% summarise(count = n()) %>% mutate(percentage = (count / sum(count)) * 100)
+kate_movies_count <- kate_movies %>% group_by(content_rating) %>% summarise(count = n()) %>% mutate(percentage = (count / sum(count)) * 100)
+
+# Skilgreina lýsingar fyrir content_rating
+rating_labels <- c(
+  "R" = "Restricted (17+)", 
+  "G" = "General Audience", 
+  "PG-13" = "Parents Strongly Cautioned (13+)", 
+  "NR" = "Not Rated", 
+  "PG" = "Parental Guidance"
+)
+
 # Setjum upp Shiny UI með flipaskipulagi
 ui <- fluidPage(
   titlePanel("Samanburður og yfirlit yfir kvikmyndir Leonardo DiCaprio og Kate Winslet"),
@@ -77,6 +90,11 @@ ui <- fluidPage(
                h3("Audience Ratings fyrir Leonardo DiCaprio yfir árin"),
                plotOutput("leoRatingPlot", hover = hoverOpts(id = "leo_hover")),
                uiOutput("leo_hover_info")
+             )),
+    tabPanel("Fjöldi mynda eftir Content Rating",
+             tabsetPanel(
+               tabPanel("Leonardo DiCaprio", plotOutput("leoPlot")),
+               tabPanel("Kate Winslet", plotOutput("katePlot"))
              )),
     tabPanel("Kynning á Leikurum",
              fluidRow(
@@ -208,6 +226,40 @@ server <- function(input, output, session) {
         )
       }
     }
+  })
+  
+  # Graf fyrir fjölda mynda með Leonardo DiCaprio eftir content rating
+  output$leoPlot <- renderPlot({
+    ggplot(leo_movies_count, aes(x = content_rating, y = count, fill = content_rating)) +
+      geom_bar(stat = "identity") +
+      geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, size = 3.5) +
+      scale_fill_manual(values = c("R" = "pink", "G" = "purple", "PG-13" = "blue", "NR" = "hotpink", "PG" = "skyblue")) +
+      scale_x_discrete(labels = rating_labels) +
+      labs(
+        title = "Number of Movies with Leonardo DiCaprio by Content Rating",
+        x = "Content Rating",
+        y = "Number of Movies"
+      ) +
+      ylim(0, max(leo_movies_count$count) * 1.2) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+  
+  # Graf fyrir fjölda mynda með Kate Winslet eftir content rating
+  output$katePlot <- renderPlot({
+    ggplot(kate_movies_count, aes(x = content_rating, y = count, fill = content_rating)) +
+      geom_bar(stat = "identity") +
+      geom_text(aes(label = paste0(round(percentage, 1), "%")), vjust = -0.5, size = 3.5) +
+      scale_fill_manual(values = c("R" = "pink", "G" = "purple", "PG-13" = "blue", "NR" = "hotpink", "PG" = "skyblue")) +
+      scale_x_discrete(labels = rating_labels) +
+      labs(
+        title = "Number of Movies with Kate Winslet by Content Rating",
+        x = "Content Rating",
+        y = "Number of Movies"
+      ) +
+      ylim(0, max(kate_movies_count$count) * 1.2) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
   })
 }
 
