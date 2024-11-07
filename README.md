@@ -1,6 +1,8 @@
 # README
 
-Ég var að skoða database-ið. Prófaði að gera app með gröfum, alls ekki fullkomið hægt að sjá gróflega hvernig gögnin lýta út og hvernig þau eru upp sett.
+Mælaborðið snýr að samanburði á milli Lewis Hamilton og Max verstappen í gegnum árin. Fyrst mun mælaborðið sýna stigafjöldasögu kappakstursmannana á árunum 2015 - 2024. 
+
+Höfum database-ið `f1db.db`. Höfum prófað að gera app með gröfum, alls ekki fullkomið hægt að sjá gróflega hvernig gögnin lýta út og hvernig þau eru upp sett.
 
 ## Keyrsla
 
@@ -9,7 +11,7 @@ Keyrðu eftirfarandi skipun til þess að vera í réttu umhverfi:
 ```bash
 pip install -r requirements.txt
 ```
-síðan getur keyrt annað hvort `appdb.p`' eða `appgogn.db` með eftirfarandi skipun:
+síðan getur keyrt annað hvort `appdb.py` eða `appgogn.db` með eftirfarandi skipun:
 
 ```bash
 shiny run appdb.py
@@ -30,5 +32,4 @@ Hægt að velja lið og sjá frammistöðu
 Hægt að velja braut og sjá frammistöðu keppanda
 *Frekar óskýrt*
 
-Eins og ég sagði þá er þetta bara ég að fikta með gögnin. Þið getið prófað að keyra og koma með hugmyndir af endurbótum.
-Síðan getum við notað einhvað af þessu ef við viljum í aðal mælaborðið okkar.
+Eins og ég sagði þá er þetta bara við að fikta með gögnin. Þið getið prófað að keyra og koma með hugmyndir af endurbótum.
