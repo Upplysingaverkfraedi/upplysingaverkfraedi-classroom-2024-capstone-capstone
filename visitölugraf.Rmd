@@ -12,6 +12,14 @@ library(tidyverse)
 ```
 
 ```{r}
+library(readxl)
+visitala <- read_excel("/Users/Dalros/Desktop/Capstone-töflur.xlsx", sheet = "vísitala íbúðarverðs")
+View(visitala)
+visitalabygg <- read_excel("/Users/Dalros/Desktop/Capstone-töflur.xlsx", sheet = "visitala án íbúðarverðs")
+```
+
+
+```{r}
 ##endurstilla víssitöluna þannig að hún byrji í 100 árið 1994
 upphafsgildi <- visitala$Vísitala[1]
 
@@ -32,7 +40,7 @@ visitala$Tími <- as.numeric(visitala$Tími)  # Breyta í tölulegt gildi
 
 ```{r}
 visitalabygg <- visitalabygg %>%
-  filter(Mánuður == 1)
+  filter(Mánuður == 1) # notum bara fyrsta mánuðinn í visitalabygg líka
 ```
 
 ```{r}
@@ -42,7 +50,7 @@ visitala<- visitala %>%
 
 ```{r}
 sameinuð_tafla <- visitalabygg %>%
-  left_join(visitala, by = c("Ár" = "Tími"))
+  left_join(visitala, by = c("Ár" = "Tími")) #búum til nýja töflu til þess að nota
 ```
 
 
@@ -50,9 +58,6 @@ sameinuð_tafla <- visitalabygg %>%
 library(shiny)
 library(ggplot2)
 library(dplyr)
-
-# Ef þú hefur ekki þegar hlaðið inn sameinuðu töflunni, gerðu það hér
-# sameinuð_tafla <- ... (fara eftir fyrri kóða)
 
 # Búðu Shiny forritið
 ui <- fluidPage(
