@@ -62,7 +62,7 @@ def save_results(all_beers_data, output_dir):
     filename = f"beer_prices_.csv"
     filepath = os.path.join(output_dir, filename)
 
-    df = pd.DataFrame(all_beers_data, columns=["Name", "Price (ISK)", "ml"])
+    df = pd.DataFrame(all_beers_data, columns=["Nafn", "Verð (Kr)", "ml"])
     df.to_csv(filepath, index=False)
     print(f"Prices saved to {filepath}")
 
