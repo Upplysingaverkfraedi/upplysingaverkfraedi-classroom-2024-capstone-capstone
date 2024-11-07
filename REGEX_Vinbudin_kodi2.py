@@ -68,7 +68,7 @@ def save_results(all_beers_data, output_dir):
 
 if __name__ == "__main__":
     # GitHub raw URL for the file containing URLs
-    github_url = 'https://raw.githubusercontent.com/Upplysingaverkfraedi/capstone-thestormlands/REGEX_Vinbudin_Kronur/REGEX_Linkar.txt'
+    github_url = 'https://raw.githubusercontent.com/Upplysingaverkfraedi/capstone-thestormlands/main/REGEX_Linkar.txt'
     urls = load_urls_from_github(github_url)
 
     output_dir = './data'
