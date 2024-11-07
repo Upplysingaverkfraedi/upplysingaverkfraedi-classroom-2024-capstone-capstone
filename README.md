@@ -130,14 +130,14 @@ Athugið að þessi keyrsla mun taka mjög langan tíma þar sem að Cinemagoer 
 
 
 
+## Gerð mælaborðs
 
+Mælaborðið er hannað í R, við notuðum Rstudios. Inni á main er skjal sem heitir Maelabord.rmd. Hlaðið því niður í tölvuna ykkar. 
+Opnið síðan skjalið gegnum Rstudios. Þið þurfið að breyta path to í viðeigandi heiti: 
 
+conn <- dbConnect(SQLite(), "C:\\Users\\Ásdís\\OneDrive - Kvennaskolinn i Reykjavik\\Desktop\\Documents\\HÍ haust 24\\Upplýsingaverkfræði\\capstone-the-north\\data\\rotten_tomatoes.db")
 
-
-
-
-
-
+Til að keyra forritið þarf að vera með shiny pakkann í R.
 
 
 
@@ -163,13 +163,23 @@ Ekki þarf að downloada time og sqlite3 því að það er nú þegar innifali�
 ```
 library(DBI)
 library(RSQLite)
+library(shiny)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
 ```
 
 Hægt að downloada pökkunum í console með skipuninni: 
 
 ```
-install.packages(DBI)
-install.packages(RSQLite)
+install.packages("DBI")
+install.packages("RSQLite")
+install.packages(shiny)
+install.packages(dplyr)
+install.packages(tidyr)
+install.packages(ggplot2)
+install.packages(stringr)
 ```
 
 Einnig þarf að hafa python3, sjá vefsíðu: https://www.python.org/downloads/
