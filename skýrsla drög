@@ -1,0 +1,30 @@
+IÐN302G										     Haust 2024
+Upplýsingaverkfræði
+
+Samanburður leikarana Kate Winslet og Leonardo Dicaprio
+
+
+Ásdís Guðmundsdóttir
+Ásdís Halla Guðmundsdóttir
+Gígja Marín Þorsteinsdóttir
+Guðný Lilja Alísa Gashi
+
+Inngangur
+Í þessari skýrslu verður fjallað um gagnagreiningu á kvikmyndum úr Rotten Tomatoes gagnagrunninum. Markmið verkefnisins er að skoða samstarf Leonardo DiCaprio og Kate Winslet í kvikmyndum og greina þætti sem tengjast þessum kvikmyndum. Með því að nota R og RStudio tengjumst við SQLite gagnagrunni til að sækja viðeigandi gögn og notum síðan Shiny til að búa til myndræna framsetningu.
+Greiningin mun einblína á þætti eins og einkunnir frá áhorfendum og gagnrýnendum, tegundir kvikmynda (genres), útgáfu dagsetningar og fleira. Með gagnvirkum gröfum getum við skoðað hvernig þessir þættir tengjast og hvaða sögu tengsli eru í gögnunum. Verkefnið mun einnig sýna fram á hvernig hægt er að nota R til að vinna með gagnagrunna og búa til skilvirkar framsetningar fyrir gagnagreiningu.
+
+Aðferð
+Í þessu verkefni er notast við tól og pakka til að vinna með kvikmyndagagn úr Rotten Tomatoes gagnagrunninum. Markmiðið er að greina samvinnu Leonardo DiCaprio og Kate Winslet í kvikmyndum og búa til gagnvirkt mælaborð með Shiny. Hér er yfirlit yfir helstu hugtök og tól sem við notum:
+R og RStudio
+R: Forritunarmál sem er sérhæft fyrir tölfræðiúrvinnslu og gagnagreiningu. Það býður upp á fjölbreytt söfn af pökkum fyrir greiningu, myndræna framsetningu og gagnavinnslu.
+RStudio: Vinnsluumhverfi sem er sérhannað fyrir R og auðveldar skrif kóða, keyrslu og lestur niðurstaðna með notendavænu viðmóti.
+
+Gagnagrunnstengingar með DBI og RSQLite
+DB: skrá fyrir gagnagrunnstengingar í R. Leyfir samræmd samskipti við mismunandi gerðir gagnagrunna.
+RSQLite: Bókasafn sem gerir R kleift að tengjast SQLite gagnagrunnum. Þetta er notað til að sækja gögn úr Rotten Tomatoes gagnagrunninum.
+
+Gagnavinnsla með dplyr og tidyr
+dplyr: Pakki fyrir skilvirka gagnavinnslu í R. Það býður upp á lesanlegar og hnitmiðaðar aðgerðir fyrir síun, flokkun, umbreytingu og samantekt gagna.
+tidyr: Notað til að breyta og hreinsa gögn, sérstaklega til að umbreyta gögnum milli "wide" og "long" sniðs og til að skipta upp samsettum dálkum.
+
+
