@@ -2,7 +2,7 @@
 .open Bjórgrunnur.db
 
 -- 1. Create table for "Bjór Vínbúðin.csv"
-CREATE TABLE IF NOT EXISTS bjor_vinbudin (
+CREATE TABLE IF NOT EXISTS Bjór_Vínbúðin (
     Nafn TEXT,
     "Verð (Kr)" INTEGER,
     ml INTEGER
@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS bjor_vinbudin (
 
 -- Insert data from "Bjór Vínbúðin.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Bjór Vínbúðin.csv" bjor_vinbudin
+.import "C:\\Users\\valur\\Downloads\\Drasl\\Bjór Vínbúðin.csv" Bjór_Vínbúðin
 
 -- 2. Býr til töflu fyrir "Bjór.csv"
-CREATE TABLE IF NOT EXISTS bjor (
+CREATE TABLE IF NOT EXISTS Bjór (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
     Latitude REAL,
@@ -51,10 +51,10 @@ CREATE TABLE IF NOT EXISTS bjor (
 
 -- Insert data from "Bjór.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Bjór.csv" bjor
+.import "C:\\Users\\valur\\Downloads\\Drasl\\Bjór.csv" Bjór
 
 -- 3. Create table for "Happy Hour.csv"
-CREATE TABLE IF NOT EXISTS happy_hour (
+CREATE TABLE IF NOT EXISTS Happy_Hour (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
     Byrjar TEXT,
@@ -92,10 +92,10 @@ CREATE TABLE IF NOT EXISTS happy_hour (
 
 -- Insert data from "Happy Hour.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Happy Hour.csv" happy_hour
+.import "C:\\Users\\valur\\Downloads\\Drasl\\Happy Hour.csv" Happy_Hour
 
 -- 4. Create table for "Lukkuhjól.csv"
-CREATE TABLE IF NOT EXISTS lukkuhjol (
+CREATE TABLE IF NOT EXISTS Lukkuhjol (
     Bar TEXT,
     Verð INTEGER,
     "Bjór mL" INTEGER,
@@ -124,13 +124,13 @@ CREATE TABLE IF NOT EXISTS lukkuhjol (
 
 -- Insert data from "Lukkuhjól.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Lukkuhjól.csv" lukkuhjol
+.import "C:\\Users\\valur\\Downloads\\Drasl\\Lukkuhjól.csv" Lukkuhjol
 
 -- Drop the table if it already exists
-DROP TABLE IF EXISTS Bjorkort;
+DROP TABLE IF EXISTS Bjórkort;
 
 -- Create the Bjorkort table with unpivoted data for visualization
-CREATE TABLE Bjorkort AS
+CREATE TABLE Bjórkort AS
 SELECT * FROM (
     SELECT 
         Bar,
@@ -139,7 +139,7 @@ SELECT * FROM (
         Longitude,
         'Gull' AS Bjór,
         Gull AS Verð
-    FROM bjor WHERE Gull IS NOT NULL
+    FROM Bjór WHERE Gull IS NOT NULL
 
     UNION ALL
 
@@ -150,7 +150,7 @@ SELECT * FROM (
         Longitude,
         'Gull Lite' AS Bjór,
         "Gull Lite" AS Verð
-    FROM bjor WHERE "Gull Lite" IS NOT NULL
+    FROM Bjór WHERE "Gull Lite" IS NOT NULL
 
     UNION ALL
 
@@ -161,7 +161,7 @@ SELECT * FROM (
         Longitude,
         'Tuborg Grön' AS Bjór,
         "Tuborg Grön" AS Verð
-    FROM bjor WHERE "Tuborg Grön" IS NOT NULL
+    FROM Bjór WHERE "Tuborg Grön" IS NOT NULL
 
     UNION ALL
 
@@ -172,7 +172,7 @@ SELECT * FROM (
         Longitude,
         'Tuborg Classic' AS Bjór,
         "Tuborg Classic" AS Verð
-    FROM bjor WHERE "Tuborg Classic" IS NOT NULL
+    FROM Bjór WHERE "Tuborg Classic" IS NOT NULL
 
     UNION ALL
 
@@ -183,7 +183,7 @@ SELECT * FROM (
         Longitude,
         'Víking Gylltur' AS Bjór,
         "Víking Gylltur" AS Verð
-    FROM bjor WHERE "Víking Gylltur" IS NOT NULL
+    FROM Bjór WHERE "Víking Gylltur" IS NOT NULL
 
     UNION ALL
 
@@ -194,7 +194,7 @@ SELECT * FROM (
         Longitude,
         'Víking Lite' AS Bjór,
         "Víking Lite" AS Verð
-    FROM bjor WHERE "Víking Lite" IS NOT NULL
+    FROM Bjór WHERE "Víking Lite" IS NOT NULL
 
     UNION ALL
 
@@ -205,7 +205,7 @@ SELECT * FROM (
         Longitude,
         'Víking Lite Classic' AS Bjór,
         "Víking Lite Classic" AS Verð
-    FROM bjor WHERE "Víking Lite Classic" IS NOT NULL
+    FROM Bjór WHERE "Víking Lite Classic" IS NOT NULL
 
     UNION ALL
 
@@ -216,7 +216,7 @@ SELECT * FROM (
         Longitude,
         'Thule' AS Bjór,
         Thule AS Verð
-    FROM bjor WHERE Thule IS NOT NULL
+    FROM Bjór WHERE Thule IS NOT NULL
 
     UNION ALL
 
@@ -227,7 +227,7 @@ SELECT * FROM (
         Longitude,
         'Carlsberg' AS Bjór,
         Carlsberg AS Verð
-    FROM bjor WHERE Carlsberg IS NOT NULL
+    FROM Bjór WHERE Carlsberg IS NOT NULL
 
     UNION ALL
 
@@ -238,7 +238,7 @@ SELECT * FROM (
         Longitude,
         'Boli' AS Bjór,
         Boli AS Verð
-    FROM bjor WHERE Boli IS NOT NULL
+    FROM Bjór WHERE Boli IS NOT NULL
 
     UNION ALL
 
@@ -249,7 +249,7 @@ SELECT * FROM (
         Longitude,
         'Peroni' AS Bjór,
         Peroni AS Verð
-    FROM bjor WHERE Peroni IS NOT NULL
+    FROM Bjór WHERE Peroni IS NOT NULL
 
     UNION ALL
 
@@ -260,7 +260,7 @@ SELECT * FROM (
         Longitude,
         'Stella Artois' AS Bjór,
         "Stella Artois" AS Verð
-    FROM bjor WHERE "Stella Artois" IS NOT NULL
+    FROM Bjór WHERE "Stella Artois" IS NOT NULL
 
     UNION ALL
 
@@ -271,7 +271,7 @@ SELECT * FROM (
         Longitude,
         'Einstök White Ale' AS Bjór,
         "Einstök White Ale" AS Verð
-    FROM bjor WHERE "Einstök White Ale" IS NOT NULL
+    FROM Bjór WHERE "Einstök White Ale" IS NOT NULL
 
     UNION ALL
 
@@ -282,7 +282,7 @@ SELECT * FROM (
         Longitude,
         'Einstök Pale Ale' AS Bjór,
         "Einstök Pale Ale" AS Verð
-    FROM bjor WHERE "Einstök Pale Ale" IS NOT NULL
+    FROM Bjór WHERE "Einstök Pale Ale" IS NOT NULL
 
     UNION ALL
 
@@ -293,7 +293,7 @@ SELECT * FROM (
         Longitude,
         'Einstök Arctic Lager' AS Bjór,
         "Einstök Arctic Lager" AS Verð
-    FROM bjor WHERE "Einstök Arctic Lager" IS NOT NULL
+    FROM Bjór WHERE "Einstök Arctic Lager" IS NOT NULL
 
     UNION ALL
 
@@ -304,7 +304,7 @@ SELECT * FROM (
         Longitude,
         'Kaldi' AS Bjór,
         Kaldi AS Verð
-    FROM bjor WHERE Kaldi IS NOT NULL
+    FROM Bjór WHERE Kaldi IS NOT NULL
 
     UNION ALL
 
@@ -315,7 +315,7 @@ SELECT * FROM (
         Longitude,
         'Ölvisholt Lite' AS Bjór,
         "Ölvisholt Lite" AS Verð
-    FROM bjor WHERE "Ölvisholt Lite" IS NOT NULL
+    FROM Bjór WHERE "Ölvisholt Lite" IS NOT NULL
 
     UNION ALL
 
@@ -326,7 +326,7 @@ SELECT * FROM (
         Longitude,
         'Eldgos' AS Bjór,
         Eldgos AS Verð
-    FROM bjor WHERE Eldgos IS NOT NULL
+    FROM Bjór WHERE Eldgos IS NOT NULL
 
     UNION ALL
 
@@ -337,7 +337,7 @@ SELECT * FROM (
         Longitude,
         'Somersby' AS Bjór,
         Somersby AS Verð
-    FROM bjor WHERE Somersby IS NOT NULL
+    FROM Bjór WHERE Somersby IS NOT NULL
 
     UNION ALL
 
@@ -348,7 +348,7 @@ SELECT * FROM (
         Longitude,
         'Blanc' AS Bjór,
         Blanc AS Verð
-    FROM bjor WHERE Blanc IS NOT NULL
+    FROM Bjór WHERE Blanc IS NOT NULL
 
     UNION ALL
 
@@ -359,7 +359,7 @@ SELECT * FROM (
         Longitude,
         'Bríó' AS Bjór,
         Bríó AS Verð
-    FROM bjor WHERE Bríó IS NOT NULL
+    FROM Bjór WHERE Bríó IS NOT NULL
 
     UNION ALL
 
@@ -370,7 +370,7 @@ SELECT * FROM (
         Longitude,
         'Garún' AS Bjór,
         Garún AS Verð
-    FROM bjor WHERE Garún IS NOT NULL
+    FROM Bjór WHERE Garún IS NOT NULL
 
     UNION ALL
 
@@ -381,7 +381,7 @@ SELECT * FROM (
         Longitude,
         'Helga' AS Bjór,
         Helga AS Verð
-    FROM bjor WHERE Helga IS NOT NULL
+    FROM Bjór WHERE Helga IS NOT NULL
 
     UNION ALL
 
@@ -392,7 +392,7 @@ SELECT * FROM (
         Longitude,
         'Snorri' AS Bjór,
         Snorri AS Verð
-    FROM bjor WHERE Snorri IS NOT NULL
+    FROM Bjór WHERE Snorri IS NOT NULL
 
     UNION ALL
 
@@ -403,7 +403,7 @@ SELECT * FROM (
         Longitude,
         'Úlfrún' AS Bjór,
         Úlfrún AS Verð
-    FROM bjor WHERE Úlfrún IS NOT NULL
+    FROM Bjór WHERE Úlfrún IS NOT NULL
 
     UNION ALL
 
@@ -414,7 +414,7 @@ SELECT * FROM (
         Longitude,
         'Úlfur' AS Bjór,
         Úlfur AS Verð
-    FROM bjor WHERE Úlfur IS NOT NULL
+    FROM Bjór WHERE Úlfur IS NOT NULL
 
     UNION ALL
 
@@ -425,7 +425,7 @@ SELECT * FROM (
         Longitude,
         'Guinness' AS Bjór,
         Guinness AS Verð
-    FROM bjor WHERE Guinness IS NOT NULL
+    FROM Bjór WHERE Guinness IS NOT NULL
 
     UNION ALL
 
@@ -436,7 +436,7 @@ SELECT * FROM (
         Longitude,
         'Bóndi' AS Bjór,
         Bóndi AS Verð
-    FROM bjor WHERE Bóndi IS NOT NULL
+    FROM Bjór WHERE Bóndi IS NOT NULL
 
     UNION ALL
 
@@ -447,8 +447,8 @@ SELECT * FROM (
         Longitude,
         'Heimabrugg/Annar IPA' AS Bjór,
         "Heimabrugg/Annar IPA" AS Verð
-    FROM bjor WHERE "Heimabrugg/Annar IPA" IS NOT NULL
+    FROM Bjór WHERE "Heimabrugg/Annar IPA" IS NOT NULL
 ) ORDER BY Bar, Bjór;
 
-DELETE FROM Bjorkort WHERE Verð IS NULL OR trim(Verð) = '';
-DELETE FROM Bjorkort WHERE Bar IS 'Bar' OR trim(Bar) = 'Bar';
+DELETE FROM Bjórkort WHERE Verð IS NULL OR trim(Verð) = '';
+DELETE FROM Bjórkort WHERE Bar IS 'Bar' OR trim(Bar) = 'Bar';
