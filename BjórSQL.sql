@@ -12,12 +12,12 @@ CREATE TABLE IF NOT EXISTS bjor_vinbudin (
 .mode csv
 .import "C:\\Users\\valur\\Downloads\\Drasl\\Bjór Vínbúðin.csv" bjor_vinbudin
 
--- 2. Create table for "Bjór.csv"
+-- 2. Býr til töflu fyrir "Bjór.csv"
 CREATE TABLE IF NOT EXISTS bjor (
     Bar TEXT,
+    "Stærð (mL)" INTEGER,
     Latitude REAL,
     Longitude REAL,
-    "Stærð (mL)" INTEGER,
     Gull INTEGER,
     "Gull Lite" INTEGER,
     "Tuborg Grön" INTEGER,
@@ -129,14 +129,14 @@ CREATE TABLE IF NOT EXISTS lukkuhjol (
 -- Drop the table if it already exists
 DROP TABLE IF EXISTS Bjorkort;
 
--- Create the `Bjorkort` table with unpivoted data for visualization
+-- Create the Bjorkort table with unpivoted data for visualization
 CREATE TABLE Bjorkort AS
 SELECT * FROM (
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Gull' AS Bjór,
         Gull AS Verð
     FROM bjor WHERE Gull IS NOT NULL
@@ -145,9 +145,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Gull Lite' AS Bjór,
         "Gull Lite" AS Verð
     FROM bjor WHERE "Gull Lite" IS NOT NULL
@@ -156,9 +156,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Tuborg Grön' AS Bjór,
         "Tuborg Grön" AS Verð
     FROM bjor WHERE "Tuborg Grön" IS NOT NULL
@@ -167,9 +167,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Tuborg Classic' AS Bjór,
         "Tuborg Classic" AS Verð
     FROM bjor WHERE "Tuborg Classic" IS NOT NULL
@@ -178,9 +178,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Víking Gylltur' AS Bjór,
         "Víking Gylltur" AS Verð
     FROM bjor WHERE "Víking Gylltur" IS NOT NULL
@@ -189,9 +189,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Víking Lite' AS Bjór,
         "Víking Lite" AS Verð
     FROM bjor WHERE "Víking Lite" IS NOT NULL
@@ -200,9 +200,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Víking Lite Classic' AS Bjór,
         "Víking Lite Classic" AS Verð
     FROM bjor WHERE "Víking Lite Classic" IS NOT NULL
@@ -211,9 +211,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Thule' AS Bjór,
         Thule AS Verð
     FROM bjor WHERE Thule IS NOT NULL
@@ -222,9 +222,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Carlsberg' AS Bjór,
         Carlsberg AS Verð
     FROM bjor WHERE Carlsberg IS NOT NULL
@@ -233,9 +233,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Boli' AS Bjór,
         Boli AS Verð
     FROM bjor WHERE Boli IS NOT NULL
@@ -244,9 +244,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Peroni' AS Bjór,
         Peroni AS Verð
     FROM bjor WHERE Peroni IS NOT NULL
@@ -255,9 +255,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Stella Artois' AS Bjór,
         "Stella Artois" AS Verð
     FROM bjor WHERE "Stella Artois" IS NOT NULL
@@ -266,9 +266,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Einstök White Ale' AS Bjór,
         "Einstök White Ale" AS Verð
     FROM bjor WHERE "Einstök White Ale" IS NOT NULL
@@ -277,9 +277,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Einstök Pale Ale' AS Bjór,
         "Einstök Pale Ale" AS Verð
     FROM bjor WHERE "Einstök Pale Ale" IS NOT NULL
@@ -288,9 +288,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Einstök Arctic Lager' AS Bjór,
         "Einstök Arctic Lager" AS Verð
     FROM bjor WHERE "Einstök Arctic Lager" IS NOT NULL
@@ -299,9 +299,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Kaldi' AS Bjór,
         Kaldi AS Verð
     FROM bjor WHERE Kaldi IS NOT NULL
@@ -310,9 +310,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Ölvisholt Lite' AS Bjór,
         "Ölvisholt Lite" AS Verð
     FROM bjor WHERE "Ölvisholt Lite" IS NOT NULL
@@ -321,9 +321,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Eldgos' AS Bjór,
         Eldgos AS Verð
     FROM bjor WHERE Eldgos IS NOT NULL
@@ -332,9 +332,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Somersby' AS Bjór,
         Somersby AS Verð
     FROM bjor WHERE Somersby IS NOT NULL
@@ -343,9 +343,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Blanc' AS Bjór,
         Blanc AS Verð
     FROM bjor WHERE Blanc IS NOT NULL
@@ -354,9 +354,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Bríó' AS Bjór,
         Bríó AS Verð
     FROM bjor WHERE Bríó IS NOT NULL
@@ -365,9 +365,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Garún' AS Bjór,
         Garún AS Verð
     FROM bjor WHERE Garún IS NOT NULL
@@ -376,9 +376,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Helga' AS Bjór,
         Helga AS Verð
     FROM bjor WHERE Helga IS NOT NULL
@@ -387,9 +387,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Snorri' AS Bjór,
         Snorri AS Verð
     FROM bjor WHERE Snorri IS NOT NULL
@@ -398,9 +398,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Úlfrún' AS Bjór,
         Úlfrún AS Verð
     FROM bjor WHERE Úlfrún IS NOT NULL
@@ -409,9 +409,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Úlfur' AS Bjór,
         Úlfur AS Verð
     FROM bjor WHERE Úlfur IS NOT NULL
@@ -420,9 +420,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Guinness' AS Bjór,
         Guinness AS Verð
     FROM bjor WHERE Guinness IS NOT NULL
@@ -431,9 +431,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Bóndi' AS Bjór,
         Bóndi AS Verð
     FROM bjor WHERE Bóndi IS NOT NULL
@@ -442,9 +442,9 @@ SELECT * FROM (
 
     SELECT 
         Bar,
+        "Stærð (mL)",
         Latitude,
         Longitude,
-        "Stærð (mL)",
         'Heimabrugg/Annar IPA' AS Bjór,
         "Heimabrugg/Annar IPA" AS Verð
     FROM bjor WHERE "Heimabrugg/Annar IPA" IS NOT NULL
