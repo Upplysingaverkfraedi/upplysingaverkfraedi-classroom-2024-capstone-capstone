@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS Bjór_Vínbúðin (
 .import ".\\data\\Bjor_Vinbudin.csv" Bjór_Vínbúðin
 
 -- 2. Býr til töflu fyrir "Bjór.csv"
-DROP TABLE IF EXISTS Bjór_Vínbúðin;
+DROP TABLE IF EXISTS Bjór;
 CREATE TABLE IF NOT EXISTS Bjór (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
