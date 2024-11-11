@@ -462,64 +462,64 @@ ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Average Price (Kr)" REAL;
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Gull")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Egils Gull' AND "Gull" IS NOT NULL
+    FROM Bjór WHERE "Gull" IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Egils Gull'
 )
 WHERE Nafn = 'Egils Gull';
 
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Gull Lite")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Gull Lite' AND "Gull Lite" IS NOT NULL
+    FROM Bjór WHERE "Gull Lite" IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Gull Lite'
 )
 WHERE Nafn = 'Gull Lite';
 
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Tuborg Grön")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Grön' AND "Tuborg Grön" IS NOT NULL
+    FROM Bjór WHERE "Tuborg Grön" IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Grön'
 )
 WHERE Nafn = 'Tuborg Grön';
 
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Tuborg Classic")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Classic' AND "Tuborg Classic" IS NOT NULL
+    FROM Bjór WHERE "Tuborg Classic" IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Classic'
 )
 WHERE Nafn = 'Tuborg Classic';
 
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Víking Gylltur")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Víking Gylltur' AND "Víking Gylltur" IS NOT NULL
+    FROM Bjór WHERE "Víking Gylltur" IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Víking Gylltur'
 )
 WHERE Nafn = 'Víking Gylltur';
 
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Víking Lite")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite' AND "Víking Lite" IS NOT NULL
+    FROM Bjór WHERE "Víking Lite" IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite'
 )
 WHERE Nafn = 'Víking Lite';
 
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Víking Lite Classic")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite Classic' AND "Víking Lite Classic" IS NOT NULL
+    FROM Bjór WHERE "Víking Lite Classic" IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite Classic'
 )
 WHERE Nafn = 'Víking Lite Classic';
 
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Thule")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Thule' AND Thule IS NOT NULL
+    FROM Bjór WHERE Thule IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Thule'
 )
 WHERE Nafn = 'Thule';
 
@@ -527,7 +527,7 @@ UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Carlsberg")
     FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Carlsberg' AND Carlsberg IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Carlsberg'
 )
 WHERE Nafn = 'Carlsberg';
 
@@ -535,7 +535,7 @@ UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
     SELECT AVG("Boli")
     FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Boli Premium' AND Boli IS NOT NULL
+    WHERE Bjór_Vínbúðin.Nafn = 'Boli Premium'
 )
 WHERE Nafn = 'Boli Premium';
 
