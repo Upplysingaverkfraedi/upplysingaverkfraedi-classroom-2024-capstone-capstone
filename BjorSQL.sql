@@ -2,6 +2,7 @@
 .open Bjórgrunnur.db
 
 -- 1. Create table for "Bjór Vínbúðin.csv"
+DROP TABLE IF EXISTS Bjór_Vínbúðin;
 CREATE TABLE IF NOT EXISTS Bjór_Vínbúðin (
     Nafn TEXT,
     "Verð (Kr)" INTEGER,
@@ -10,9 +11,10 @@ CREATE TABLE IF NOT EXISTS Bjór_Vínbúðin (
 
 -- Insert data from "Bjór Vínbúðin.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Bjór Vínbúðin.csv" Bjór_Vínbúðin
+.import ".\\data\\Bjor_Vinbudin.csv" Bjór_Vínbúðin
 
 -- 2. Býr til töflu fyrir "Bjór.csv"
+DROP TABLE IF EXISTS Bjór_Vínbúðin;
 CREATE TABLE IF NOT EXISTS Bjór (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
@@ -51,9 +53,10 @@ CREATE TABLE IF NOT EXISTS Bjór (
 
 -- Insert data from "Bjór.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Bjór.csv" Bjór
+.import ".\\data\\Bjor.csv" Bjór
 
 -- 3. Create table for "Happy Hour.csv"
+DROP TABLE IF EXISTS Happy_Hour;
 CREATE TABLE IF NOT EXISTS Happy_Hour (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
@@ -92,10 +95,11 @@ CREATE TABLE IF NOT EXISTS Happy_Hour (
 
 -- Insert data from "Happy Hour.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Happy Hour.csv" Happy_Hour
+.import ".\\data\\Happy_Hour.csv" Happy_Hour
 
 -- 4. Create table for "Lukkuhjól.csv"
-CREATE TABLE IF NOT EXISTS Lukkuhjol (
+DROP TABLE IF EXISTS Lukkuhjól;
+CREATE TABLE IF NOT EXISTS Lukkuhjól (
     Bar TEXT,
     Verð INTEGER,
     "Bjór mL" INTEGER,
@@ -124,12 +128,10 @@ CREATE TABLE IF NOT EXISTS Lukkuhjol (
 
 -- Insert data from "Lukkuhjól.csv"
 .mode csv
-.import "C:\\Users\\valur\\Downloads\\Drasl\\Lukkuhjól.csv" Lukkuhjol
-
--- Drop the table if it already exists
-DROP TABLE IF EXISTS Bjórkort;
+.import ".\\data\\Lukkuhjol.csv" Lukkuhjól
 
 -- Create the Bjorkort table with unpivoted data for visualization
+DROP TABLE IF EXISTS Bjórkort;
 CREATE TABLE Bjórkort AS
 SELECT * FROM (
     SELECT 
