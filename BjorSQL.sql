@@ -454,3 +454,223 @@ SELECT * FROM (
 
 DELETE FROM Bjórkort WHERE Verð IS NULL OR trim(Verð) = '';
 DELETE FROM Bjórkort WHERE Bar IS 'Bar' OR trim(Bar) = 'Bar';
+
+-- Add the column for average price if it doesn't exist (in case the table was created before)
+ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Average Price (Kr)" REAL;
+
+-- 2. Update the new column with the average price of each beer from the Bjór table
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Gull")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Egils Gull' AND "Gull" IS NOT NULL
+)
+WHERE Nafn = 'Egils Gull';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Gull Lite")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Gull Lite' AND "Gull Lite" IS NOT NULL
+)
+WHERE Nafn = 'Gull Lite';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Tuborg Grön")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Grön' AND "Tuborg Grön" IS NOT NULL
+)
+WHERE Nafn = 'Tuborg Grön';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Tuborg Classic")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Classic' AND "Tuborg Classic" IS NOT NULL
+)
+WHERE Nafn = 'Tuborg Classic';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Víking Gylltur")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Víking Gylltur' AND "Víking Gylltur" IS NOT NULL
+)
+WHERE Nafn = 'Víking Gylltur';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Víking Lite")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite' AND "Víking Lite" IS NOT NULL
+)
+WHERE Nafn = 'Víking Lite';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Víking Lite Classic")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite Classic' AND "Víking Lite Classic" IS NOT NULL
+)
+WHERE Nafn = 'Víking Lite Classic';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Thule")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Thule' AND Thule IS NOT NULL
+)
+WHERE Nafn = 'Thule';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Carlsberg")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Carlsberg' AND Carlsberg IS NOT NULL
+)
+WHERE Nafn = 'Carlsberg';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Boli")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Boli Premium' AND Boli IS NOT NULL
+)
+WHERE Nafn = 'Boli Premium';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Peroni")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Peroni Nastro Azzurro' AND Peroni IS NOT NULL
+)
+WHERE Nafn = 'Peroni Nastro Azzurro';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Stella Artois")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Stella Artois' AND "Stella Artois" IS NOT NULL
+)
+WHERE Nafn = 'Stella Artois';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Einstök White Ale")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Einstök White Ale' AND "Einstök White Ale" IS NOT NULL
+)
+WHERE Nafn = 'Einstök White Ale';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Einstök Pale Ale")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Einstök Arctic Pale Ale' AND "Einstök Pale Ale" IS NOT NULL
+)
+WHERE Nafn = 'Einstök Arctic Pale Ale';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Kaldi")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Kaldi' AND Kaldi IS NOT NULL
+)
+WHERE Nafn = 'Kaldi';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Ölvisholt Lite")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Ölvisholt Lite' AND "Ölvisholt Lite" IS NOT NULL
+)
+WHERE Nafn = 'Ölvisholt Lite';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Eldgos")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Eldgos Flamingo Kokteill' AND "Eldgos" IS NOT NULL
+)
+WHERE Nafn = 'Eldgos Flamingo Kokteill';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Somersby")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Somersby Apple' AND Somersby IS NOT NULL
+)
+WHERE Nafn = 'Somersby Apple';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Blanc")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Kronenbourg 1664 Blanc' AND "Blanc" IS NOT NULL
+)
+WHERE Nafn = 'Kronenbourg 1664 Blanc';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Bríó")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Bríó nr. 1 Pilsner' AND "Bríó" IS NOT NULL
+)
+WHERE Nafn = 'Bríó nr. 1 Pilsner';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Garún")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Garún nr. 19 Icelandic Stout' AND "Garún" IS NOT NULL
+)
+WHERE Nafn = 'Garún nr. 19 Icelandic Stout';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Helga")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Helga nr. 69 Raspberry Sour' AND "Helga" IS NOT NULL
+)
+WHERE Nafn = 'Helga nr. 69 Raspberry Sour';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Snorri")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Snorri nr. 10 íslenskt öl' AND "Snorri" IS NOT NULL
+)
+WHERE Nafn = 'Snorri nr. 10 íslenskt öl';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Úlfrún")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Úlfrún nr. 34' AND "Úlfrún" IS NOT NULL
+)
+WHERE Nafn = 'Úlfrún nr. 34';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Úlfur")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Úlfur nr. 3 India Pale Ale' AND "Úlfur" IS NOT NULL
+)
+WHERE Nafn = 'Úlfur nr. 3 India Pale Ale';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Guinness")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Guinness Draught' AND "Guinness" IS NOT NULL
+)
+WHERE Nafn = 'Guinness Draught';
+
+UPDATE Bjór_Vínbúðin
+SET "Average Price (Kr)" = (
+    SELECT AVG("Bóndi")
+    FROM Bjór
+    WHERE Bjór_Vínbúðin.Nafn = 'Bóndi Session IPA' AND "Bóndi" IS NOT NULL
+)
+WHERE Nafn = 'Bóndi Session IPA';
