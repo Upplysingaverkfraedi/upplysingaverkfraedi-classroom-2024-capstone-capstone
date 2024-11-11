@@ -13,13 +13,33 @@ CREATE TABLE IF NOT EXISTS Bjór_Vínbúðin (
 .mode csv
 .import ".\\data\\Bjor_Vinbudin.csv" Bjór_Vínbúðin
 
--- 2. Býr til töflu fyrir "Bjór.csv"
+-- Update names in Bjór_Vínbúðin to match those in Bjórkort
+UPDATE Bjór_Vínbúðin SET Nafn = 'Gull' WHERE Nafn = 'Egils Gull';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Boli' WHERE Nafn = 'Boli Premium';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Peroni' WHERE Nafn = 'Peroni Nastro Azzurro';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Einstök Pale Ale' WHERE Nafn = 'Einstök Arctic Pale Ale';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Eldgos' WHERE Nafn = 'Eldgos Flamingo Kokteill';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Somersby' WHERE Nafn = 'Somersby Apple';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Blanc' WHERE Nafn = 'Kronenbourg 1664 Blanc';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Bríó' WHERE Nafn = 'Bríó nr. 1 Pilsner';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Garún' WHERE Nafn = 'Garún nr. 19 Icelandic Stout';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Helga' WHERE Nafn = 'Helga nr. 69 Raspberry Sour';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Snorri' WHERE Nafn = 'Snorri nr. 10 íslenskt öl';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Úlfrún' WHERE Nafn = 'Úlfrún nr. 34';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Úlfur' WHERE Nafn = 'Úlfur nr. 3 India Pale Ale';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Guinness' WHERE Nafn = 'Guinness Draught';
+UPDATE Bjór_Vínbúðin SET Nafn = 'Bóndi' WHERE Nafn = 'Bóndi Session IPA';
+
+-- Drop the table if it already exists
 DROP TABLE IF EXISTS Bjór;
+
+-- Create the Bjór table with the new "Mynd (url)" column
 CREATE TABLE IF NOT EXISTS Bjór (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
     Latitude REAL,
     Longitude REAL,
+    "Mynd (url)" TEXT, -- New column for image URLs
     Gull INTEGER,
     "Gull Lite" INTEGER,
     "Tuborg Grön" INTEGER,
@@ -51,7 +71,7 @@ CREATE TABLE IF NOT EXISTS Bjór (
     "Heimabrugg/Annar IPA" INTEGER
 );
 
--- Insert data from "Bjór.csv"
+-- Insert data from "Bjór.csv" including the new "Mynd (url)" column
 .mode csv
 .import ".\\data\\Bjor.csv" Bjór
 
@@ -130,8 +150,10 @@ CREATE TABLE IF NOT EXISTS Lukkuhjól (
 .mode csv
 .import ".\\data\\Lukkuhjol.csv" Lukkuhjól
 
--- Create the Bjorkort table with unpivoted data for visualization
+-- Drop the table if it already exists
 DROP TABLE IF EXISTS Bjórkort;
+
+-- Create the Bjórkort table with unpivoted data for visualization, including the Mynd (url) column
 CREATE TABLE Bjórkort AS
 SELECT * FROM (
     SELECT 
@@ -139,6 +161,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",  -- Include the image URL column
         'Gull' AS Bjór,
         Gull AS Verð
     FROM Bjór WHERE Gull IS NOT NULL
@@ -150,6 +173,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Gull Lite' AS Bjór,
         "Gull Lite" AS Verð
     FROM Bjór WHERE "Gull Lite" IS NOT NULL
@@ -161,6 +185,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Tuborg Grön' AS Bjór,
         "Tuborg Grön" AS Verð
     FROM Bjór WHERE "Tuborg Grön" IS NOT NULL
@@ -172,6 +197,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Tuborg Classic' AS Bjór,
         "Tuborg Classic" AS Verð
     FROM Bjór WHERE "Tuborg Classic" IS NOT NULL
@@ -183,6 +209,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Víking Gylltur' AS Bjór,
         "Víking Gylltur" AS Verð
     FROM Bjór WHERE "Víking Gylltur" IS NOT NULL
@@ -194,6 +221,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Víking Lite' AS Bjór,
         "Víking Lite" AS Verð
     FROM Bjór WHERE "Víking Lite" IS NOT NULL
@@ -205,6 +233,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Víking Lite Classic' AS Bjór,
         "Víking Lite Classic" AS Verð
     FROM Bjór WHERE "Víking Lite Classic" IS NOT NULL
@@ -216,6 +245,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Thule' AS Bjór,
         Thule AS Verð
     FROM Bjór WHERE Thule IS NOT NULL
@@ -227,6 +257,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Carlsberg' AS Bjór,
         Carlsberg AS Verð
     FROM Bjór WHERE Carlsberg IS NOT NULL
@@ -238,6 +269,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Boli' AS Bjór,
         Boli AS Verð
     FROM Bjór WHERE Boli IS NOT NULL
@@ -249,6 +281,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Peroni' AS Bjór,
         Peroni AS Verð
     FROM Bjór WHERE Peroni IS NOT NULL
@@ -260,6 +293,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Stella Artois' AS Bjór,
         "Stella Artois" AS Verð
     FROM Bjór WHERE "Stella Artois" IS NOT NULL
@@ -271,6 +305,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Einstök White Ale' AS Bjór,
         "Einstök White Ale" AS Verð
     FROM Bjór WHERE "Einstök White Ale" IS NOT NULL
@@ -282,6 +317,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Einstök Pale Ale' AS Bjór,
         "Einstök Pale Ale" AS Verð
     FROM Bjór WHERE "Einstök Pale Ale" IS NOT NULL
@@ -293,6 +329,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Einstök Arctic Lager' AS Bjór,
         "Einstök Arctic Lager" AS Verð
     FROM Bjór WHERE "Einstök Arctic Lager" IS NOT NULL
@@ -304,6 +341,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Kaldi' AS Bjór,
         Kaldi AS Verð
     FROM Bjór WHERE Kaldi IS NOT NULL
@@ -315,6 +353,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Ölvisholt Lite' AS Bjór,
         "Ölvisholt Lite" AS Verð
     FROM Bjór WHERE "Ölvisholt Lite" IS NOT NULL
@@ -326,6 +365,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Eldgos' AS Bjór,
         Eldgos AS Verð
     FROM Bjór WHERE Eldgos IS NOT NULL
@@ -337,6 +377,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Somersby' AS Bjór,
         Somersby AS Verð
     FROM Bjór WHERE Somersby IS NOT NULL
@@ -348,6 +389,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Blanc' AS Bjór,
         Blanc AS Verð
     FROM Bjór WHERE Blanc IS NOT NULL
@@ -359,6 +401,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Bríó' AS Bjór,
         Bríó AS Verð
     FROM Bjór WHERE Bríó IS NOT NULL
@@ -370,6 +413,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Garún' AS Bjór,
         Garún AS Verð
     FROM Bjór WHERE Garún IS NOT NULL
@@ -381,6 +425,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Helga' AS Bjór,
         Helga AS Verð
     FROM Bjór WHERE Helga IS NOT NULL
@@ -392,6 +437,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Snorri' AS Bjór,
         Snorri AS Verð
     FROM Bjór WHERE Snorri IS NOT NULL
@@ -403,6 +449,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Úlfrún' AS Bjór,
         Úlfrún AS Verð
     FROM Bjór WHERE Úlfrún IS NOT NULL
@@ -414,6 +461,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Úlfur' AS Bjór,
         Úlfur AS Verð
     FROM Bjór WHERE Úlfur IS NOT NULL
@@ -425,6 +473,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Guinness' AS Bjór,
         Guinness AS Verð
     FROM Bjór WHERE Guinness IS NOT NULL
@@ -436,6 +485,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Bóndi' AS Bjór,
         Bóndi AS Verð
     FROM Bjór WHERE Bóndi IS NOT NULL
@@ -447,230 +497,24 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
+        "Mynd (url)",
         'Heimabrugg/Annar IPA' AS Bjór,
         "Heimabrugg/Annar IPA" AS Verð
     FROM Bjór WHERE "Heimabrugg/Annar IPA" IS NOT NULL
 ) ORDER BY Bar, Bjór;
 
+-- Clean up rows with invalid data
 DELETE FROM Bjórkort WHERE Verð IS NULL OR trim(Verð) = '';
 DELETE FROM Bjórkort WHERE Bar IS 'Bar' OR trim(Bar) = 'Bar';
+
 
 -- Add the column for average price if it doesn't exist (in case the table was created before)
 ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Average Price (Kr)" REAL;
 
--- 2. Update the new column with the average price of each beer from the Bjór table
+-- Step 1: Calculate and update the average prices for each beer type in Bjór_Vínbúðin based on data from Bjórkort
 UPDATE Bjór_Vínbúðin
 SET "Average Price (Kr)" = (
-    SELECT AVG("Gull")
-    FROM Bjór WHERE "Gull" IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Egils Gull'
-)
-WHERE Nafn = 'Egils Gull';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Gull Lite")
-    FROM Bjór WHERE "Gull Lite" IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Gull Lite'
-)
-WHERE Nafn = 'Gull Lite';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Tuborg Grön")
-    FROM Bjór WHERE "Tuborg Grön" IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Grön'
-)
-WHERE Nafn = 'Tuborg Grön';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Tuborg Classic")
-    FROM Bjór WHERE "Tuborg Classic" IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Tuborg Classic'
-)
-WHERE Nafn = 'Tuborg Classic';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Víking Gylltur")
-    FROM Bjór WHERE "Víking Gylltur" IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Víking Gylltur'
-)
-WHERE Nafn = 'Víking Gylltur';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Víking Lite")
-    FROM Bjór WHERE "Víking Lite" IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite'
-)
-WHERE Nafn = 'Víking Lite';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Víking Lite Classic")
-    FROM Bjór WHERE "Víking Lite Classic" IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Víking Lite Classic'
-)
-WHERE Nafn = 'Víking Lite Classic';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Thule")
-    FROM Bjór WHERE Thule IS NOT NULL
-    WHERE Bjór_Vínbúðin.Nafn = 'Thule'
-)
-WHERE Nafn = 'Thule';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Carlsberg")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Carlsberg'
-)
-WHERE Nafn = 'Carlsberg';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Boli")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Boli Premium'
-)
-WHERE Nafn = 'Boli Premium';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Peroni")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Peroni Nastro Azzurro' AND Peroni IS NOT NULL
-)
-WHERE Nafn = 'Peroni Nastro Azzurro';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Stella Artois")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Stella Artois' AND "Stella Artois" IS NOT NULL
-)
-WHERE Nafn = 'Stella Artois';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Einstök White Ale")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Einstök White Ale' AND "Einstök White Ale" IS NOT NULL
-)
-WHERE Nafn = 'Einstök White Ale';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Einstök Pale Ale")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Einstök Arctic Pale Ale' AND "Einstök Pale Ale" IS NOT NULL
-)
-WHERE Nafn = 'Einstök Arctic Pale Ale';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Kaldi")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Kaldi' AND Kaldi IS NOT NULL
-)
-WHERE Nafn = 'Kaldi';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Ölvisholt Lite")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Ölvisholt Lite' AND "Ölvisholt Lite" IS NOT NULL
-)
-WHERE Nafn = 'Ölvisholt Lite';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Eldgos")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Eldgos Flamingo Kokteill' AND "Eldgos" IS NOT NULL
-)
-WHERE Nafn = 'Eldgos Flamingo Kokteill';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Somersby")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Somersby Apple' AND Somersby IS NOT NULL
-)
-WHERE Nafn = 'Somersby Apple';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Blanc")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Kronenbourg 1664 Blanc' AND "Blanc" IS NOT NULL
-)
-WHERE Nafn = 'Kronenbourg 1664 Blanc';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Bríó")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Bríó nr. 1 Pilsner' AND "Bríó" IS NOT NULL
-)
-WHERE Nafn = 'Bríó nr. 1 Pilsner';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Garún")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Garún nr. 19 Icelandic Stout' AND "Garún" IS NOT NULL
-)
-WHERE Nafn = 'Garún nr. 19 Icelandic Stout';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Helga")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Helga nr. 69 Raspberry Sour' AND "Helga" IS NOT NULL
-)
-WHERE Nafn = 'Helga nr. 69 Raspberry Sour';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Snorri")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Snorri nr. 10 íslenskt öl' AND "Snorri" IS NOT NULL
-)
-WHERE Nafn = 'Snorri nr. 10 íslenskt öl';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Úlfrún")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Úlfrún nr. 34' AND "Úlfrún" IS NOT NULL
-)
-WHERE Nafn = 'Úlfrún nr. 34';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Úlfur")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Úlfur nr. 3 India Pale Ale' AND "Úlfur" IS NOT NULL
-)
-WHERE Nafn = 'Úlfur nr. 3 India Pale Ale';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Guinness")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Guinness Draught' AND "Guinness" IS NOT NULL
-)
-WHERE Nafn = 'Guinness Draught';
-
-UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG("Bóndi")
-    FROM Bjór
-    WHERE Bjór_Vínbúðin.Nafn = 'Bóndi Session IPA' AND "Bóndi" IS NOT NULL
-)
-WHERE Nafn = 'Bóndi Session IPA';
+    SELECT AVG(Verð)
+    FROM Bjórkort
+    WHERE Bjórkort.Bjór = Bjór_Vínbúðin.Nafn
+);
