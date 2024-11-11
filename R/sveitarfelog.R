@@ -28,7 +28,7 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   # Hlaða inn shapefile og undirbúa það
-  d <- st_read(here("data-raw", "sveitarfelog", "Sveitarfelog_timalina.shp"),
+  d <- st_read(here("R", "data-raw", "sveitarfelog", "Sveitarfelog_timalina.shp"),
                options = "ENCODING=ISO-8859-10") |>
     filter(endir_tima == max(endir_tima)) |>
     st_transform(crs = "WGS84")
