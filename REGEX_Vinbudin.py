@@ -5,23 +5,23 @@ from datetime import datetime
 import os
 
 # Load URLs from a GitHub file link
-def load_urls_from_github(github_url):
-    response = requests.get(github_url)
-    if response.status_code == 200:
-        urls = [line.strip() for line in response.text.splitlines() if line.strip() and not line.startswith('#')]
-        return urls
-    else:
-        print(f"Failed to retrieve URL list from {github_url}")
-        return []
+def load_urls_from_file(file_name):
 
-# Fetch the HTML from a URL
+    # read file 'REGEX_Linkar.txt'
+    with open(file_name, 'r') as file:
+
+        urls =  [line.strip() for line in file if line.strip() and not line.startswith('#')]
+        return urls
+    
 def fetch_html(url):
     response = requests.get(url)
     if response.status_code == 200:
-        return response.text
+        html = response.text
+        return html
     else:
         print(f"Failed to retrieve data from {url}")
         return None
+
 
 # Parse HTML using regex to extract beer names and prices separately
 def parse_html(html):
@@ -48,9 +48,10 @@ def parse_html(html):
     volume_ml = volume_match.group(1).strip() if volume_match else 'Unknown'
 
     # Process beer matches into a list of dictionaries, including volume
-    beers_data = [{"Name": name.strip(), "Price (ISK)": price.replace(".", "").replace(",", ""), "ml": volume_ml} for name, price in beer_matches]
+    beers_data = [{"Nafn": name.strip(), "Verð (Kr)": price.replace(".", "").replace(",", ""), "ml": volume_ml} for name, price in beer_matches]
     
     return beers_data
+
 
 # Save the results to a single CSV file
 def save_results(all_beers_data, output_dir):
@@ -59,7 +60,7 @@ def save_results(all_beers_data, output_dir):
         return
     
     os.makedirs(output_dir, exist_ok=True)
-    filename = f"beer_prices_.csv"
+    filename = "Bjor_Vinbudin.csv"  # Uppfært nafn á CSV skrá
     filepath = os.path.join(output_dir, filename)
 
     df = pd.DataFrame(all_beers_data, columns=["Nafn", "Verð (Kr)", "ml"])
@@ -68,8 +69,8 @@ def save_results(all_beers_data, output_dir):
 
 if __name__ == "__main__":
     # GitHub raw URL for the file containing URLs
-    github_url = 'https://raw.githubusercontent.com/Upplysingaverkfraedi/capstone-thestormlands/main/REGEX_Linkar.txt'
-    urls = load_urls_from_github(github_url)
+    url_file = 'REGEX_Linkar.txt'
+    urls = load_urls_from_file(url_file)
 
     output_dir = './data'
     all_beers_data = []
