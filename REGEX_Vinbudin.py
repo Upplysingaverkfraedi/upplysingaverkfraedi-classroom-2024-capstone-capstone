@@ -60,7 +60,7 @@ def save_results(all_beers_data, output_dir):
         return
     
     os.makedirs(output_dir, exist_ok=True)
-    filename = "Bjór Vínbúðin.csv"  # Uppfært nafn á CSV skrá
+    filename = "Bjor_Vinbudin.csv"  # Uppfært nafn á CSV skrá
     filepath = os.path.join(output_dir, filename)
 
     df = pd.DataFrame(all_beers_data, columns=["Nafn", "Verð (Kr)", "ml"])
