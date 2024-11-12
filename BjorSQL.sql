@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS Bjór (
 -- Insert data from "Bjór.csv" including the new "Mynd (url)" column
 .mode csv
 .import ".\\data\\Bjor.csv" Bjór
+DELETE FROM Bjór WHERE Bar = 'Bar';
 
 -- 3. Create table for "Happy Hour.csv"
 DROP TABLE IF EXISTS Happy_Hour;
@@ -116,6 +117,7 @@ CREATE TABLE IF NOT EXISTS Happy_Hour (
 -- Insert data from "Happy Hour.csv"
 .mode csv
 .import ".\\data\\Happy_Hour.csv" Happy_Hour
+DELETE FROM Happy_Hour WHERE Bar = 'Bar';
 
 -- 4. Create table for "Lukkuhjól.csv"
 DROP TABLE IF EXISTS Lukkuhjól;
@@ -126,6 +128,7 @@ CREATE TABLE IF NOT EXISTS Lukkuhjól (
     "Win Rate" REAL,
     "Lose Rate" REAL,
     "Even Rate" REAL,
+    "Win Something Rate" REAL,
     "Lose All Rate" REAL,
     "Stærsta Win (Kr)" INTEGER,
     "1" TEXT,
@@ -149,6 +152,7 @@ CREATE TABLE IF NOT EXISTS Lukkuhjól (
 -- Insert data from "Lukkuhjól.csv"
 .mode csv
 .import ".\\data\\Lukkuhjol.csv" Lukkuhjól
+DELETE FROM Lukkuhjól WHERE Bar = 'Bar';
 
 -- Drop the table if it already exists
 DROP TABLE IF EXISTS Bjórkort;
