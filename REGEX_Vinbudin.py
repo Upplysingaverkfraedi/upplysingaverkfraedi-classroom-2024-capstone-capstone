@@ -48,7 +48,7 @@ def parse_html(html):
     volume_ml = volume_match.group(1).strip() if volume_match else 'Unknown'
 
     # Process beer matches into a list of dictionaries, including volume
-    beers_data = [{"Nafn": name.strip(), "Verð (Kr)": price.replace(".", "").replace(",", ""), "ml": volume_ml} for name, price in beer_matches]
+    beers_data = [{"Bjór": name.strip(), "Verð (Kr)": price.replace(".", "").replace(",", ""), "Stærð (mL)": volume_ml} for name, price in beer_matches]
     
     return beers_data
 
@@ -60,10 +60,10 @@ def save_results(all_beers_data, output_dir):
         return
     
     os.makedirs(output_dir, exist_ok=True)
-    filename = "Bjor_Vinbudin.csv"  # Uppfært nafn á CSV skrá
+    filename = "Bjor_Vinbudin.csv"
     filepath = os.path.join(output_dir, filename)
 
-    df = pd.DataFrame(all_beers_data, columns=["Nafn", "Verð (Kr)", "ml"])
+    df = pd.DataFrame(all_beers_data, columns=["Bjór", "Verð (Kr)", "Stærð (mL)"])
     df.to_csv(filepath, index=False)
     print(f"Prices saved to {filepath}")
 

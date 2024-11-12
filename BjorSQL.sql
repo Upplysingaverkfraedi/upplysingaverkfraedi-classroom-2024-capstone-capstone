@@ -1,45 +1,58 @@
--- Open or create the Bjórgrunnur.db database
+-- Gagnagrunnur búinn til
 .open Bjórgrunnur.db
 
--- 1. Create table for "Bjór Vínbúðin.csv"
+------------------------------------------------------------------------------------------------
+-- 1
+
+-- Tafla með bjórum úr Vínbúðinni
+------------------------------------------------------------------------------------------------
+
+-- Tafla búin til
 DROP TABLE IF EXISTS Bjór_Vínbúðin;
 CREATE TABLE IF NOT EXISTS Bjór_Vínbúðin (
-    Nafn TEXT,
+    Bjór TEXT,
     "Verð (Kr)" INTEGER,
-    ml INTEGER
+    "Stærð (mL)" INTEGER
 );
 
--- Insert data from "Bjór Vínbúðin.csv"
+-- Gögn frá "Bjor_Vinbudin.csv" sett inn í töflu og aukadálk eytt
 .mode csv
 .import ".\\data\\Bjor_Vinbudin.csv" Bjór_Vínbúðin
+DELETE FROM Bjór_Vínbúðin WHERE Bjór = 'Bjór';
 
--- Update names in Bjór_Vínbúðin to match those in Bjórkort
-UPDATE Bjór_Vínbúðin SET Nafn = 'Gull' WHERE Nafn = 'Egils Gull';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Boli' WHERE Nafn = 'Boli Premium';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Peroni' WHERE Nafn = 'Peroni Nastro Azzurro';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Einstök Pale Ale' WHERE Nafn = 'Einstök Arctic Pale Ale';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Eldgos' WHERE Nafn = 'Eldgos Flamingo Kokteill';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Somersby' WHERE Nafn = 'Somersby Apple';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Blanc' WHERE Nafn = 'Kronenbourg 1664 Blanc';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Bríó' WHERE Nafn = 'Bríó nr. 1 Pilsner';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Garún' WHERE Nafn = 'Garún nr. 19 Icelandic Stout';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Helga' WHERE Nafn = 'Helga nr. 69 Raspberry Sour';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Snorri' WHERE Nafn = 'Snorri nr. 10 íslenskt öl';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Úlfrún' WHERE Nafn = 'Úlfrún nr. 34';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Úlfur' WHERE Nafn = 'Úlfur nr. 3 India Pale Ale';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Guinness' WHERE Nafn = 'Guinness Draught';
-UPDATE Bjór_Vínbúðin SET Nafn = 'Bóndi' WHERE Nafn = 'Bóndi Session IPA';
+-- Nöfn uppfærð í samræmi við Bjór töfluna
+UPDATE Bjór_Vínbúðin SET Bjór = 'Gull' WHERE Bjór = 'Egils Gull';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Boli' WHERE Bjór = 'Boli Premium';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Peroni' WHERE Bjór = 'Peroni Nastro Azzurro';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Einstök Pale Ale' WHERE Bjór = 'Einstök Arctic Pale Ale';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Eldgos' WHERE Bjór = 'Eldgos Flamingo Kokteill';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Somersby' WHERE Bjór = 'Somersby Apple';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Blanc' WHERE Bjór = 'Kronenbourg 1664 Blanc';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Bríó' WHERE Bjór = 'Bríó nr. 1 Pilsner';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Garún' WHERE Bjór = 'Garún nr. 19 Icelandic Stout';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Helga' WHERE Bjór = 'Helga nr. 69 Raspberry Sour';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Snorri' WHERE Bjór = 'Snorri nr. 10 íslenskt öl';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Úlfrún' WHERE Bjór = 'Úlfrún nr. 34';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Úlfur' WHERE Bjór = 'Úlfur nr. 3 India Pale Ale';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Guinness' WHERE Bjór = 'Guinness Draught';
+UPDATE Bjór_Vínbúðin SET Bjór = 'Bóndi' WHERE Bjór = 'Bóndi Session IPA';
 
--- Drop the table if it already exists
+
+------------------------------------------------------------------------------------------------
+-- 2
+
+-- Tafla með bjórum úr bænum
+------------------------------------------------------------------------------------------------
+
+-- Tafla búin til
 DROP TABLE IF EXISTS Bjór;
-
--- Create the Bjór table with the new "Mynd (url)" column
 CREATE TABLE IF NOT EXISTS Bjór (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
     Latitude REAL,
     Longitude REAL,
-    "Mynd (url)" TEXT, -- New column for image URLs
+    "Meðalverð (kr)" INTEGER,
+    "Meðal Lítraverð (kr)" INTEGER,
     Gull INTEGER,
     "Gull Lite" INTEGER,
     "Tuborg Grön" INTEGER,
@@ -68,21 +81,30 @@ CREATE TABLE IF NOT EXISTS Bjór (
     Úlfur INTEGER,
     Guinness INTEGER,
     Bóndi INTEGER,
-    "Heimabrugg/Annar IPA" INTEGER
+    "Heimabrugg/Annar IPA" INTEGER,
+    "Mynd (url)" TEXT
 );
 
--- Insert data from "Bjór.csv" including the new "Mynd (url)" column
+-- Gögn frá "Bjor.csv" sett inn í töflu og aukadálk eytt
 .mode csv
 .import ".\\data\\Bjor.csv" Bjór
 DELETE FROM Bjór WHERE Bar = 'Bar';
 
--- 3. Create table for "Happy Hour.csv"
+------------------------------------------------------------------------------------------------
+-- 3
+
+-- Tafla með bjórum úr Vínbúðinni
+------------------------------------------------------------------------------------------------
+
+-- Tafla búin til
 DROP TABLE IF EXISTS Happy_Hour;
 CREATE TABLE IF NOT EXISTS Happy_Hour (
     Bar TEXT,
     "Stærð (mL)" INTEGER,
     Byrjar TEXT,
     Endar TEXT,
+    "Meðalverð (kr)" INTEGER,
+    "Meðal Lítraverð (kr)" INTEGER,
     Gull INTEGER,
     "Gull Lite" INTEGER,
     "Tuborg Grön" INTEGER,
@@ -114,12 +136,18 @@ CREATE TABLE IF NOT EXISTS Happy_Hour (
     "Heimabrugg/Annar IPA" INTEGER
 );
 
--- Insert data from "Happy Hour.csv"
+-- Gögn frá "Happy_Hour.csv" sett inn í töflu og aukadálk eytt
 .mode csv
 .import ".\\data\\Happy_Hour.csv" Happy_Hour
 DELETE FROM Happy_Hour WHERE Bar = 'Bar';
 
--- 4. Create table for "Lukkuhjól.csv"
+------------------------------------------------------------------------------------------------
+-- 4
+
+-- Tafla með gögnum úr Lukkuhjólum
+------------------------------------------------------------------------------------------------
+
+-- Tafla búin til
 DROP TABLE IF EXISTS Lukkuhjól;
 CREATE TABLE IF NOT EXISTS Lukkuhjól (
     Bar TEXT,
@@ -149,15 +177,19 @@ CREATE TABLE IF NOT EXISTS Lukkuhjól (
     "16" TEXT
 );
 
--- Insert data from "Lukkuhjól.csv"
+-- Gögn frá "Lukkuhjol.csv" sett inn í töflu og aukadálk eytt
 .mode csv
 .import ".\\data\\Lukkuhjol.csv" Lukkuhjól
 DELETE FROM Lukkuhjól WHERE Bar = 'Bar';
-
--- Drop the table if it already exists
 DROP TABLE IF EXISTS Bjórkort;
 
--- Create the Bjórkort table with unpivoted data for visualization, including the Mynd (url) column
+------------------------------------------------------------------------------------------------
+-- 5
+
+-- Tafla búin til fyrir kort á mælaborði
+------------------------------------------------------------------------------------------------
+
+-- Tafla búin til úr Bjór töflunni með unpivot uppsetningu
 CREATE TABLE Bjórkort AS
 SELECT * FROM (
     SELECT 
@@ -165,7 +197,7 @@ SELECT * FROM (
         "Stærð (mL)",
         Latitude,
         Longitude,
-        "Mynd (url)",  -- Include the image URL column
+        "Mynd (url)", 
         'Gull' AS Bjór,
         Gull AS Verð
     FROM Bjór WHERE Gull IS NOT NULL
@@ -507,18 +539,37 @@ SELECT * FROM (
     FROM Bjór WHERE "Heimabrugg/Annar IPA" IS NOT NULL
 ) ORDER BY Bar, Bjór;
 
--- Clean up rows with invalid data
+-- Aukalínum eytt
 DELETE FROM Bjórkort WHERE Verð IS NULL OR trim(Verð) = '';
 DELETE FROM Bjórkort WHERE Bar IS 'Bar' OR trim(Bar) = 'Bar';
 
+------------------------------------------------------------------------------------------------
+-- 6
 
--- Add the column for average price if it doesn't exist (in case the table was created before)
-ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Average Price (Kr)" REAL;
+-- Dálkum með meðalverðum bætt í Bjór Vínbúð töflu
+------------------------------------------------------------------------------------------------
 
--- Step 1: Calculate and update the average prices for each beer type in Bjór_Vínbúðin based on data from Bjórkort
+-- Dálk bætt við með meðalverðum á bjór í bænum
+ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Meðalverð í bæ (Kr)" INTEGER;
 UPDATE Bjór_Vínbúðin
-SET "Average Price (Kr)" = (
-    SELECT AVG(Verð)
+SET "Meðalverð í bæ (Kr)" = (
+    SELECT CAST(ROUND(AVG(Verð)) AS INTEGER)
     FROM Bjórkort
-    WHERE Bjórkort.Bjór = Bjór_Vínbúðin.Nafn
+    WHERE Bjórkort.Bjór = Bjór_Vínbúðin.Bjór
 );
+
+-- Dálk bætt við með meðal lítraverðum á bjórum í bænum
+ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Meðal lítraverð í bæ (Kr)" INTEGER;
+UPDATE Bjór_Vínbúðin
+SET "Meðal lítraverð í bæ (Kr)" = (
+    SELECT CAST(ROUND("Meðalverð í bæ (Kr)" / (AVG("Stærð (mL)") / 1000)) AS INTEGER)
+    FROM Bjórkort
+    WHERE Bjórkort.Bjór = Bjór_Vínbúðin.Bjór
+);
+
+-- Dálk bætt við með meðal lítraverðum á bjórum í vínbúðinni
+ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Lítraverð (Kr)" INTEGER;
+UPDATE Bjór_Vínbúðin
+SET "Lítraverð (Kr)" = ("Verð (Kr)" / ("Stærð (mL)" / 1000.0))
+WHERE "Stærð (mL)" IS NOT NULL AND "Stærð (mL)" > 0;
+
