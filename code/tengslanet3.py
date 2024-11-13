@@ -98,10 +98,10 @@ def display_connection(clickData):
                 return f"{actor1} and {actor2} played together in: " + ", ".join(movies_shared)
             else:
                 selected_nodes = []
-                return f"{actor1} and {actor2} have not appeared together in any movies."
+                return f"{actor1} and {actor2} have not starred in a movie together."
 
     return "Click on two actor nodes to see their shared movies."
 
 # Run the Dash app
 if __name__ == "__main__":
-    app.run_server(debug=True, port=8053)
+    app.run_server(debug=True, port=8055)
