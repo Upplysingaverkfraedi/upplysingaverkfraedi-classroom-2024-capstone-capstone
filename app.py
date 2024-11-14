@@ -255,9 +255,10 @@ def server(input, output, session):
                 ui.output_table("driver_table")
             )
         else:
-            # For selected races, display the head-to-head comparison table
+            # For selected races, display the head-to-head comparison table and track image
             return ui.TagList(
                 ui.h3(f"Head-to-Head Comparison for {race}"),
+                ui.output_image("track_image"),
                 ui.output_table("race_comparison_table")
             )
 
@@ -282,6 +283,33 @@ def server(input, output, session):
                 return pd.DataFrame({"Message": [f"No data available for {race}"]})
         else:
             return pd.DataFrame({"Message": [f"Race ID not found for {race}"]})
+
+    # Render track image based on selected race
+    @output
+    @render.image
+    def track_image():
+        race = input.race_select()
+        if race == "2021 Season Overview":
+            return None  # Do not display an image for the overview
+        else:
+            # Construct the image file name (e.g., 'bahrain.png')
+            image_name = race.lower().replace(" ", "_") + ".png"
+            img_path = Path(__file__).parent / "www" / image_name
+
+            if img_path.exists():
+                img: ImgData = {
+                    "src": str(img_path),
+                    "width": "600px",
+                    "height": "auto",
+                    "style": "border:2px solid black;"
+                }
+                return img
+            else:
+                # Handle case where image does not exist
+                return {
+                    "src": "",
+                    "alt": f"No image available for {race}"
+                }
 
 # Create the Shiny app
 app = App(app_ui, server)
