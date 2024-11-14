@@ -61,8 +61,10 @@ node_trace = go.Scatter(x=node_x, y=node_y, mode='markers+text', text=node_text,
 fig = go.Figure(data=[edge_trace, node_trace],
                 layout=go.Layout(title="Actor Co-occurrence Network", showlegend=False,
                                  hovermode='closest', margin=dict(b=0, l=0, r=0, t=40),
+                                 width=1450, height=700,  # Aukið breidd og hæð
                                  xaxis=dict(showgrid=False, zeroline=False),
                                  yaxis=dict(showgrid=False, zeroline=False)))
+
 
 # Initialize Dash app
 app = dash.Dash(__name__)
@@ -104,4 +106,4 @@ def display_connection(clickData):
 
 # Run the Dash app
 if __name__ == "__main__":
-    app.run_server(debug=True, port=8055)
+    app.run_server(debug=True, port=8076)
