@@ -3,16 +3,110 @@ from shiny.types import ImgData
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
+import sqlite3
 
-# Sample data for demonstration
-def load_sample_data():
+# Mapping of race names to race IDs
+race_mapping = {
+    "Bahrain": 1036,
+    "Emilia-Romagna": 1037,
+    "Portugal": 1038,
+    "Spain": 1039,
+    "Monaco": 1040,
+    "Azerbaijan": 1041,
+    "France": 1042,
+    "Styria": 1043,
+    "Austria": 1044,
+    "Great Britain": 1045,
+    "Hungary": 1046,
+    "Belgium": 1047,
+    "Netherlands": 1048,
+    "Italy": 1049,
+    "Russia": 1050,
+    "Turkey": 1051,
+    "United States": 1052,
+    "Mexico": 1053,
+    "Brazil": 1054,
+    "Qatar": 1055,
+    "Saudi Arabia": 1056,
+    "Abu Dhabi": 1057
+}
+
+# Database path
+db_path = '/Users/haatlason/Documents/GitHub/sqlite-greyjoy/capstone-ironislands/f1db.db'
+
+def load_2021_season_data():
+    # Placeholder for actual 2021 season data
+    # For demonstration, using sample data
     data = pd.DataFrame({
         'Driver': ['Lewis Hamilton', 'Max Verstappen'],
-        'Wins': [103, 50],
-        'Podiums': [182, 85],
-        'Poles': [103, 30]
+        'Wins': [8, 10],
+        'Podiums': [17, 18],
+        'Poles': [5, 10],
+        'Points': [387.5, 395.5]
     })
     return data
+
+def get_race_comparison_data(race_id, race_name):
+    # SQL query to retrieve the filtered race data for the given race_id
+    query = f"""
+    SELECT 
+        race_id,
+        type,
+        position_display_order,
+        position_number,
+        driver_number,
+        driver_id,
+        constructor_id,
+        engine_manufacturer_id,
+        tyre_manufacturer_id,
+        race_laps,
+        race_time,
+        race_gap,
+        race_interval,
+        race_points,
+        race_qualification_position_number,
+        race_grid_position_number,
+        race_positions_gained,
+        race_pit_stops,
+        race_fastest_lap,
+        race_driver_of_the_day,
+        race_grand_slam
+    FROM 
+        hamilton_verstappen_race_data_2021
+    WHERE 
+        race_id = {race_id}
+        AND type = 'RACE_RESULT'
+        AND (driver_id = 'lewis-hamilton' OR driver_id = 'max-verstappen');
+    """
+
+    # Connect to the database and fetch data
+    conn = sqlite3.connect(db_path)
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+
+    if df.empty:
+        return None
+
+    # Prepare the data for head-to-head table
+    hamilton_stats = df[df['driver_id'] == 'lewis-hamilton'].iloc[0]
+    verstappen_stats = df[df['driver_id'] == 'max-verstappen'].iloc[0]
+
+    # Exclude 'race_id' and 'driver_id' columns
+    stats_columns = df.columns.drop(['race_id', 'driver_id']).tolist()
+
+    # Convert numeric values to strings to avoid rendering issues
+    hamilton_values = [str(hamilton_stats[col]) for col in stats_columns]
+    verstappen_values = [str(verstappen_stats[col]) for col in stats_columns]
+
+    # Construct a comparison table DataFrame
+    comparison_data = {
+        "Stat": stats_columns,
+        "Lewis Hamilton": hamilton_values,
+        "Max Verstappen": verstappen_values
+    }
+    comparison_df = pd.DataFrame(comparison_data)
+
+    return comparison_df
 
 # Define ui
 app_ui = ui.page_fluid(
@@ -76,127 +170,28 @@ app_ui = ui.page_fluid(
         ),
         ui.nav_panel(
             "2021 Season Comparison",
-            ui.h3("Driver Statistics"),
-            ui.output_table("driver_table")
-        ),
-        ui.nav_panel(
-            "Bahrain",
-            ui.h3("Performance Charts"),
-            ui.output_plot("performance_chart")
-        ),
-        ui.nav_panel(
-            "Emilia-Romagna",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Portugal",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Spain",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Monaco",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Azerbaijan",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "France",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Styria",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Austria",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Great Britain",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Hungary",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Belgium",
-            ui.h3("Performance Charts"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Netherlands",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Italy",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Russia",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Turkey",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "United States",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Mexico",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Brazil",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Qatar",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Saudi Arabia",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
-        ),
-        ui.nav_panel(
-            "Abu Dhabi",
-            ui.h3("About This Dashboard"),
-            ui.p("This dashboard compares the statistics of Lewis Hamilton and Max Verstappen.")
+            ui.layout_sidebar(
+                ui.sidebar(
+                    ui.input_select(
+                        "race_select",
+                        "Select a Race:",
+                        choices=["2021 Season Overview"] + list(race_mapping.keys()),
+                        selected="2021 Season Overview"
+                    ),
+                ),
+                # Main content area that updates based on selected race
+                ui.div(
+                    ui.output_ui("race_content")
+                )
+            )
         )
-
     )
 )
 
 # Define server logic
 def server(input, output, session):
     # Load sample data
-    data = load_sample_data()
+    data = load_2021_season_data()
 
     # Render the Hamilton image
     @output
@@ -237,7 +232,7 @@ def server(input, output, session):
         }
         return img
 
-    # Reactive text outputs
+    # Reactive text outputs for "All-time Comparison" tab
     @output
     @render.text
     def output_text():
@@ -248,25 +243,45 @@ def server(input, output, session):
     def output_text_verbatim():
         return f"Slider value is: {input.sample_slider()}"
 
+    # Reactive output for race content in "2021 Season Comparison" tab
+    @output
+    @render.ui
+    def race_content():
+        race = input.race_select()
+        if race == "2021 Season Overview":
+            # Display the driver statistics table
+            return ui.TagList(
+                ui.h3("2021 Season Overview"),
+                ui.output_table("driver_table")
+            )
+        else:
+            # For selected races, display the head-to-head comparison table
+            return ui.TagList(
+                ui.h3(f"Head-to-Head Comparison for {race}"),
+                ui.output_table("race_comparison_table")
+            )
+
     # Render driver statistics table
     @output
     @render.table
     def driver_table():
+        # For demonstration, return the sample data
         return data
 
-    # Render performance chart
+    # Render race comparison table
     @output
-    @render.plot
-    def performance_chart():
-        fig = px.bar(
-            data.melt(id_vars=['Driver'], var_name='Statistic', value_name='Value'),
-            x='Statistic',
-            y='Value',
-            color='Driver',
-            barmode='group',
-            title='Driver Performance Comparison'
-        )
-        return fig
+    @render.table
+    def race_comparison_table():
+        race = input.race_select()
+        race_id = race_mapping.get(race)
+        if race_id:
+            comparison_df = get_race_comparison_data(race_id, race)
+            if comparison_df is not None:
+                return comparison_df
+            else:
+                return pd.DataFrame({"Message": [f"No data available for {race}"]})
+        else:
+            return pd.DataFrame({"Message": [f"Race ID not found for {race}"]})
 
 # Create the Shiny app
 app = App(app_ui, server)
