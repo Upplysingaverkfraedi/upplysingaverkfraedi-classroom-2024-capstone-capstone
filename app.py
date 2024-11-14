@@ -5,6 +5,39 @@ import pandas as pd
 import plotly.express as px
 import sqlite3
 
+
+# Helper Functions
+def snake_to_title(snake_str):
+    """
+    Converts snake_case string to Title Case with spaces.
+
+    Args:
+        snake_str (str): The snake_case string.
+
+    Returns:
+        str: The Title Case string with spaces.
+    """
+    components = snake_str.split('_')
+    return ' '.join(x.capitalize() for x in components)
+
+
+def clean_column_data(df, columns):
+    """
+    Removes dashes, dots, and commas from specified columns in the DataFrame.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to clean.
+        columns (list): List of column names to clean.
+
+    Returns:
+        pd.DataFrame: The cleaned DataFrame.
+    """
+    for col in columns:
+        if col in df.columns:
+            df[col] = df[col].astype(str).str.replace(r"[-.,]", "", regex=True)
+    return df
+
+
 # Mapping of race names to race IDs
 race_mapping = {
     "Bahrain": 1036,
@@ -34,6 +67,7 @@ race_mapping = {
 # Database path
 db_path = '/Users/haatlason/Documents/GitHub/sqlite-greyjoy/capstone-ironislands/f1db.db'
 
+
 def load_2021_season_data():
     # Placeholder for actual 2021 season data
     # For demonstration, using sample data
@@ -46,7 +80,19 @@ def load_2021_season_data():
     })
     return data
 
+
 def get_race_comparison_data(race_id, race_name):
+    """
+    Retrieves and processes head-to-head comparison data for Lewis Hamilton and Max Verstappen
+    for a specific race.
+
+    Args:
+        race_id (int): The ID of the race.
+        race_name (str): The name of the race.
+
+    Returns:
+        pd.DataFrame or None: A DataFrame containing the comparison data or None if no data found.
+    """
     # SQL query to retrieve the filtered race data for the given race_id
     query = f"""
     SELECT 
@@ -87,12 +133,34 @@ def get_race_comparison_data(race_id, race_name):
     if df.empty:
         return None
 
-    # Prepare the data for head-to-head table
-    hamilton_stats = df[df['driver_id'] == 'lewis-hamilton'].iloc[0]
-    verstappen_stats = df[df['driver_id'] == 'max-verstappen'].iloc[0]
+    # Rename 'position_display_order' to 'position display order'
+    df.rename(columns={'position_display_order': 'position_display_order'}, inplace=True)
 
-    # Exclude 'race_id' and 'driver_id' columns
-    stats_columns = df.columns.drop(['race_id', 'driver_id']).tolist()
+    # Define columns that need cleaning
+    columns_to_clean = [
+        'position_display_order',
+        'race_time',
+        'race_gap',
+        'race_interval',
+        'race_positions_gained',
+        'race_pit_stops',
+        'race_fastest_lap',
+        'race_driver_of_the_day',
+        'race_grand_slam'
+    ]
+
+    # Clean the specified columns
+    df = clean_column_data(df, columns_to_clean)
+
+    # Convert all column names from snake_case to Title Case with spaces
+    df.rename(columns=lambda x: snake_to_title(x), inplace=True)
+
+    # Prepare the data for head-to-head table
+    hamilton_stats = df[df['Driver Id'] == 'lewis-hamilton'].iloc[0]
+    verstappen_stats = df[df['Driver Id'] == 'max-verstappen'].iloc[0]
+
+    # Exclude 'Race Id' and 'Driver Id' columns
+    stats_columns = df.columns.drop(['Race Id', 'Driver Id']).tolist()
 
     # Convert numeric values to strings to avoid rendering issues
     hamilton_values = [str(hamilton_stats[col]) for col in stats_columns]
@@ -108,7 +176,8 @@ def get_race_comparison_data(race_id, race_name):
 
     return comparison_df
 
-# Define ui
+
+# Define UI
 app_ui = ui.page_fluid(
     # Header with F1 logo, images, and title, with a red background and white title text
     ui.div(
@@ -188,9 +257,10 @@ app_ui = ui.page_fluid(
     )
 )
 
-# Define server logic
+
+# Define Server Logic
 def server(input, output, session):
-    # Load sample data
+    # Load 2021 season overview data
     data = load_2021_season_data()
 
     # Render the Hamilton image
@@ -258,7 +328,7 @@ def server(input, output, session):
             # For selected races, display the head-to-head comparison table and track image
             return ui.TagList(
                 ui.h3(f"Head-to-Head Comparison for {race}"),
-                ui.output_image("track_image"),
+                ui.output_image("track_image"),  # Display track image
                 ui.output_table("race_comparison_table")
             )
 
@@ -290,26 +360,28 @@ def server(input, output, session):
     def track_image():
         race = input.race_select()
         if race == "2021 Season Overview":
-            return None  # Do not display an image for the overview
+            return None  # No image for the overview
         else:
-            # Construct the image file name (e.g., 'bahrain.png')
-            image_name = race.lower().replace(" ", "_") + ".png"
+            # Generate the file name based on the race name
+            # Handle special characters and spaces
+            image_name = race.lower().replace(" ", "_").replace("-", "_") + ".png"
             img_path = Path(__file__).parent / "www" / image_name
-
             if img_path.exists():
                 img: ImgData = {
                     "src": str(img_path),
-                    "width": "600px",
+                    "width": "600px",  # Adjust the width as needed
                     "height": "auto",
-                    "style": "border:2px solid black;"
+                    "style": "display: block; margin-left: auto; margin-right: auto;"
                 }
                 return img
             else:
-                # Handle case where image does not exist
+                # Optionally, return a default image or an error message
+                # Here, returning an alt text
                 return {
                     "src": "",
-                    "alt": f"No image available for {race}"
+                    "alt": f"Image for {race} not found."
                 }
+
 
 # Create the Shiny app
 app = App(app_ui, server)
