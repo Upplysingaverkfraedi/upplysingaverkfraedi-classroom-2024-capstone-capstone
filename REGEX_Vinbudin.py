@@ -56,14 +56,14 @@ def parse_html(html):
 # Save the results sem .CSV file
 def save_results(all_beers_data, output_dir):
     if not all_beers_data:
-        print("No data to save.")
+        print("No data to save.") # Ef það er ekki fundið neitt í html vinbudin.is þá prentast þetta
         return
     
     os.makedirs(output_dir, exist_ok=True)
     filename = "Bjor_Vinbudin.csv"  # Nafn á CSV skrá
     filepath = os.path.join(output_dir, filename)
 
-    df = pd.DataFrame(all_beers_data, columns=["Nafn", "Verð (Kr)", "ml"])
+    df = pd.DataFrame(all_beers_data, columns=["Nafn", "Verð (Kr)", "ml"]) # Setja form .csv skjals þar sem efstu colums hafn merkingar
     df.to_csv(filepath, index=False)
     print(f"Prices saved to {filepath}")
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     for url in urls:
         html = fetch_html(url)
         if html:
-            beers_data = parse_html(html)
+            beers_data = parse_html(html) # notar fall def parse_html til að finna nafn, verð og ml
             all_beers_data.extend(beers_data) # Bætir beers_data við all_beers_data
 
     if all_beers_data: # Vistar upplýnsingar in í skjal data
