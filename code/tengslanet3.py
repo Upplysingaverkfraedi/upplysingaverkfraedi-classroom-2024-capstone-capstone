@@ -106,4 +106,4 @@ def display_connection(clickData):
 
 # Run the Dash app
 if __name__ == "__main__":
-    app.run_server(debug=True, port=8076)
+    app.run_server(debug=True, port=8063)
