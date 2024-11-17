@@ -1,11 +1,22 @@
 # Capstone verkefni 
 
+
+## TL;DR fyrir 
+Þetta verkefni snýst um að greina kvikmyndagögn frá Rotten Tomatoes og IMDb til að draga fram upplýsingar um leikarana Leonardo DiCaprio og Kate Winslet. Verkefnið felur í sér að vinna með SQLite gagnagrunn, tengja gögn milli taflna með IMDb ID, og smíða gagnvirkt mælaborð til að sýna niðurstöðurnar. Mælaborðið gerir notendum kleift að sjá dreifingu kvikmynda, upplýsingar um leikarana, og aðra tölfræðilega greiningu.
+
+## Strúktúr
+
+- `code`mappan: Inniheldur öll nauðsynleg forrit sem þarf til að búa til gagnagrunn
+- `data mappan: Inniheldur gagnagrunninn í formi binary skrár og csv skránna sem notuð var við gerð gagnagrunns
+- `Mælaborð` mappan: Inniheldur rmd skjal með mælaborðinu ásamt skýrslu í formi html skráar.
+
+
 ## Uppsetning Gagnagrunns 
 
 ### 1. rotten_tomatoes_movies
 
-Við lesum gögnin úr csv skránni okkar sem heitir **rotten_tomatoes_movies2.csv** sem hægt er að finna í data möppunni. 
-Til þessu að búa til sql töflu úr csv skránni okkar notum við forritið **create_db2.sql** sem er að finna í code möppunni. 
+Við lesum gögnin úr csv skránni okkar sem heitir `rotten_tomatoes_movies2.csv` sem hægt er að finna í data möppunni. 
+Til þessu að búa til sql töflu úr csv skránni okkar notum við forritið `create_db2.sql` sem er að finna í code möppunni. 
 
 Við búum til töfluna með því að keyra eftirfarandi skipun á terminal/cmd: 
 
@@ -25,7 +36,7 @@ sqlite> select * from rotten_tomatoes_movies limit 10;
 ```
 Þá ættuð þið að sjá fyrstu tíu línurnar í töflunni. 
 
-Síðan þarf að bæta við dálkinum movie_id í töfluna okkar. Það er einfaldlega dálkur sem gefur hverri kvikmynd id númer sem hægt er að nýta seinna meir til að gera fleiri töflur. Það eru nokkrar leiðir til að gera þetta en ég gerði þetta í R, það hefði líklegra verið hentugra og einfaldara að nota AUTOINCREMENT þegar búið var til töfluna, það hefði verið hægt með því að hafa efst í forritinu ´create_db2.sql´:
+Síðan þarf að bæta við dálkinum movie_id í töfluna okkar. Það er einfaldlega dálkur sem gefur hverri kvikmynd id númer sem hægt er að nýta seinna meir til að gera fleiri töflur. Það eru nokkrar leiðir til að gera þetta en ég gerði þetta í R, það hefði líklegra verið hentugra og einfaldara að nota AUTOINCREMENT þegar búið var til töfluna, það hefði verið hægt með því að hafa efst í forritinu `create_db2.sql`:
 
 ```
 CREATE TABLE rotten_tomatoes_movies (
@@ -104,7 +115,7 @@ python3 code/content_rating_count.py
 
 ### 4. movie_actors
 
-Til að gera töfluna okkar, movie_actors notum við forritið `create_actor.py` í code möppunni.
+Til að gera töfluna okkar, `movie_actors` notum við forritið `create_actor.py` í code möppunni.
 Til að búa til töfluna getum keyrt skipunina: 
 
 ```
@@ -141,57 +152,91 @@ Eftir þetta ferli ættu töflurnar `rotten_tomatoes_movies`, `rotten_tomatoes_m
 
 
 
+## Uppsetning mælaborðs
 
-## Gerð mælaborðs
+Mælaborðið er hannað í R Markdown skjali, við notuðum Rstudios. Inni á main er skjal sem heitir Maelabord.rmd. Hlaðið því niður í tölvuna ykkar. 
 
-Mælaborðið er hannað í R, við notuðum Rstudios. Inni á main er skjal sem heitir Maelabord.rmd. Hlaðið því niður í tölvuna ykkar. 
-Opnið síðan skjalið gegnum Rstudios. Þið þurfið að breyta path to í viðeigandi heiti: 
+Þið þurfið að breyta path to í viðeigandi heiti: 
 
-conn <- dbConnect(SQLite(), "C:\\Users\\Ásdís\\OneDrive - Kvennaskolinn i Reykjavik\\Desktop\\Documents\\HÍ haust 24\\Upplýsingaverkfræði\\capstone-the-north\\data\\rotten_tomatoes.db")
-
-Til að keyra forritið þarf að vera með shiny pakkann í R.
+conn <- dbConnect(SQLite(), "path/to/your/data/rotten_tomatoes.db")
 
 
+Áður en keyrt er skjalið þarf fyrst að keyra forritið `tengslanet3.py` sem má finna í code möppunni. Þetta gerum við til að skoða tengslanetið í mælaborðinu.
+Hægt er að keyra forritið með skipuninni: 
+
+```
+python3 code/tengslanet3.py
+```
+** Athugið: Python-forritið verður að vera í keyrslu á meðan mælaborðið er keyrt.**
+
+Þegar búið er að skoða mælaborðið er mikilvægt að hætta keyrslunni á `tengslanet3.py` með `Ctrl + C`, **Ekki hætta keyrslu með `Ctrl + Z`**. Ef það er gert, mun forritið áfram halda sambandi við port númerið, sem veldur því að portið verður óaðgengilegt næst þegar forritið er keyrt.
+
+Í því ólíklega tilfelli að óvart er ýtt á `Ctrl+Z` til að hætta keyrslu, og þið viljið aftur skoða mælaborðið er hægt að laga vandamálið með því að breyta portnúmerinu í forritinu, og síðan þarf að breyta portnúmerinu í mælaborðinu. 
+
+Getið breytt inni á tengslanet3.py: 
+
+```
+# breyta í t.d bara 8064
+app.run_server(debug=True, port=8063)
+```
+og síðan breyta í mælaborðinu:
+```
+  tabPanel(
+      "Tengslanet",
+      h3("Tengslanet fyrir aðalleikara"),
+      tags$iframe(src = "http://127.0.0.1:8063/", height = "600", width = "100%")
+    )
+# Breyta http://127.0.0.1:8063/ yfir í //127.0.0.1:8064/
+# Þarf að vera sama port númer og er í forritinu
+```
+En þetta vandamál ætti ekki að koma upp ef það er notað bara `Ctrl + C`
 
 
-## Nauðsynleg bókasöfn
+## Nauðsynleg bókasöfn 
 
-í python: 
+### í python: 
 
 ```
 import sqlite3
 from imdb import Cinemagoer
 import time
+import re
+import pandas as pd
+import unicodedata
+from difflib import get_close_matches
+import requests
+from bs4 import BeautifulSoup
+import networkx as nx
+import dash
+from dash import dcc, html, Input, Output, State
+import plotly.graph_objects as go
+from itertools import combinations
 ```
-Hægt er að downloada imdb pakkanum með skipuninni: 
+
+Ég útfærði skjal, `requirements.txt`, sem má finna í code möppunni sem inniheldur þá pakka sem eru ekki innbyggðir í python. Til að hlaða þeim pökkum er hægt að keyra skipunina:
 
 ```
-pip3 install IMDbPY 
+pip3 install -r code/requirements.txt
 ```
-Ekki þarf að downloada time og sqlite3 því að það er nú þegar innifalið í python 3 pakkanum. 
 
-Í R: 
+### Í R: 
 
 ```
-library(DBI)
-library(RSQLite)
 library(shiny)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(DBI)
+library(RSQLite)
 library(stringr)
+library(bslib)
+library(plotly)
 ```
 
-Hægt að downloada pökkunum í console með skipuninni: 
+Hægt er að downloada pökkunum í console með skipuninni: 
 
 ```
-install.packages("DBI")
-install.packages("RSQLite")
-install.packages(shiny)
-install.packages(dplyr)
-install.packages(tidyr)
-install.packages(ggplot2)
-install.packages(stringr)
+install.packages("Nafn_pakka")
 ```
 
 Einnig þarf að hafa python3, sjá vefsíðu: https://www.python.org/downloads/
