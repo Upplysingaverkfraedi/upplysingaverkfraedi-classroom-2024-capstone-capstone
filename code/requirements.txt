@@ -1,0 +1,7 @@
+imdbpy
+pandas
+requests
+beautifulsoup4
+networkx
+dash
+plotly
