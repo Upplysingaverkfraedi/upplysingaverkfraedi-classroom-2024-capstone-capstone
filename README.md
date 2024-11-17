@@ -5,10 +5,7 @@
 ### 1. rotten_tomatoes_movies
 
 Við lesum gögnin úr csv skránni okkar sem heitir **rotten_tomatoes_movies2.csv** sem hægt er að finna í data möppunni. 
-Það þarf að hlaða niður þeirri skrá á viðeigandi stað (hentugast að hafa data möppu). 
-
 Til þessu að búa til sql töflu úr csv skránni okkar notum við forritið **create_db2.sql** sem er að finna í code möppunni. 
-Hlaða þarf þeirri skrá, og helst hafa hana í code möppu. 
 
 Við búum til töfluna með því að keyra eftirfarandi skipun á terminal/cmd: 
 
@@ -28,14 +25,21 @@ sqlite> select * from rotten_tomatoes_movies limit 10;
 ```
 Þá ættuð þið að sjá fyrstu tíu línurnar í töflunni. 
 
-Síðan þurfum við að bæta við dálkinum movie_id í töfluna okkar. Það er einfaldlega dálkur sem gefur hverri kvikmynd id númer sem hægt er að nýta seinna meir til að gera fleiri töflur. Það eru nokkrar leiðir til að gera þetta en ég gerði þetta í R. Ég keyrði bútinn: 
+Síðan þarf að bæta við dálkinum movie_id í töfluna okkar. Það er einfaldlega dálkur sem gefur hverri kvikmynd id númer sem hægt er að nýta seinna meir til að gera fleiri töflur. Það eru nokkrar leiðir til að gera þetta en ég gerði þetta í R, það hefði líklegra verið hentugra og einfaldara að nota AUTOINCREMENT þegar búið var til töfluna, það hefði verið hægt með því að hafa efst í forritinu ´create_db2.sql´:
+
+```
+CREATE TABLE rotten_tomatoes_movies (
+    movie_id INTEGER PRIMARY KEY AUTOINCREMENT,
+```
+
+En ég bjó til dálkinn með því að keyra í R markdown skjali: 
 
 ```
 library(DBI)
 library(RSQLite)
 
 # Tengist SQLite gagnagrunninum
-conn <- dbConnect(RSQLite::SQLite(), "Documents/GitHub/capstone-the-north/data/rotten_tomatoes.db")
+conn <- dbConnect(RSQLite::SQLite(), "path/to/your/data/rotten_tomatoes.db")
 
 # Les gögnin inn úr töflunni í gagnagrunninum til að skoða gögnin ef þú vilt
 rotten_tomatoes_data <- dbReadTable(conn, "rotten_tomatoes_movies")
@@ -54,62 +58,53 @@ dbWriteTable(conn, "rotten_tomatoes_movies", rotten_tomatoes_data, overwrite = T
 # Lokar tengingunni
 dbDisconnect(conn)
 ```
-Til að keyra þennan bút í R þarf að hafa bókasöfnin DBI og RSQLite. Hægt að er að downloada þeim í console með því að keyra: 
-
-```
-install.packages(RBI)
-```
-og 
-
-```
-install.packages(RSQLite)
-```
-
-Passið að "path/to" sé rétt slóð til að forritið nái að lesa gögnin. En eftir þessa keyrslu ætti dálkurinn movie_id að vera komin inní töfluna ykkar. 
-
-Til að vera viss um að dálkurinn sé kominn inní töfluna er hægt að fara aftur í terminal/cmd og keyra: 
-
-```
-sqlite3 data/rotten_tomatoes.db 
-```
-
-```
-sqlite> select * from rotten_tomatoes_movies limit 10; 
-```
-til að skoða töfluna. 
+Passa þarf að "path/to" sé rétt slóð til að forritið nái að lesa gögnin. En eftir þessa keyrslu ætti dálkurinn movie_id að vera komin inní töfluna. 
 
 ### 2. rotten_tomatoes_movies_dicaprio_winslet
 
 Nú getum við síað gögnin okkar og búið til nýja töflu sem inniheldur aðeins myndir sem að Leonardo Dicaprio eða Kate Winslet léku í: 
+Til þess að gera það er notað forritið `leo_kate.sql`. Það forrit er staðsett í code möppunni. 
 
-Til þess að gera það þarf að hlaða niður forritinu **leo_kate.sql**. Það forrit er staðsett í code möppunni. 
-
-Þegar búið er að hlaða því niður á viðeigandi stað er hægt að búa til töfluna með því að keyra skipunina: 
+Hægt að búa til töfluna með því að keyra skipunina: 
 
 ```
-sqlite3 data/rotten_tomatoes.db < leo_kate.sql
+sqlite3 data/rotten_tomatoes.db < code/leo_kate.sql
 ```
 inná terminal/cmd. 
 
 Nú ætti að verða til tvær töflur inná rotten_tomatoes.db sem heita rotten_tomatoes_movies_dicaprio_winslet og rotten_tomatoes_movies. 
-Til að vera viss um að báðar töflur séu til staðar er hægt að gera 
+
+Einnig þarf að uppfæra genres dálkinn sem að lætur óalgengar tegundir verða að "other". Þetta er gert með forritinu `genres.py`:
+Keyra þarf skipunina:
 
 ```
-sqlite3 data/rotten_tomatoes.db
-sqlite> .tables
+python3 code/genres.py
 ```
-Þá ættuð þið að sjá báðar töflur. Síðan til að sjá innihald töflunnar getið þið gert: 
+Þá ætti genres dálkurinn í töflunni `rotten_tomatoes_movies_dicaprio_winslet` að vera uppfærður.
+
+## 3. leo_movies og kate_movies
+
+Einnig þarf að búa til töflurnar `leo_movies` og `kate movies`, sem aðskilur töfluna `rotten_tomatoes_movies_dicaprio_winslet`. Þetta er einfaldlega gert með forritunum leo_movies.py og kate_movies.py
+
+Keyra þarf skipanirnar:
+```
+python3 code/kate_movies.py
+```
+og 
 
 ```
-sqlite3 data/rotten_tomatoes.db
-sqlite> select * from rotten_tomatoes_movies_dicaprio_winslet limit 10;
+python3 code/leo_movies.py
+```
+Þegar búið er að gera þessar töflur þarf að búa til töfluna `content_rating_count` sem að mun hjálpa við hönnun mælaborðsins. Þetta er gert með forritinu `content_rating_count.py`. Keyra þarf skipunina:
+
+```
+python3 code/content_rating_count.py
 ```
 
-líkt og áðan 
 
-### 3. movie_actors
+### 4. movie_actors
 
-Til að gera þriðju töfluna okkar, movie_actors notum við forritið **create_actor.py** í code möppunni.
+Til að gera töfluna okkar, movie_actors notum við forritið `create_actor.py` í code möppunni.
 Til að búa til töfluna getum keyrt skipunina: 
 
 ```
@@ -117,16 +112,33 @@ python3 code/create_actor.py
 ```
 Þá ætti að verða til þriðja taflan í rotten_tomatoes.db filenum okkar sem heitir movie_actors. Athugið að actor_id dálkurinn er bara með NA gildum, en það er í lagi því að við eigum eftir að setja inn viðeigandi id í þann dálk seinna. 
 
+### 5. actors_info
 
-### 4. actors_info
-
-Til að gera seinustu töfluna notum við python pakka sem heitir Cinemagoer (eð. IMDbPY), sem er pakki til að sækja gögn frá gagnagrunni IMDb. Forritið sem við notum heitir **create_actors_info** og er að finna í code möppunni. Þegar búið er að hlaða niður forritinu og downloada Cinemagoer pakkanum er hægt að búa til forritið með því að keyra skipunina: 
-
+Forritið sem við notum heitir `createactors_info` og er að finna í code möppunni. Búið er til töfluna með því að keyra skipunina:
 
 ```
-python3 code/create_actors_info.py
+python3 code/createactors_info.py
 ```
-Athugið að þessi keyrsla mun taka mjög langan tíma þar sem að Cinemagoer er frekar hægvirkur pakki og einnig erum við með mikið af leikurum í töflunni okkar. 
+
+Athugið að þessi keyrsla mun taka mjög langan tíma þar sem að Cinemagoer er frekar hægvirkur pakki og einnig erum við með mikið af leikurum í töflunni okkar. Það er þó hægt að stoppa keyrsluna og upplýsingarnar sem forritið var búið að sækja mun commitast inni á töfluna. Síðan þegar hafið er aftur keyrslu mun forritið aðeins sækja þau gögn sem hafa ekki verið "processed". Eftir þessa keyrslu ætti einnig actor_id dálkurinn í töflunni `movie-actors` að vera uppfærður með viðeigandi IMDb ID. Fyrir þetta verkefni þurfum við helst upplýsingar um Kate Winslet og Leonardo DiCaprio. Því er hægt að ljúka keyrslunni þegar þau eru komin inn, til að stytta tíma. 
+
+Til að sækja fleiri upplýsingar í actors_info töfluna, þ.e mini_biography, trivia og highest paid movie og salary er notað forritið `get_biography.py`. Hægt er að keyra forritið með skipuninni:
+
+```
+python3 code/get_biography.py
+```
+Athugið að þessi keyrsla tekur tíma, en ef stoppað er keyrslu munu þær upplýsingar sem forritið er búið að sækja commitast, því er nóg að stoppa keyrslu þegar upplýsingar fyrir Leonardo DiCaprio og Kate Winslet eru komin inn, uppá virkni mælaborðsins. En það er þó auðvitað hægt að keyra þetta fyrir alla leikarana, ætti ekki að taka jafn langan tíma og að keyra `createactors_info`
+
+### 6. main_actors_in_info
+
+Til að búa til töfluna `main_actors_in_info`, sem seinna meir verður notuð til að byggja upp tengslanet, notum við forritið `actors_in_info`. Keyra skal skipunina: 
+
+```
+python3 code/actors_in_info.py
+```
+
+Eftir þetta ferli ættu töflurnar `rotten_tomatoes_movies`, `rotten_tomatoes_movies_dicaprio_winslet`, `leo_movie`, `kate_movies`, `content_rating_count`, `movie_actors`, `actors_info`, `main_actors_in_info`, 
+
 
 
 
