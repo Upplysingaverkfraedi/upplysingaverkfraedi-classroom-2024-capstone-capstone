@@ -1,0 +1,172 @@
+---
+title: "maelabord"
+author: "Guðný Lilja"
+date: "2024-11-17"
+output: html_document
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(shiny)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(DBI)
+library(RSQLite)
+library(stringr)
+library(plotly)
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+```
+
+
+```{r}
+# Connect to the database
+conn <- dbConnect(RSQLite::SQLite(), "/Users/gudnylilja/Documents/GitHub/capstone-the-north/data/rotten_tomatoes.db")
+
+# Load tables
+leo_movies <- dbReadTable(conn, "leo_movies")
+kate_movies <- dbReadTable(conn, "kate_movies")
+leo_kate_movies <- dbReadTable(conn, "leo_kate_movies")
+dicaprio_winslet_movies <- dbReadTable(conn, "rotten_tomatoes_movies_dicaprio_winslet")
+
+# Disconnect from the database
+dbDisconnect(conn)
+
+```
+
+```{r}
+# Define UI
+ui <- fluidPage(
+  titlePanel("Greining á kvikmyndagögnum"),
+  sidebarLayout(
+    sidebarPanel(
+      h3("Valmöguleikar"),
+      selectInput("leikari", "Veldu leikara:", choices = c("Leonardo DiCaprio", "Kate Winslet"))
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel("Tegundir", plotOutput("genrePlot")),
+        tabPanel("Orðaský", plotOutput("wordCloud"))
+      )
+    )
+  )
+)
+
+```
+
+```{r}
+# Define server logic
+server <- function(input, output) {
+  # Reactive: Filtered data based on actor selection
+  actor_data <- reactive({
+    req(input$leikari)
+    if(input$leikari == "Leonardo DiCaprio") {
+      leo_movies
+    } else {
+      kate_movies
+    }
+  })
+
+  # Generate plot for genre distribution
+  output$genrePlot <- renderPlot({
+    data <- actor_data() %>%
+      separate_rows(genres, sep = ", ") %>%
+      count(genres)
+    
+    ggplot(data, aes(x = genres, y = n, fill = genres)) +
+      geom_bar(stat = "identity") +
+      theme_minimal() +
+      labs(title = paste("Fjöldi mynda eftir tegund fyrir", input$leikari), x = "Tegund", y = "Fjöldi kvikmynda")
+  })
+
+  # Prepare and render the word cloud
+  output$wordCloud <- renderPlot({
+    corpus <- Corpus(VectorSource(tolower(dicaprio_winslet_movies$critics_consensus)))
+    corpus <- tm_map(corpus, removePunctuation)
+    corpus <- tm_map(corpus, content_transformer(tolower))
+    corpus <- tm_map(corpus, removeWords, stopwords("english"))
+    corpus <- tm_map(corpus, removeNumbers)
+    
+    tdm <- TermDocumentMatrix(corpus)
+    m <- as.matrix(tdm)
+    word_freqs <- sort(rowSums(m), decreasing = TRUE)
+    df <- data.frame(word = names(word_freqs), freq = word_freqs)
+    
+    df <- df[df$word %in% c("brilliant", "powerful", "best", "strong", "thrilling", "superb", "undeniably", "masterpiece", "compelling", "emotional", "beautiful", "dazzling", "exceptional", "outstanding", "perfect", "loved", "amazing", "great", "incredible", "fantastic", "good", "excellent"),]
+    
+    wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words = 100, random.order = FALSE, rot.per = 0.35, colors = brewer.pal(8, "Dark2"))
+  })
+}
+
+
+
+```
+
+```{r}
+# Run the application
+shinyApp(ui = ui, server = server)
+
+```
+
+```{r}
+server <- function(input, output) {
+  # Reactive: Filtered data based on actor selection
+  actor_data <- reactive({
+    req(input$actor)
+    if(input$actor == "Leonardo DiCaprio") {
+      leo_movies
+    } else {
+      kate_movies
+    }
+  })
+
+  # Generate plot for genre distribution
+  output$genrePlot <- renderPlot({
+    data <- actor_data() %>%
+      separate_rows(genres, sep = ", ") %>%
+      count(genres)
+    
+    ggplot(data, aes(x = genres, y = n, fill = genres)) +
+      geom_bar(stat = "identity") +
+      theme_minimal() +
+      labs(title = paste("Number of Movies by Genre for", input$actor), x = "Genre", y = "Number of Movies")
+  })
+
+  # Prepare and render the word cloud
+  output$wordCloud <- renderPlot({
+    # Ensure critic_texts is filtered based on the actor selected
+    text_data <- tolower(critic_texts$critics_consensus[critic_texts$actor == input$actor])
+    words <- unlist(strsplit(text_data, "\\W+"))  # use "\\W+" to split by non-word characters
+    word_freqs <- table(words)
+    word_freqs <- as.data.frame(word_freqs, stringsAsFactors = FALSE)
+    names(word_freqs) <- c("word", "freq")
+    # Define positive words (customize this list as needed)
+    positive_words <- c("brilliant", "powerful", "best", "strong", "thrilling", "superb", "undeniably", "masterpiece", "compelling", "emotional", "beautiful", "dazzling", "exceptional", "outstanding", "perfect", "loved", "amazing", "great", "incredible", "fantastic", "good", "excellent")
+    word_freqs <- word_freqs[word_freqs$word %in% positive_words,]
+
+    # Using wordcloud package to generate the cloud
+    wordcloud(words = word_freqs$word, freq = word_freqs$freq, min.freq = 1,
+              max.words = 100, random.order = FALSE, rot.per = 0.35,
+              colors = brewer.pal(8, "Dark2"))
+  })
+}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
