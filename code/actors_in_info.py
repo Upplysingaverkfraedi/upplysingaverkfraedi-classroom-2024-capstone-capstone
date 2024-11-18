@@ -39,7 +39,8 @@ cursor.execute("""
         tomatometer_fresh_critics_count,
         tomatometer_rotten_critics_count,
         movie_id,
-        actors  -- Keep the original actors column
+        actors,
+        processed  
     FROM rotten_tomatoes_movies_dicaprio_winslet WHERE 0
 """)
 
