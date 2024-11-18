@@ -7,7 +7,8 @@ python REGEX_Vinbudin.py
 ##  Mælaborð:
 Downloadið eftirfarandi skrá og opnið í PowerBI desktop (Mögulega hægt að opna á vefútgáfu)
 
-Mælaborð.pbix
+[Mælaborð.pbix](Mælaborð.pbix)  
+
 
 **Í þessu verkefni**
 
