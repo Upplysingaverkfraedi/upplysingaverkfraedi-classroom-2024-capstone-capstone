@@ -11,12 +11,12 @@ print("Tengist gagnagrunninum...")
 conn = sqlite3.connect('f1db.db')
 cursor = conn.cursor()
 
-cursor.execute('''DROP TABLE IF EXISTS race_data''')
+cursor.execute('''DROP TABLE IF EXISTS f1_race_data''')
 
 # Búa til töflu ef hún er ekki til
 print("Býr til töflu í gagnagrunninum...")
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS race_data (
+CREATE TABLE IF NOT EXISTS f1_race_data (
     race_id INTEGER,
     driver_id TEXT,
     lap INTEGER,
@@ -159,7 +159,7 @@ for user_race_id, site_info in final_race_mapping.items():
                     avg_speed = float(re.sub('<[^<]+?>', '', cols[7]).strip())
 
                     cursor.execute('''
-                        INSERT INTO race_data (race_id, driver_id, lap, time_of_day, lap_time, avg_speed)
+                        INSERT INTO f1_race_data (race_id, driver_id, lap, time_of_day, lap_time, avg_speed)
                         VALUES (?, ?, ?, ?, ?, ?)
                     ''', (user_race_id, driver_ids[driver_full_name], lap, time_of_day, lap_time, avg_speed))
     else:
@@ -203,7 +203,7 @@ for user_race_id, site_info in final_race_mapping.items():
                     pit_stop_time_sum = re.sub('<[^<]+?>', '', cols[7]).strip()
 
                     cursor.execute('''
-                        UPDATE race_data
+                        UPDATE f1_race_data
                         SET stops = ?, pit_stop_lap = ?, pit_stop_time = ?, pit_stop_time_sum = ?
                         WHERE race_id = ? AND driver_id = ?
                     ''', (stops, pit_stop_lap, pit_stop_time, pit_stop_time_sum, user_race_id, driver_ids[driver_full_name]))
