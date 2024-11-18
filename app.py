@@ -459,7 +459,6 @@ def get_average_points(data):
     return avg_data
 
 def create_performance_map(data):
-    # Use average points
     data = get_average_points(data)
 
     # Ensure data has no missing values in required columns
@@ -489,6 +488,35 @@ def create_performance_map(data):
     fig.update_layout(mapbox_accesstoken=mapbox_access_token)
     return fig
 
+def create_performance_map_with_race_points(data):
+    # Fjarlægja línur með vantar breytur í nauðsynlegum dálkum
+    data = data.dropna(subset=['lat', 'lon', 'race_points'])
+
+    fig = px.scatter_mapbox(
+        data,
+        lat="lat",
+        lon="lon",
+        color="driver_id",
+        size="race_points",
+        hover_name="circuit_id",
+        hover_data={
+            "driver_id": True,
+            "race_points": True,
+            "lat": False,
+            "lon": False
+        },
+        title="Race Points by Location for Hamilton and Verstappen",
+        labels={"driver_id": "Driver", "race_points": "Race Points"},
+        mapbox_style="light",
+        zoom=1,
+        height=600
+    )
+
+    # Update layout with access token and map style
+    fig.update_layout(mapbox_accesstoken=mapbox_access_token)
+    return fig
+
+
 # Búa til valmöguleika fyrir framleiðanda flokka
 manufacturer_choices = {
     "Vélaframleiðandi": "engine_manufacturer_id",
@@ -515,6 +543,21 @@ def get_race_details(race_name):
         return None
     
     return result.iloc[0].to_dict()
+
+def get_race_points(race_name):
+    
+    race_id = race_mapping.get(race_name)
+    query = f"""
+    SELECT driver_id, race_points
+    FROM hamilton_verstappen_race_data_2021
+    WHERE race_id = {race_id} AND type = 'RACE_RESULT'
+    """
+    conn = sqlite3.connect(DB_PATH)
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    return df
+
+
 
 # Define UI
 app_ui = ui.page_fluid(
@@ -729,7 +772,7 @@ def server(input, output, session):
             
             # Athugaðu hvort síuð gögn eru til
             if not filtered_data.empty:
-                return create_performance_map(filtered_data)
+                return create_performance_map_with_race_points(filtered_data)
             else:
                 # Skila tómu korti eða skilaboðum ef engin gögn eru til
                 fig = px.scatter_mapbox(
@@ -860,9 +903,9 @@ def server(input, output, session):
                     ),
                     ui.card(
                         ui.h4("Race Time vs Race Points"),
-                        output_widget("update_horizontal_bar_chart")  # Lárétta súluritið
+                        output_widget("horizontal_race_bar_chart")  # Lárétta súluritið
                     ),
-                    col_widths=[6, 6]
+                    col_widths=[6, 6, 4]
                 ),
                 ui.output_table("race_comparison_table")
             )
@@ -1251,6 +1294,39 @@ def server(input, output, session):
         )
 
         return fig
+    
+    @output
+    @render_widget
+    def horizontal_race_bar_chart():
+        # Ná í valið keppni
+        race = input.race_select()
+
+        # Ná í gögn fyrir valda keppni
+        df = get_race_points(race)
+        
+        # Búa til lóðrétt súlurit
+        fig = px.bar(
+            df,
+            x="driver_id",
+            y="race_points",
+            title=f"Race Points for {race}",
+            labels={"driver_id": "Driver", "race_points": "Points"},
+            color="driver_id",  # Litir eftir keppanda
+            color_discrete_map={
+                'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',  # Smooth blátt fyrir Hamilton
+                'max-verstappen': 'rgba(255, 0, 0, 0.7)'   # Smooth rautt fyrir Verstappen
+            }
+        )
+        fig.update_layout(
+            xaxis_title="Driver",
+            yaxis_title="Race Points",
+            template="plotly_white",
+            showlegend=False  # Fjarlægja legend ef ekki nauðsynlegt
+        )
+        return fig
+
+
+    
     
 
 # Create the Shiny app
