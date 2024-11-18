@@ -7,9 +7,11 @@
 ## Regex
 **Notið þetta til að keyra**
 
-Þarft að vera með skjalið 'REGEX_Linkar.txt'
-
-python3 REGEX_Vinbudin.py
+1. Þarft að vera með skjalið 'REGEX_Linkar.txt'
+2. Þarft að vera með skjalið 'REGEX_Vinbudin.py'
+3. Fara í Terminal og skrifa part 4
+4. python3 REGEX_Vinbudin.py
+5. Run kóðan sem gefur þér skjal sem heitir 'Bjor_Vinbudin.csv'
 
 
 ##  Mælaborð:
