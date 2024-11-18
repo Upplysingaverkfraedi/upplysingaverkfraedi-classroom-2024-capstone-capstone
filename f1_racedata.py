@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS race_data (
     avg_speed REAL,
     stops INTEGER,
     pit_stop_lap INTEGER,
-    pit_stop_time TEXT
+    pit_stop_time TEXT,
+    pit_stop_time_sum TEXT
 )
 ''')
 
@@ -170,7 +171,7 @@ for user_race_id, site_info in final_race_mapping.items():
     print(f"Sækir 'Pit Stop Summary' töflu frá: {full_pit_stop_url}")
 
     driver.get(full_pit_stop_url)
-    time.sleep(3)
+    time.sleep(1)
 
     html_content = driver.page_source
     table_match = table_pattern.search(html_content)
@@ -199,12 +200,13 @@ for user_race_id, site_info in final_race_mapping.items():
                     stops = int(re.sub('<[^<]+?>', '', cols[0]).strip())
                     pit_stop_lap = int(re.sub('<[^<]+?>', '', cols[4]).strip())
                     pit_stop_time = re.sub('<[^<]+?>', '', cols[6]).strip()
+                    pit_stop_time_sum = re.sub('<[^<]+?>', '', cols[7]).strip()
 
                     cursor.execute('''
                         UPDATE race_data
-                        SET stops = ?, pit_stop_lap = ?, pit_stop_time = ?
+                        SET stops = ?, pit_stop_lap = ?, pit_stop_time = ?, pit_stop_time_sum = ?
                         WHERE race_id = ? AND driver_id = ?
-                    ''', (stops, pit_stop_lap, pit_stop_time, user_race_id, driver_ids[driver_full_name]))
+                    ''', (stops, pit_stop_lap, pit_stop_time, pit_stop_time_sum, user_race_id, driver_ids[driver_full_name]))
     else:
         print(f"Engin tafla fannst fyrir 'Pit Stop Summary' fyrir race_id {user_race_id}.")
 
