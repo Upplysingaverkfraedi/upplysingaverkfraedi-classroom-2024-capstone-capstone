@@ -1,6 +1,5 @@
 # Capstone verkefni 
 
-
 ## TL;DR
 Þetta verkefni snýst um að greina kvikmyndagögn frá Rotten Tomatoes og IMDb til að draga fram upplýsingar um leikarana Leonardo DiCaprio og Kate Winslet. Verkefnið felur í sér að vinna með SQLite gagnagrunn, tengja gögn milli taflna með IMDb ID, og smíða gagnvirkt mælaborð til að sýna niðurstöðurnar. Mælaborðið gerir notendum kleift að sjá dreifingu kvikmynda, upplýsingar um leikarana, og aðra tölfræðilega greiningu.
 
@@ -13,15 +12,72 @@
 
 ## Uppsetning Gagnagrunns 
 
+### Nauðsynleg bókasöfn 
+
+### í python: 
+
+```
+import sqlite3
+from imdb import Cinemagoer
+import time
+import re
+import pandas as pd
+import unicodedata
+from difflib import get_close_matches
+import requests
+from bs4 import BeautifulSoup
+import networkx as nx
+import dash
+from dash import dcc, html, Input, Output, State
+import plotly.graph_objects as go
+from itertools import combinations
+```
+
+Við útfærðum skjalið, `requirements.txt`, sem má finna í code möppunni sem inniheldur þá pakka sem eru ekki innbyggðir í python. Til að hlaða þeim pökkum er hægt að keyra skipunina:
+
+```
+pip3 install -r code/requirements.txt
+```
+
+### Í R: 
+
+```
+library(shiny)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(DBI)
+library(RSQLite)
+library(stringr)
+library(bslib)
+library(plotly)
+```
+
+Hægt er að downloada pökkunum í console með skipuninni: 
+
+```
+install.packages("Nafn_pakka")
+```
+
+Einnig þarf að hafa python3, sjá vefsíðu: https://www.python.org/downloads/
+
+og R, sjá vefsíðu: https://cran.r-project.org/
+
+Þegar búið er að hlaða inn öllum viðeigandi pökkum er hægt að hefjast við gerð gagnagrunnsins.
+
 ### 1. rotten_tomatoes_movies
 
 Við lesum gögnin úr csv skránni okkar sem heitir `rotten_tomatoes_movies2.csv` sem hægt er að finna í data möppunni. 
 Til þessu að búa til sql töflu úr csv skránni okkar notum við forritið `create_db2.sql` sem er að finna í code möppunni. 
 
-Við búum til töfluna með því að keyra eftirfarandi skipun á terminal/cmd: 
+Við búum til töfluna með því að keyra eftirfarandi skipun ef unnið er á unix-skel (macOS eða Linux): 
 
 ```
 sqlite3 data/rotten_tomatoes.db < code/create_db2.sql
+```
+En ef unnið er á Windows PowerShell er keyrst skipunina:
+```
+Get-Content code/create_db2.sql | sqlite3 data/rotten_tomatoes.db
 ```
 
 Nú verður til rotten_tomatoes.db skjal í data möppunni ykkar sem inniheldur töfluna rotten_tomatoes_movies. 
@@ -36,14 +92,14 @@ sqlite> select * from rotten_tomatoes_movies limit 10;
 ```
 Þá ættuð þið að sjá fyrstu tíu línurnar í töflunni. 
 
-Síðan þarf að bæta við dálkinum movie_id í töfluna okkar. Það er einfaldlega dálkur sem gefur hverri kvikmynd id númer sem hægt er að nýta seinna meir til að gera fleiri töflur. Það eru nokkrar leiðir til að gera þetta en ég gerði þetta í R, það hefði líklegra verið hentugra og einfaldara að nota AUTOINCREMENT þegar búið var til töfluna, það hefði verið hægt með því að hafa efst í forritinu `create_db2.sql`:
+Síðan þarf að bæta við dálkinum movie_id í töfluna okkar. Það er einfaldlega dálkur sem gefur hverri kvikmynd id númer sem hægt er að nýta seinna meir til að gera fleiri töflur. Það eru nokkrar leiðir til að gera þetta en við gerðum þetta í R, það hefði líklegra verið hentugra og einfaldara að nota AUTOINCREMENT þegar búið var til töfluna, það hefði verið hægt með því að hafa efst í forritinu `create_db2.sql`:
 
 ```
 CREATE TABLE rotten_tomatoes_movies (
     movie_id INTEGER PRIMARY KEY AUTOINCREMENT,
 ```
 
-En ég bjó til dálkinn með því að keyra í R markdown skjali: 
+Við bjuggum til dálkinn með því að keyra í R markdown skjali: 
 
 ```
 library(DBI)
@@ -76,12 +132,17 @@ Passa þarf að "path/to" sé rétt slóð til að forritið nái að lesa gögn
 Nú getum við síað gögnin okkar og búið til nýja töflu sem inniheldur aðeins myndir sem að Leonardo Dicaprio eða Kate Winslet léku í: 
 Til þess að gera það er notað forritið `leo_kate.sql`. Það forrit er staðsett í code möppunni. 
 
-Hægt að búa til töfluna með því að keyra skipunina: 
+Hægt að búa til töfluna með því að keyra skipunina í cmd/terminal: 
 
+Í macOS epa Linux:
 ```
 sqlite3 data/rotten_tomatoes.db < code/leo_kate.sql
 ```
-inná terminal/cmd. 
+En í Windows tölvu: 
+
+```
+Get-Content code/leo_kate.sql | sqlite3 data/rotten_tomatoes.db
+```
 
 Nú ætti að verða til tvær töflur inná rotten_tomatoes.db sem heita rotten_tomatoes_movies_dicaprio_winslet og rotten_tomatoes_movies. 
 
@@ -130,6 +191,7 @@ Forritið sem við notum heitir `createactors_info` og er að finna í code möp
 ```
 python3 code/createactors_info.py
 ```
+Ef það kemur upp villa við þessa keyrslu, þarf líklegast að keyra með python, ekki python3 (jafnvel þó að python3 sé þegar í tölvunni).
 
 Athugið að þessi keyrsla mun taka mjög langan tíma þar sem að Cinemagoer er frekar hægvirkur pakki og einnig erum við með mikið af leikurum í töflunni okkar. Það er þó hægt að stoppa keyrsluna og upplýsingarnar sem forritið var búið að sækja mun commitast inni á töfluna. Síðan þegar hafið er aftur keyrslu mun forritið aðeins sækja þau gögn sem hafa ekki verið "processed". Eftir þessa keyrslu ætti einnig actor_id dálkurinn í töflunni `movie-actors` að vera uppfærður með viðeigandi IMDb ID. Fyrir þetta verkefni þurfum við helst upplýsingar um Kate Winslet og Leonardo DiCaprio. Því er hægt að ljúka keyrslunni þegar þau eru komin inn, til að stytta tíma. 
 
@@ -138,6 +200,8 @@ Til að sækja fleiri upplýsingar í actors_info töfluna, þ.e mini_biography,
 ```
 python3 code/get_biography.py
 ```
+Ef það kemur upp villa við þessa keyrslu, þarf líklegast að keyra með python, ekki python3 (jafnvel þó að python3 sé þegar í tölvunni).
+
 Athugið að þessi keyrsla tekur tíma, en ef stoppað er keyrslu munu þær upplýsingar sem forritið er búið að sækja commitast, því er nóg að stoppa keyrslu þegar upplýsingar fyrir Leonardo DiCaprio og Kate Winslet eru komin inn, uppá virkni mælaborðsins. En það er þó auðvitað hægt að keyra þetta fyrir alla leikarana, ætti ekki að taka jafn langan tíma og að keyra `createactors_info`
 
 ### 6. main_actors_in_info
@@ -192,56 +256,7 @@ og síðan breyta í mælaborðinu:
 En þetta vandamál ætti ekki að koma upp ef það er notað bara `Ctrl + C`
 
 
-## Nauðsynleg bókasöfn 
 
-### í python: 
-
-```
-import sqlite3
-from imdb import Cinemagoer
-import time
-import re
-import pandas as pd
-import unicodedata
-from difflib import get_close_matches
-import requests
-from bs4 import BeautifulSoup
-import networkx as nx
-import dash
-from dash import dcc, html, Input, Output, State
-import plotly.graph_objects as go
-from itertools import combinations
-```
-
-Ég útfærði skjal, `requirements.txt`, sem má finna í code möppunni sem inniheldur þá pakka sem eru ekki innbyggðir í python. Til að hlaða þeim pökkum er hægt að keyra skipunina:
-
-```
-pip3 install -r code/requirements.txt
-```
-
-### Í R: 
-
-```
-library(shiny)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(DBI)
-library(RSQLite)
-library(stringr)
-library(bslib)
-library(plotly)
-```
-
-Hægt er að downloada pökkunum í console með skipuninni: 
-
-```
-install.packages("Nafn_pakka")
-```
-
-Einnig þarf að hafa python3, sjá vefsíðu: https://www.python.org/downloads/
-
-og R, sjá vefsíðu: https://cran.r-project.org/
 
 
 
