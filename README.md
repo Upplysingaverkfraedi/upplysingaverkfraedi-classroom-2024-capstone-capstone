@@ -1,7 +1,10 @@
-# Capstone verkefni 
+# Capstone verkefni - Samanburður leikarana Kate Winslet og Leonardo Dicaprio
 
 ## TL;DR
-Þetta verkefni snýst um að greina kvikmyndagögn frá Rotten Tomatoes og IMDb til að draga fram upplýsingar um leikarana Leonardo DiCaprio og Kate Winslet. Verkefnið felur í sér að vinna með SQLite gagnagrunn, tengja gögn milli taflna með IMDb ID, og smíða gagnvirkt mælaborð til að sýna niðurstöðurnar. Mælaborðið gerir notendum kleift að sjá dreifingu kvikmynda, upplýsingar um leikarana, og aðra tölfræðilega greiningu.
+Í þessu verkefni er borið saman feril og vinsældir Leonardo DiCaprio og Kate Winslet út frá gögnunum á Rotten Tomatoes og IMDb. Markmiðið var að greina þróun ferils þeirra, árangur út frá gagnrýnenda- og áhorfendaeinkunnum, og aðra mælikvarða eins og tegundir kvikmynda, leikstjóra og áhorfendafjölda.
+    Gögnin voru sótt frá Rotten Tomatoes og IMDb, unnin með SQL og Python, og sett fram á mælaborði í RStudio Shiny. Myndrænar greiningar sýna að DiCaprio hefur hækkað í áliti bæði gagnrýnenda og áhorfenda með árunum, á meðan Winslet sýnir meiri sveiflur og lægri meðaleinkunn. Báðir leikarar leika að mestu í dramatískum myndum og eru vinsælastir í kvikmyndum með strangari aldurstakmörkun (R og PG-13).
+    Mælaborðið, ásamt tengslaneti fyrir kvikmyndir, auðveldaði greiningu og framsetningu. Í verkefninu voru notuð SQL, RegEx, og önnur greiningartól sem tengjast námsefninu, sem skilaði bæði dýpri innsýn á gögnin og dró fram áhugaverðar niðurstöður. Verkefnið varpar ljósi á hvernig gögn má nýta til að svara spurningum um feril leikara og þróun þeirra.
+
 
 ## Strúktúr
 
