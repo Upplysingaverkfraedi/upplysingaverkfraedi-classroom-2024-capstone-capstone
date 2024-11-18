@@ -51,8 +51,8 @@ library(RSQLite)
 library(stringr)
 library(bslib)
 library(plotly)
+library(lubridate)
 ```
-
 Hægt er að downloada pökkunum í console með skipuninni: 
 
 ```
@@ -211,8 +211,15 @@ Til að búa til töfluna `main_actors_in_info`, sem seinna meir verður notuð 
 ```
 python3 code/actors_in_info.py
 ```
+### 7. Töflur fyrir directors graf
 
-Eftir þetta ferli ættu töflurnar `rotten_tomatoes_movies`, `rotten_tomatoes_movies_dicaprio_winslet`, `leo_movie`, `kate_movies`, `content_rating_count`, `movie_actors`, `actors_info`, `main_actors_in_info`, 
+Að lokum þarf að bæta við töflunum `all_movies_audience_directors` , `all_movies_tomatometer_directors` , `top10_audience_movies` og `top10_tomatometer_movies` til að gera graf til að skoða dreifni einkunna meðal top 10 leikstjóra. Notað er forritið `directors.py`, sem býr til allar 4 töflurnar. Keyrt er skipunina: 
+```
+python3 code/directors.py
+```
+
+
+Eftir þetta ferli ættu töflurnar `rotten_tomatoes_movies`, `rotten_tomatoes_movies_dicaprio_winslet`, `leo_movie`, `kate_movies`, `content_rating_count`, `movie_actors`, `actors_info`, `main_actors_in_info`, `all_movies_audience_directors` , `all_movies_tomatometer_directors` , `top10_audience_movies` og `top10_tomatometer_movies` að vera komnar í gagnagrunninn rotten_tomatoes.db
 
 
 
