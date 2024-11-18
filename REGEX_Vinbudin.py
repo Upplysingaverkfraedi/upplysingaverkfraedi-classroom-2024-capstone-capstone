@@ -9,13 +9,10 @@ import os
 def load_urls_from_file(file_name):
 
     # lesa skrá 'REGEX_Linkar.txt' sem inniheldir linka að "vefsíðum"
-
     with open(file_name, 'r') as file:
-
         urls =  [line.strip() for line in file if line.strip() and not line.startswith('#')]
         return urls
     
-
 def fetch_html(url):  # Nær í url
 
     response = requests.get(url)
@@ -23,7 +20,6 @@ def fetch_html(url):  # Nær í url
         html = response.text
         return html
     else:
-
         print(f"Náði ekki upplýsingum {url}")
         return None
 
@@ -35,15 +31,12 @@ def parse_html(html):
         r'<span id="ctl00_ctl01_Label_ProductName" class="product-info-text">([^<]+)</span>.*?'
         r'<span id="ctl00_ctl01_Label_ProductPrice" class="money">([\d.,]+)</span>'
     )
-
-    # Bæta við regex pattern fyrir volume in ml
-    volume_pattern = r'<span[^>]*id="ctl00_ctl01_Label_ProductBottleVolumeMobile"[^>]*>(\d+)\s*ml</span>'
-
-    # Finna matches fyrir bjór, Verð og ml
-    beer_matches = re.findall(beer_pattern, html, re.DOTALL)
+    volume_pattern = r'<span[^>]*id="ctl00_ctl01_Label_ProductBottleVolumeMobile"[^>]*>(\d+)\s*ml</span>' # Bæta við regex pattern fyrir volume in ml
+    
+    beer_matches = re.findall(beer_pattern, html, re.DOTALL) # Finna matches fyrir bjór, Verð og ml
     
     # Bæta við, finna match fyrir ml
-    volume_match = re.search(volume_pattern, html, re.DOTALL) # Bætti við rúmmáli ml seinna hér.
+    volume_match = re.search(volume_pattern, html, re.DOTALL) # Bætti þessum kóða við, sem rúmmáli ml seinna hér.
 
     if not beer_matches:
         print("Engin bjór, verð né ml fundið í HTML.")
@@ -55,7 +48,6 @@ def parse_html(html):
     # Process beer matches í lista af dictionaries, including volume
     beers_data = [{"Bjór": name.strip(), "Verð (Kr)": price.replace(".", "").replace(",", ""), "Stærð (ml)": volume_ml} for name, price in beer_matches]
 
-    
     return beers_data
 
 # Save the results sem .CSV file
@@ -80,11 +72,9 @@ if __name__ == "__main__":
     output_dir = './data' # skjal sem heitir data
     all_beers_data = [] # Tómt skjal sem hefur allar upplýsingar um nafn bjór, verð og volume.
 
-
     for url in urls:
         html = fetch_html(url)
         if html:
-          
             beers_data = parse_html(html) # notar fall def parse_html til að finna nafn, verð og ml
             all_beers_data.extend(beers_data) # Bætir beers_data við all_beers_data
 
