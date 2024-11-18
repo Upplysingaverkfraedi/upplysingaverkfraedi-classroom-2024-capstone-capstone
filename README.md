@@ -1,4 +1,7 @@
 ##  Mælaborð:
+Í þessu verkefni var sett upp mælaborð þar sem borið var saman verð á kranabjórum í miðbæ Reykjavíkur, happy hour og verð þeirra í vínbúðinni.
+Einnig voru lukkuhjól í bænum borin saman.
+
 ### Uppsetning
 #### Windows
 Sækið Power BI Desktop forritið á Microsoft Store
