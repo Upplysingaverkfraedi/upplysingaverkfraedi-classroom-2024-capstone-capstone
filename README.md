@@ -1,58 +1,40 @@
 # Capstone verkefni 
-
-## Verkefni
-Verkefnið er tvíþætt:
-
-- **Skýrsla** – Þið þurfið að skila tæknilegri skýrslu þar sem þið útskýrið hvernig þið nálguðust gagnaöflun, meðhöndlun gagna, og hvaða niðurstöður þið teljið markverðastar. Þetta þarf að vera á `HTML` formi, t.d. með [RPubs](https://rpubs.com/) fyrir RMarkdown.
-- **Mælaborð og kynning** – Þið þurfið að hanna mælaborð og halda kynningu þar sem þið útskýrið mælaborðið og niðurstöðurnar fyrir bekknum. Mælaborðið getur t.d. verið hýst á [shinyapps.io](https://www.shinyapps.io/).
-
-## Mælaborð
-Mælaborðið er hannað fyrir samnemendur ykkar í upplýsingaverkfræði. Munið að það þarf að:
-- **Sannfæra áhorfendur**: Sýnið þeim hvernig það gagnast.
-- **Skýrt viðmót**: Þið þurfið að tryggja að það sé auðvelt í notkun og framsetningin á gögnum sé skýr.
-
-## Skipulag
-Það eru ný teymi með 3-4 einstaklingum. Þið þurfið að skrá ykkur í Canvas og samþykkja GitHub Classroom verkefni með því að nota teymisnafnið ykkar.
-
-Í tímanum þann 21. október voru lyfturæður um möguleg capstone verkefni. Þið þurfið að velja eitt þeirra verkefna til að vinna með (aðeins eitt teymi má vinna með hvert efni).
-
-## Skil og kynning
-- **Skil á skýrslu**: `PDF` (eða `html`) þarf að vera komið inn á Canvas og GitHub repo fyrir lok dags 18. nóvember (mánudagur).
-- **Kynning á mælaborði**: Þið kynnið mælaborðið í tíma þann 21. nóvember (fimmtudagur). **Skyldumæting**.
-
-## Frjálst val á framsetningu
-Þið getið verið skapandi með framsetningu. Það er mikilvægt að myndirnar og mælaborðið hjálpi til við að segja sögu um gögnin sem fangar athygli áhorfenda.
-
-### Atriði sem skýrslan þarf að innihalda:
-- **Lýsing á gagnaöflun** – Hvaðan komu gögnin og hvernig voru þau fengin?
-- **Gagnavinnsla** – Hvernig voru gögnin meðhöndluð? Notið REGEX til að laga texta.
-- **Markverðustu niðurstöður** – Hverjar voru helstu niðurstöður?
-- **Mælaborðið** – Hvað gerðuð þið og hver var tilgangur þess?
-
-## GitHub Repo
-Þið þurfið að skila öllum skrám í GitHub repo teymisins. 
-
-Munið að `README` skráin þarf að innihalda: 
-- **TL;DR** – Stutt lýsing á verkefninu og niðurstöðum.
-- **Strúktur** – Lýsing á möppum og mikilvægum skrám.
-- **Keyrsluuppsetning** – Hvernig kóði og gagnagrunnur eru settir upp á öðrum tölvum. Öll lykilorð og notendanöfn skulu vera geymd með umhverfisbreytum.
-
-## Einkunnagjöf
-Einkunn verður byggð á:
-- **Gagnafrásögn** – Hversu skýr og aðgengileg er kynningin?
-- **Mælaborðið** – Hversu notendavænt og skýrt er það?
-
----
-
-## Viðvörun: Ekki vista lykilorð í GitHub repo
-
-Að vista lykilorð, notendanöfn eða aðrar viðkvæmar upplýsingar í GitHub repo sem er opinber (public)
-er mjög alvarlegt öryggisbrot. Hér eru nokkrar ástæður fyrir því að það má aldrei gera þetta:
-
-1. **Öryggisbrestur** – Opnar fyrir öryggisbrot.
-2. **Kostnaður** – Þriðji aðili gæti misnotað gögnin.
-3. **Git útgáfusaga** – Það er erfitt að fjarlægja viðkvæmar upplýsingar úr útgáfusögunni.
-4. **Orðspor** – Slíkar villur geta skaðað orðspor þitt sem forritari.
+### Uppsetning
+- Downloadið PowerBI desktop
+- Hafið Python sett upp í tölvunni ykkar
 
 
-  
+## Regex
+**Notið þetta til að keyra**
+Imports sem þarf
+
+import re
+import requests
+import pandas as pd
+from datetime import datetime
+import os
+
+
+1. Þarft að vera með skjalið 'REGEX_Linkar.txt'
+2. Þarft að vera með skjalið 'REGEX_Vinbudin.py'
+3. Fara í Terminal og skrifa part 4
+4. python3 REGEX_Vinbudin.py
+5. Run kóðan sem gefur þér skjal sem heitir 'Bjor_Vinbudin.csv'
+
+
+##  Mælaborð:
+Downloadið eftirfarandi skrám og opnið í PowerBI desktop (Mögulega hægt að opna á vefútgáfu)
+- Bjórkort.pbix
+- Hjól_Winrate.pbix
+
+**Í þessu verkefni**
+
+Í þessu verkefni er verið að ná í upplýsingar um bjór verð út úr versýðunni vínbúðin.is
+
+Þessi kóði,
+1. Imports,
+2. Er "load_urls_from_file(file_name)" Þetta les skrá 'REGEX_Linkar.txt' sem inniheldir linka að "vefsíðum"
+3. Er "fetch_html" Þetta leyfir okkur að ná í upplýsingar frá vefsýðum á netinu.
+4. Er "parse_html" þetta safnar upplýsingar um nafn, verð og rúmmál bjóra sem teknar eru frá vefsýðu "vínbúðin.is"
+5.  "save_results" vistar upplýsingarnar sem safnaðar voru úr vefsýðunni og setur þær í dálka "Bjór", "Verð (Kr)" og "Stærð (ml)"
+6. Er "__name__" þetta er notað til keyra kóðan sem safna upplýsingum frá "REGEX_Linkar.txt", þannig allir ættu að geta keyrt kóðan og fengið upplýsingarnar.
