@@ -7,7 +7,7 @@
 ## Strúktúr
 
 - `code`mappan: Inniheldur öll nauðsynleg forrit sem þarf til að búa til gagnagrunn
-- `data mappan: Inniheldur gagnagrunninn í formi binary skrár og csv skránna sem notuð var við gerð gagnagrunns
+- `data` mappan: Inniheldur gagnagrunninn í formi binary skrár og csv skránna sem notuð var við gerð gagnagrunns
 - `capstone_docs` mappan: Inniheldur rmd skjal með mælaborðinu ásamt skýrslu í formi html skráar.
 
 
