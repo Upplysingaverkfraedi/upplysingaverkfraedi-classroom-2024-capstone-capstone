@@ -16,5 +16,5 @@ Sækið [Mælaborð.pbix](Mælaborð.pbix) skrána og opnið í Power BI
 
 ## Notkun SQL, REGEX og uppsetning gagnagrunns
 Þar sem ekki þarf að keyra neinn kóða til að opna mælaborðið má finna frekari upplýsingar um SQL, REGEX og nokun þess til að setja upp gagnagrunnin í skjalinu:
-Þar má einnig finna upplýsingar um hvernig á að setja upp gagnagrunninn á eigin vegum.
+Þar má einnig finna upplýsingar um hvernig á að setja upp gagnagrunninn á eigin vegum og tengja hann við PowerBI
 [SQL_og_REGEX_notkun](SQL_og_REGEX_notkun.md) 
