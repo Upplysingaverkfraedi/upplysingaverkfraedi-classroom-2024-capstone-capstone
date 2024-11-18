@@ -1,13 +1,13 @@
-## Regex
-Notið þetta til að keyra
-
-python REGEX_Vinbudin.py
-
-
 ##  Mælaborð:
-Downloadið eftirfarandi skrá og opnið í PowerBI desktop (Mögulega hægt að opna á vefútgáfu)
+### Uppsetning
+#### Windows
+Sækið Power BI Desktop forritið á Microsoft Store
 
-[Mælaborð.pbix](Mælaborð.pbix)  
+#### MacOS
+Þar sem ekki er hægt að sækja Power BI Desktop á MacOS þarf að nota vefsíðuna: [Power BI](https://app.powerbi.com/home?experience=power-bi) 
+
+### Opna Mælaborðið
+Sækið [Mælaborð.pbix](Mælaborð.pbix) skrána og opnið í Power BI
 
 
 **Í þessu verkefni**
@@ -23,3 +23,10 @@ Part 3. Er "fetch_html" Þetta leyfir okkur að ná í upplýsingar frá vefsý�
 Part 4. Er "parse_html" þetta safnar upplýsingar um nafn, verð og rúmmál bjóra sem teknar eru frá vefsýðunni "vínbúðin.is"
 Part 5. "save_results" vistar upplýsingarnar sem safnaðar voru úr vefsýðunni og setur þær í dálka "Bjór", "Verð (Kr)" og "Stærð (ml)"
 Part 6. Er "__name__" þetta er notað til keyra kóðan sem safna upplýsingum frá "REGEX_Linkar.txt", þannig allir ættu að geta keyrt kóðan og fengið upplýsingarnar.
+
+
+## Regex
+Notið þetta til að keyra
+
+python REGEX_Vinbudin.py
+
