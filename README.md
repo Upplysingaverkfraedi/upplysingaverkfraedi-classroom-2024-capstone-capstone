@@ -1,7 +1,7 @@
 # Capstone verkefni 
 
 
-## TL;DR fyrir 
+## TL;DR
 Þetta verkefni snýst um að greina kvikmyndagögn frá Rotten Tomatoes og IMDb til að draga fram upplýsingar um leikarana Leonardo DiCaprio og Kate Winslet. Verkefnið felur í sér að vinna með SQLite gagnagrunn, tengja gögn milli taflna með IMDb ID, og smíða gagnvirkt mælaborð til að sýna niðurstöðurnar. Mælaborðið gerir notendum kleift að sjá dreifingu kvikmynda, upplýsingar um leikarana, og aðra tölfræðilega greiningu.
 
 ## Strúktúr
