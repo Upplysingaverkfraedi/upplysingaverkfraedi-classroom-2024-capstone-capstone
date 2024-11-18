@@ -1,58 +1,95 @@
-# Capstone verkefni 
+# Keyrsla á `app.py` 
 
-## Verkefni
-Verkefnið er tvíþætt:
+Höfum database-ið `f1db.db`. Höfum prófað að gera app með gröfum, alls ekki fullkomið hægt að sjá gróflega hvernig gögnin lýta út og hvernig þau eru upp sett.
 
-- **Skýrsla** – Þið þurfið að skila tæknilegri skýrslu þar sem þið útskýrið hvernig þið nálguðust gagnaöflun, meðhöndlun gagna, og hvaða niðurstöður þið teljið markverðastar. Þetta þarf að vera á `HTML` formi, t.d. með [RPubs](https://rpubs.com/) fyrir RMarkdown.
-- **Mælaborð og kynning** – Þið þurfið að hanna mælaborð og halda kynningu þar sem þið útskýrið mælaborðið og niðurstöðurnar fyrir bekknum. Mælaborðið getur t.d. verið hýst á [shinyapps.io](https://www.shinyapps.io/).
+Keyrðu eftirfarandi skipun til þess að vera í réttu umhverfi:
 
-## Mælaborð
-Mælaborðið er hannað fyrir samnemendur ykkar í upplýsingaverkfræði. Munið að það þarf að:
-- **Sannfæra áhorfendur**: Sýnið þeim hvernig það gagnast.
-- **Skýrt viðmót**: Þið þurfið að tryggja að það sé auðvelt í notkun og framsetningin á gögnum sé skýr.
+```bash
+pip install -r requirements.txt
+```
+síðan getur keyrt annað hvort `appdb.py` eða `appgogn.db` með eftirfarandi skipun:
 
-## Skipulag
-Það eru ný teymi með 3-4 einstaklingum. Þið þurfið að skrá ykkur í Canvas og samþykkja GitHub Classroom verkefni með því að nota teymisnafnið ykkar.
+```bash
+shiny run appdb.py
+```
+Ef þú ert með windows tölvu gæti verið að þú þurfir að keyra þessa skipun til þess að keyra app-ið:
+```bash
+python -m shiny run --reload appdb.py
+```
 
-Í tímanum þann 21. október voru lyfturæður um möguleg capstone verkefni. Þið þurfið að velja eitt þeirra verkefna til að vinna með (aðeins eitt teymi má vinna með hvert efni).
+# Ferli
 
-## Skil og kynning
-- **Skil á skýrslu**: `PDF` (eða `html`) þarf að vera komið inn á Canvas og GitHub repo fyrir lok dags 18. nóvember (mánudagur).
-- **Kynning á mælaborði**: Þið kynnið mælaborðið í tíma þann 21. nóvember (fimmtudagur). **Skyldumæting**.
+## Skref 1, sækja gagnagrunn.
 
-## Frjálst val á framsetningu
-Þið getið verið skapandi með framsetningu. Það er mikilvægt að myndirnar og mælaborðið hjálpi til við að segja sögu um gögnin sem fangar athygli áhorfenda.
+### A. Sækja og Undirbúa Rétta Gagnagrunnsskrá
 
-### Atriði sem skýrslan þarf að innihalda:
-- **Lýsing á gagnaöflun** – Hvaðan komu gögnin og hvernig voru þau fengin?
-- **Gagnavinnsla** – Hvernig voru gögnin meðhöndluð? Notið REGEX til að laga texta.
-- **Markverðustu niðurstöður** – Hverjar voru helstu niðurstöður?
-- **Mælaborðið** – Hvað gerðuð þið og hver var tilgangur þess?
+### Fara á Útgáfusíðuna:
+- Farðu á: [https://github.com/f1db/f1db/releases](https://github.com/f1db/f1db/releases).
 
-## GitHub Repo
-Þið þurfið að skila öllum skrám í GitHub repo teymisins. 
+### Sækja SQLite Gagnagrunnsskrána:
+- Undir nýjustu útgáfu, finndu og sæktu `f1db-sqlite.zip`.
 
-Munið að `README` skráin þarf að innihalda: 
-- **TL;DR** – Stutt lýsing á verkefninu og niðurstöðum.
-- **Strúktur** – Lýsing á möppum og mikilvægum skrám.
-- **Keyrsluuppsetning** – Hvernig kóði og gagnagrunnur eru settir upp á öðrum tölvum. Öll lykilorð og notendanöfn skulu vera geymd með umhverfisbreytum.
+### Afþjappa Gagnagrunnsskránni:
+- Notaðu þjappunarforrit til að afþjappa `f1db-sqlite.zip`.
+- Eftir afþjöppun ættirðu að fá skrána `f1db.sqlite` eða `f1db.db`.
 
-## Einkunnagjöf
-Einkunn verður byggð á:
-- **Gagnafrásögn** – Hversu skýr og aðgengileg er kynningin?
-- **Mælaborðið** – Hversu notendavænt og skýrt er það?
+### Staðfesta Gagnagrunnsskrána:
+- Athugaðu skráarstærðina (hún ætti að vera nokkrar MB).
+- Ekki opna skrána í textaritli, þar sem það getur eyðilagt tvíundargögnin.
 
----
+## B. Tengja Gagnagrunninn í PyCharm
 
-## Viðvörun: Ekki vista lykilorð í GitHub repo
+### Opna PyCharm og Fá Aðgang að Gagnagrunnsglugga Tólsins:
+- Í PyCharm, farðu í **View > Tool Windows > Database**.
 
-Að vista lykilorð, notendanöfn eða aðrar viðkvæmar upplýsingar í GitHub repo sem er opinber (public)
-er mjög alvarlegt öryggisbrot. Hér eru nokkrar ástæður fyrir því að það má aldrei gera þetta:
+### Bæta við Nýjum Gagnagrunni:
+1. Smelltu á + (Bæta við) táknið í gagnagrunnsglugganum.
+2. Veldu **Data Source > SQLite**.
 
-1. **Öryggisbrestur** – Opnar fyrir öryggisbrot.
-2. **Kostnaður** – Þriðji aðili gæti misnotað gögnin.
-3. **Git útgáfusaga** – Það er erfitt að fjarlægja viðkvæmar upplýsingar úr útgáfusögunni.
-4. **Orðspor** – Slíkar villur geta skaðað orðspor þitt sem forritari.
+### Stilla Gagnagrunntenginguna:
+- **Database File**: Smelltu á möpputáknið og veldu afþjöppuðu `f1db.sqlite` skrána.
+- **Driver**: Ef beðið er um það, leyfðu PyCharm að sækja nauðsynlega SQLite drivera.
 
+### Prófa Tengingu:
+- Smelltu á **Test Connection** til að tryggja að PyCharm geti tengst gagnagrunninum.
+- Þú ættir að sjá skilaboð um að tengingin hafi tekist.
 
-  
+### Vista Stillinguna:
+- Smelltu á **OK** til að vista gagnagrunninn.
+
+### Skoða Gagnagrunninn:
+- Í gagnagrunnsglugganum, stækkaðu f1db gagnagrunninn.
+- Nú ættirðu að sjá allar töflur (t.d. drivers, constructors, races, osfrv.).
+
+## C. Bilanaúrræði ef Vandamál Halda Áfram
+
+Ef þú stendur enn frammi fyrir sömu villu eftir að hafa fylgt ofangreindum skrefum, reyndu eftirfarandi:
+
+### Staðfesta Heilleika Gagnagrunnsskrárinnar:
+- Reyndu að opna `f1db.sqlite` skrána í SQLiteStudio eða öðru SQLite-samhæfu tóli.
+- Ef önnur tól geta ekki opnað gagnagrunninn gæti verið að skráin sé skemmd.
+
+### Reyna Annað Þjappunarforrit:
+- Stundum mistekst þjappunarforritum þögult.
+- Prófaðu annað forrit (t.d. ef þú notaðir innbyggða þjappunarforritið, prófaðu 7-Zip).
+
+### Athuga Skrá fyrir Spillingu:
+- Berðu saman skráarstærðina á `f1db.sqlite` við það sem gefið er upp á útgáfusíðunni eða við aðra sem hafa náð að hlaða henni niður.
+- Ef stærðirnar eru verulega ólíkar gæti niðurhal ekki verið fullkomið.
+
+### Nota SQL Dump sem Valkost:
+Ef gagnagrunnsskráin veldur enn vandræðum, íhugaðu að nota SQL dump skrána.
+
+#### Flytja SQL Dump Inn í Nýjan SQLite Gagnagrunn:
+
+##### Með Skipanalínu:
+- Búa til nýjan tóman gagnagrunn:
+  ```bash
+  sqlite3 new_f1db.dbß
+  ```
+
+## Skref 2, búa til nothæf gögn. `Max-Lewis-table.py`
+Þessi kóði fer í upphaflega f1db.db gagnagrunninn og býr til 2x nýjar töflu sem heita, 
+- `hamilton_verstappen_all_time_data`
+- `hamilton_verstappen_race_dara_2021`
+

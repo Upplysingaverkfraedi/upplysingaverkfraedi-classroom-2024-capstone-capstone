@@ -10,26 +10,30 @@ import plotly.express as px
 import plotly.graph_objects as go
 import datetime
 
-# Database path
+# Slóð að gagnagrunni
 DB_PATH = 'f1db.db'
 con = sqlite3.connect(DB_PATH)
 
-# Set your Mapbox access token
-mapbox_access_token = "pk.eyJ1IjoiYnJ5bmphcjgiLCJhIjoiY20zZzRxcGdtMDB0NDJtczZ1NWQwcGdqcyJ9.R0R4d1jbGxe9ZC0ydvT7gQ"  # Replace with your actual token
+# Settu Mapbox aðgangslykillinn þinn
+mapbox_access_token = "pk.eyJ1IjoiYnJ5bmphcjgiLCJhIjoiY20zZzRxcGdtMDB0NDJtczZ1NWQwcGdqcyJ9.R0R4d1jbGxe9ZC0ydvT7gQ"
 px.set_mapbox_access_token(mapbox_access_token)
 
-# Helper Functions
+
+# Stoðfall
 def snake_to_title(snake_str):
     components = snake_str.split('_')
     return ' '.join(x.capitalize() for x in components)
 
+
+# Þrífur tiltekna dálka í DataFrame
 def clean_column_data(df, columns):
     for col in columns:
         if col in df.columns:
             df[col] = df[col].astype(str).str.replace(r"[-.,]", "", regex=True)
     return df
 
-# Mapping of race names to race IDs
+
+# Vörpun keppnisheita yfir í keppnisauðkenni
 race_mapping = {
     "Bahrain": 1036,
     "Emilia-Romagna": 1037,
@@ -55,18 +59,20 @@ race_mapping = {
     "Abu Dhabi": 1057
 }
 
-# Load 2021 season data
+
+# Hleður gögn fyrir 2021 keppnistímabilið
 def load_2021_season_data():
-    # Placeholder for actual 2021 season data
-    # For demonstration, using sample data
+    # Staðgengill fyrir raunveruleg gögn frá 2021 tímabilinu
+    # Fyrir sýnidæmi, notum sýnigögn
     data = pd.DataFrame({
-        'Driver': ['Lewis Hamilton', 'Max Verstappen'],
-        'Wins': [8, 10],
-        'Podiums': [17, 18],
-        'Poles': [5, 10],
-        'Points': [387.5, 395.5]
+        'Ökumaður': ['Lewis Hamilton', 'Max Verstappen'],
+        'Sigur': [8, 10],
+        'Verðlaunapallur': [17, 18],
+        'Pól': [5, 10],
+        'Stig': [387.5, 395.5]
     })
     return data
+
 
 def get_race_comparison_data(race_id, race):
     query = f"""
@@ -100,7 +106,7 @@ def get_race_comparison_data(race_id, race):
         AND (driver_id = 'lewis-hamilton' OR driver_id = 'max-verstappen');
     """
 
-    # Connect to the database and fetch data
+    # Tengist gagnagrunninum og sækir gögn
     conn = sqlite3.connect(DB_PATH)
     df = pd.read_sql_query(query, conn)
     conn.close()
@@ -108,10 +114,10 @@ def get_race_comparison_data(race_id, race):
     if df.empty:
         return None
 
-    # Rename 'position_display_order' to 'position_display_order'
+    # Endurnefna 'position_display_order' í 'position_display_order'
     df.rename(columns={'position_display_order': 'position_display_order'}, inplace=True)
 
-    # Define columns that need cleaning
+    # Skilgreina dálka sem þarf að þrífa
     columns_to_clean = [
         'position_display_order',
         'race_time',
@@ -124,26 +130,26 @@ def get_race_comparison_data(race_id, race):
         'race_grand_slam'
     ]
 
-    # Clean the specified columns
+    # Þrífa tiltekna dálka
     df = clean_column_data(df, columns_to_clean)
 
-    # Convert all column names from snake_case to Title Case with spaces
+    # Breyta öllum dálkanöfnum úr snake_case í Title Case með bilum
     df.rename(columns=lambda x: snake_to_title(x), inplace=True)
 
-    # Prepare the data for head-to-head table
+    # Undirbúa gögn fyrir höfuð-á-höfuð töflu
     hamilton_stats = df[df['Driver Id'] == 'lewis-hamilton'].iloc[0]
     verstappen_stats = df[df['Driver Id'] == 'max-verstappen'].iloc[0]
 
-    # Exclude 'Race Id' and 'Driver Id' columns
+    # Útiloka 'Race Id' og 'Driver Id' dálka
     stats_columns = df.columns.drop(['Race Id', 'Driver Id']).tolist()
 
-    # Convert numeric values to strings to avoid rendering issues
+    # Breyta tölulegum gildum í strengi til að forðast birtingarvandamál
     hamilton_values = [str(hamilton_stats[col]) for col in stats_columns]
     verstappen_values = [str(verstappen_stats[col]) for col in stats_columns]
 
-    # Construct a comparison table DataFrame
+    # Búa til samanburðartöflu DataFrame
     comparison_data = {
-        "Stat": stats_columns,
+        "Staða": stats_columns,
         "Lewis Hamilton": hamilton_values,
         "Max Verstappen": verstappen_values
     }
@@ -151,7 +157,8 @@ def get_race_comparison_data(race_id, race):
 
     return comparison_df
 
-# All-time comparison functions and data processing
+
+# Allur-tími samanburður - fall og gagnavinnsla
 def get_driver_stats(driver_id):
     conn = sqlite3.connect(DB_PATH)
     query = f"""
@@ -168,9 +175,10 @@ def get_driver_stats(driver_id):
     conn.close()
     return df.iloc[0]
 
+
 def scale_to_log(data):
     data = data.copy()
-    data = np.log(data + 1)  # Adding 1 to avoid log(0)
+    data = np.log(data + 1)  # Bæta 1 til að forðast log(0)
     data['total_points'] = data['total_points'] / 1.9
     data['grand_slams'] = data['grand_slams'] * 2
     data['driver_of_the_day_awards'] = data['driver_of_the_day_awards'] * 1.2
@@ -179,31 +187,29 @@ def scale_to_log(data):
     data['positions_gained'] = data['positions_gained'] * 0.9
     return data
 
-# Get stats for Hamilton and Verstappen
+
+# Sækja tölfræði fyrir Hamilton og Verstappen
 hamilton_original = get_driver_stats("lewis-hamilton")
 verstappen_original = get_driver_stats("max-verstappen")
 
-# Scale data for the plot
+# Stilla gögn fyrir grafið
 hamilton_values_scaled = scale_to_log(hamilton_original)
 verstappen_values_scaled = scale_to_log(verstappen_original)
 
 categories = ['Total Points', 'Fastest Laps', 'Positions Gained', 'Driver of the Day Awards', 'Grand Slams']
 categoriesSpider = ['Total Points', 'Fastest Laps', 'Positions Gained', 'Driver of the Day Awards', 'Grand Slams']
 
-# Find indices for the categories in categoriesSpider
+# Finna vísitölur fyrir flokkana í categoriesSpider
 indices = [categories.index(cat) for cat in categoriesSpider]
 
-# Sum the scaled values for each driver
-#hamilton_logSpider_sum = np.sum(hamilton_values_scaled[indices])
-#verstappen_logSpider_sum = np.sum(verstappen_values_scaled[indices])
 
-# Create the spider chart with scaled values and original hover text
+# Búa til kóngulógraf með stilltum gildum og upprunalegum hover texta
 def create_spider_chart():
     categories = categoriesSpider
 
     fig = go.Figure()
 
-    # Data for Hamilton with custom hover text showing unscaled values
+    # Gögn fyrir Hamilton með sérsniðnum hover texta sem sýnir óstilluð gildi
     fig.add_trace(go.Scatterpolar(
         r=hamilton_values_scaled,
         theta=categories,
@@ -213,7 +219,7 @@ def create_spider_chart():
         hovertext=[f'{cat}: {val}' for cat, val in zip(categories, hamilton_original)]
     ))
 
-    # Data for Verstappen with custom hover text showing unscaled values
+    # Gögn fyrir Verstappen með sérsniðnum hover texta sem sýnir óstilluð gildi
     fig.add_trace(go.Scatterpolar(
         r=verstappen_values_scaled,
         theta=categories,
@@ -252,8 +258,9 @@ def create_spider_chart():
         ),
         template="plotly_white"
     )
-    
+
     return fig
+
 
 def get_points_progression(driver_id):
     conn = sqlite3.connect(DB_PATH)
@@ -265,16 +272,18 @@ def get_points_progression(driver_id):
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
-    # Calculate cumulative points
+    # Reikna uppsöfnuð stig
     df['cumulative_points'] = df['race_points'].cumsum()
     df['career_race'] = range(1, len(df) + 1)
-    # Count wins (assuming 25 or more points indicates a win)
+    # Telja sigra (gera ráð fyrir að 25 eða fleiri stig séu sigur)
     wins = df[df['race_points'] >= 25].shape[0]
     return df, wins
 
-# Get points progression for Hamilton and Verstappen
+
+# Sækja stigþróun fyrir Hamilton og Verstappen
 hamilton_points_progression, hamilton_wins = get_points_progression("lewis-hamilton")
 verstappen_points_progression, verstappen_wins = get_points_progression("max-verstappen")
+
 
 def create_points_progression_chart(x_axis='career_race'):
     fig = go.Figure()
@@ -287,7 +296,7 @@ def create_points_progression_chart(x_axis='career_race'):
         line=dict(shape='spline', smoothing=1.3, width=3, color='blue'),
         name='Lewis Hamilton',
         hoverinfo='text',
-        hovertext=[f"Race {race}: {points} pts, Cumulative: {cumulative} pts"
+        hovertext=[f"Keppni {race}: {points} stig, Uppsöfnuð: {cumulative} stig"
                    for race, points, cumulative in zip(
                 hamilton_points_progression[x_axis],
                 hamilton_points_progression['race_points'],
@@ -301,9 +310,9 @@ def create_points_progression_chart(x_axis='career_race'):
         y=hamilton_winning_races['cumulative_points'],
         mode='markers',
         marker=dict(color='gold', size=5, symbol='star'),
-        name='Hamilton Wins',
+        name='Sigur Hamilton',
         hoverinfo='text',
-        hovertext=[f"Race {race}: {points} pts, Cumulative: {cumulative} pts"
+        hovertext=[f"Keppni {race}: {points} stig, Uppsöfnuð: {cumulative} stig"
                    for race, points, cumulative in zip(
                 hamilton_winning_races[x_axis],
                 hamilton_winning_races['race_points'],
@@ -318,7 +327,7 @@ def create_points_progression_chart(x_axis='career_race'):
         line=dict(shape='spline', smoothing=1.3, width=3, color='red'),
         name='Max Verstappen',
         hoverinfo='text',
-        hovertext=[f"Race {race}: {points} pts, Cumulative: {cumulative} pts"
+        hovertext=[f"Keppni {race}: {points} stig, Uppsöfnuð: {cumulative} stig"
                    for race, points, cumulative in zip(
                 verstappen_points_progression[x_axis],
                 verstappen_points_progression['race_points'],
@@ -332,9 +341,9 @@ def create_points_progression_chart(x_axis='career_race'):
         y=verstappen_winning_races['cumulative_points'],
         mode='markers',
         marker=dict(color='silver', size=5, symbol='star'),
-        name='Verstappen Wins',
+        name='Sigur Verstappen',
         hoverinfo='text',
-        hovertext=[f"Race {race}: {points} pts, Cumulative: {cumulative} pts"
+        hovertext=[f"Keppni {race}: {points} stig, Uppsöfnuð: {cumulative} stig"
                    for race, points, cumulative in zip(
                 verstappen_winning_races[x_axis],
                 verstappen_winning_races['race_points'],
@@ -343,22 +352,21 @@ def create_points_progression_chart(x_axis='career_race'):
 
     # Uppfærsla á útliti
     fig.update_layout(
-        title="Points Progression Over Time with Winning Races Highlighted",
+        title="Stigaþróun Yfir Tíma með Merktum Sigurkeppnum",
         xaxis=dict(
-            title="Career Race Number" if x_axis == 'career_race' else "Race ID",
+            title="Keppnisnúmer á ferli" if x_axis == 'career_race' else "Keppnisauðkenni",
             showgrid=True
         ),
         yaxis=dict(
-            title="Cumulative Points",
+            title="Uppsöfnuð Stig",
             showgrid=True
         ),
-        legend_title="Driver",
+        legend_title="Ökumaður",
         template="plotly_white",
         showlegend=True
     )
 
     return fig
-
 
 
 def get_fastest_lap_data():
@@ -373,8 +381,9 @@ def get_fastest_lap_data():
     conn.close()
     return df
 
+
 def prepare_heatmap_data(df):
-    # Use pivot_table with mean aggregation to handle duplicates
+    # Nota pivot_table með mean til að meðhöndla afrit
     heatmap_data = df.pivot_table(
         index="driver_id",
         columns="race_id",
@@ -384,30 +393,32 @@ def prepare_heatmap_data(df):
     heatmap_data = heatmap_data.fillna(0)
     return heatmap_data
 
+
 def create_fastest_lap_heatmap():
-    # Prepare data
+    # Undirbúa gögn
     fastest_lap_data = get_fastest_lap_data()
     heatmap_data = prepare_heatmap_data(fastest_lap_data)
     drivers = heatmap_data.index.tolist()
     races = heatmap_data.columns.tolist()
     z_values = heatmap_data.values
 
-    # Create heatmap
+    # Búa til hita kort
     fig = go.Figure(data=go.Heatmap(
         z=z_values,
         x=races,
         y=drivers,
         colorscale='Plasma',
-        colorbar=dict(title="Fastest Lap Time (ms)")
+        colorbar=dict(title="Hraðasti Hringur (ms)")
     ))
 
     fig.update_layout(
-        title=dict(text="Fastest Lap Times per Race"),
-        xaxis=dict(title="Race ID"),
-        yaxis=dict(title="Driver")
+        title=dict(text="Hraðasti Hringur per Keppni"),
+        xaxis=dict(title="Keppnisauðkenni"),
+        yaxis=dict(title="Ökumaður")
     )
 
     return fig
+
 
 def get_location_and_performance_data():
     conn = sqlite3.connect(DB_PATH)
@@ -425,12 +436,10 @@ def get_location_and_performance_data():
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
-    # Fill NaN values in race_points with 0
+    # Fylla upp í NaN gildi í race_points með 0
     df['race_points'] = df['race_points'].fillna(0)
     return df
 
-# Get location and performance data
-location_performance_data = get_location_and_performance_data()
 
 def get_location_and_performance_data_2021():
     conn = sqlite3.connect(DB_PATH)
@@ -448,21 +457,25 @@ def get_location_and_performance_data_2021():
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
-    # Fill NaN values in race_points with 0
+    # Fylla upp í NaN gildi í race_points með 0
     df['race_points'] = df['race_points'].fillna(0)
     return df
 
+
+location_performance_data = get_location_and_performance_data()
 location_performance_data_2021 = get_location_and_performance_data_2021()
+
 
 def get_average_points(data):
     avg_data = data.groupby(['circuit_id', 'lat', 'lon', 'driver_id']).race_points.mean().reset_index()
     avg_data.rename(columns={'race_points': 'avg_points'}, inplace=True)
     return avg_data
 
+
 def create_performance_map(data):
     data = get_average_points(data)
 
-    # Ensure data has no missing values in required columns
+    # Tryggja að gögn hafi ekki vantar gildi í nauðsynlegum dálkum
     data = data.dropna(subset=['lat', 'lon', 'avg_points'])
 
     fig = px.scatter_mapbox(
@@ -478,16 +491,17 @@ def create_performance_map(data):
             "lat": False,
             "lon": False
         },
-        title="Average Performance by Location for Hamilton and Verstappen",
-        labels={"driver_id": "Driver", "avg_points": "Average Points"},
+        title="Meðal Frammistaða eftir Staðsetningu fyrir Hamilton og Verstappen",
+        labels={"driver_id": "Ökumaður", "avg_points": "Meðal Stig"},
         mapbox_style="light",
         zoom=1,
         height=600
     )
 
-    # Update layout with the access token correctly
+    # Uppfæra layout með réttum aðgangslykli
     fig.update_layout(mapbox_accesstoken=mapbox_access_token)
     return fig
+
 
 def create_performance_map_with_race_points(data):
     # Fjarlægja línur með vantar breytur í nauðsynlegum dálkum
@@ -506,14 +520,14 @@ def create_performance_map_with_race_points(data):
             "lat": False,
             "lon": False
         },
-        title="Race Points by Location for Hamilton and Verstappen",
-        labels={"driver_id": "Driver", "race_points": "Race Points"},
+        title="Stig í Keppni eftir Staðsetningu fyrir Hamilton og Verstappen",
+        labels={"driver_id": "Ökumaður", "race_points": "Stig í Keppni"},
         mapbox_style="light",
         zoom=1,
         height=600
     )
 
-    # Update layout with access token and map style
+    # Uppfæra layout með aðgangslykli og kortastíl
     fig.update_layout(mapbox_accesstoken=mapbox_access_token)
     return fig
 
@@ -525,12 +539,13 @@ manufacturer_choices = {
     "Lið": "constructor_id"
 }
 
-# Fetch laps and distance data from the database
+
+# Sækja upplýsingar um hringi og vegalengd úr gagnagrunninum
 def get_race_details(race_name):
     race_id = race_mapping.get(race_name)
     if not race_id:
         return None
-    
+
     query = f"""
     SELECT laps, distance
     FROM race
@@ -539,14 +554,14 @@ def get_race_details(race_name):
     conn = sqlite3.connect(DB_PATH)
     result = pd.read_sql_query(query, conn)
     conn.close()
-    
+
     if result.empty:
         return None
-    
+
     return result.iloc[0].to_dict()
 
+
 def get_race_points(race_name):
-    
     race_id = race_mapping.get(race_name)
     query = f"""
     SELECT driver_id, race_points
@@ -558,47 +573,42 @@ def get_race_points(race_name):
     conn.close()
     return df
 
+
 def convert_time_to_seconds(time_str):
-    if time_str is None:  # Athuga hvort gildið sé None
+    if time_str is None:
         return None
     try:
-        # Breytir tímanum í datetime object og svo í sekúndur
         t = datetime.datetime.strptime(time_str, "%H:%M:%S.%f")
         return t.hour * 3600 + t.minute * 60 + t.second + t.microsecond / 1e6
     except ValueError:
-        # Ef tíminn er ekki á réttu formi, skilaðu None
         return None
-    
+
+
 def convert_lap_time_to_seconds(lap_time_str):
     try:
-        # Skipta strengnum í mínútur og sekúndur.millisekúndur
         minutes, seconds = lap_time_str.split(":")
-        return int(minutes) * 60 + float(seconds)  # Umbreyta í sekúndur
+        return int(minutes) * 60 + float(seconds)
     except (ValueError, TypeError):
-        return None  # Skila None ef umbreyting mistekst
-    
+        return None
+
+
 def convert_time_to_seconds_2(time_str):
     try:
-        # Ef tíminn er á sniði mínútur:sekúndur.millisekúndur (t.d., "1:11.497")
         if ":" in time_str:
             minutes, seconds = time_str.split(":")
             return int(minutes) * 60 + float(seconds)
-        # Ef tíminn er á sniði sekúndur.millisekúndur (t.d., "59.926")
         else:
             return float(time_str)
     except (ValueError, TypeError):
-        return None  # Skila None ef umbreyting mistekst
+        return None
 
 
-
-
-
-# Define UI
+# Skilgreina UI
 app_ui = ui.page_fluid(
-    # Header with F1 logo, images, and title, with a red background and white title text
+    # Haus með F1 merki, myndum og titli, með rauðum bakgrunni og hvítum titli
     ui.div(
         ui.row(
-            # Hamilton Image on the left
+            # Mynd af Hamilton til vinstri
             ui.column(
                 3,
                 ui.div(
@@ -606,7 +616,7 @@ app_ui = ui.page_fluid(
                     style="text-align:center; margin: 0; padding: 0; height: 200px"
                 )
             ),
-            # F1 Logo in the center
+            # F1 Merki í miðjunni
             ui.column(
                 6,
                 ui.div(
@@ -614,7 +624,7 @@ app_ui = ui.page_fluid(
                     style="text-align:center; margin: 0; padding: 0; height: 120px"
                 )
             ),
-            # Verstappen Image on the right
+            # Mynd af Verstappen til hægri
             ui.column(
                 3,
                 ui.div(
@@ -622,10 +632,10 @@ app_ui = ui.page_fluid(
                     style="text-align:center; margin: 0; padding: 0; height: 200px"
                 )
             ),
-            # Row style to center images and logo
+            # Stíll fyrir röð til að miðja myndir og merki
             style="display: flex; align-items: center; justify-content: center; margin-bottom: 0;"
         ),
-        # Title centered below the images and logo
+        # Titill miðjaður undir myndum og merki
         ui.div(
             ui.h2(
                 "Lewis Hamilton VS Max Verstappen",
@@ -633,28 +643,28 @@ app_ui = ui.page_fluid(
             ),
             style="margin-top: 0;"
         ),
-        # Apply the red background color and set fixed height for header
+        # Setja rauðan bakgrunnslit og fasta hæð fyrir haus
         style="background-color: red; color: white; height: 220px;"
     ),
-    # Tabs for organizing content using ui.navset_tab and ui.nav_panel
+    # Flipa til að skipuleggja efni með ui.navset_tab og ui.nav_panel
     ui.navset_tab(
         ui.nav_panel(
-            "All-time Comparison",
-            ui.h2("Lewis Hamilton VS Max Verstappen Overview"),
+            "Samanburður yfir allan ferilinn",
+            ui.h2("Yfirlit Lewis Hamilton vs Max Verstappen"),
             ui.layout_sidebar(
-                # Sidebar fyrir valkosti
+                # Hliðarvalmynd fyrir valkosti
                 ui.sidebar(
                     ui.input_radio_buttons(
                         "x_axis_radio",
-                        ui.h4("Choose X-axis"),
-                        choices={"career_race": "Career Race", "race_id": "Race ID"},
+                        ui.h4("Veldu X-ás"),
+                        choices={"career_race": "Keppnisnúmer á ferli", "race_id": "Keppnisauðkenni"},
                         selected="career_race"
                     )
                 ),
                 ui.page_fillable(
                     ui.layout_columns(
                         ui.card(
-                            output_widget("wins_bar_chart")  # Hér birtist nýja súluritið
+                            output_widget("wins_bar_chart")
                         ),
                         ui.card(
                             output_widget("points_progression_chart")
@@ -664,27 +674,27 @@ app_ui = ui.page_fluid(
                         ),
                         ui.card("Samanburður á Lewis Hamilton og Max Verstappen",
                                 output_widget("spider_chart")
-                        ),
+                                ),
                         ui.card(
                             output_widget("fastest_lap_heatmap")
                         ),
-                    col_widths=[4,8,8,4,12],
+                        col_widths=[4, 8, 8, 4, 12],
                     )
                 )
             ),
         ),
         ui.nav_panel(
-            "2021 Season Comparison",
+            "Samanburður á 2021 Tímabili",
             ui.layout_sidebar(
                 ui.sidebar(
                     ui.input_select(
                         "race_select",
-                        "Select a Race:",
+                        "Veldu Keppni:",
                         choices=["2021 Season Overview"] + list(race_mapping.keys()),
                         selected="2021 Season Overview"
                     ),
                 ),
-                # Main content area that updates based on selected race
+                # Aðal efnis svæði sem uppfærist miðað við valda keppni
                 ui.div(
                     ui.output_ui("race_content")
                 )
@@ -699,15 +709,16 @@ app_ui = ui.page_fluid(
     )
 )
 
-# Define Server Logic
-def server(input, output, session):
-    # Load 2021 season overview data
-    data = load_2021_season_data()
-    
-    # Snúa töflunni
-    transposed_data = data.set_index("Driver").transpose()
 
-    # Render the Hamilton image
+# Skilgreina Server Logic
+def server(input, output, session):
+    # Hlaða 2021 tímabils yfirlitsgögnum
+    data = load_2021_season_data()
+
+    # Snúa töflunni
+    transposed_data = data.set_index("Ökumaður").transpose()
+
+    # Birta mynd af Hamilton
     @output
     @render.image
     def hamilton_image():
@@ -723,10 +734,10 @@ def server(input, output, session):
         else:
             return {
                 "src": "",
-                "alt": "Lewis Hamilton image not found."
+                "alt": "Mynd af Lewis Hamilton fannst ekki."
             }
 
-    # Render the Verstappen image
+    # Birta mynd af Verstappen
     @output
     @render.image
     def verstappen_image():
@@ -742,10 +753,10 @@ def server(input, output, session):
         else:
             return {
                 "src": "",
-                "alt": "Max Verstappen image not found."
+                "alt": "Mynd af Max Verstappen fannst ekki."
             }
 
-    # Render the F1 logo image
+    # Birta F1 merki mynd
     @output
     @render.image
     def f1logo_image():
@@ -761,10 +772,10 @@ def server(input, output, session):
         else:
             return {
                 "src": "",
-                "alt": "F1 Logo image not found."
+                "alt": "F1 Merki mynd fannst ekki."
             }
 
-    # Outputs for "All-time Comparison" tab
+    # Úttök fyrir "Samanburður yfir allan ferilinn" flipann
     @output
     @render_widget
     def spider_chart():
@@ -785,26 +796,25 @@ def server(input, output, session):
     @render_widget
     def performance_map_1():
         return create_performance_map(location_performance_data)
-    
+
     @output
     @render_widget
     def performance_map_3():
         return create_performance_map(location_performance_data_2021)
-    
-    
+
     @output
     @render_widget
     def performance_map_2():
         race = input.race_select()
-        
-        # Athugaðu hvort valið keppni er til í race_mapping
+
+        # Athuga hvort valin keppni sé í race_mapping
         if race in race_mapping:
             race_id = race_mapping[race]
-            
+
             # Sía gögnin fyrir valda keppnina
             filtered_data = location_performance_data_2021[location_performance_data_2021['race_id'] == race_id]
-            
-            # Athugaðu hvort síuð gögn eru til
+
+            # Athuga hvort síuð gögn séu til
             if not filtered_data.empty:
                 return create_performance_map_with_race_points(filtered_data)
             else:
@@ -819,7 +829,7 @@ def server(input, output, session):
                 )
                 return fig
         else:
-            # Skila tómu korti eða skilaboðum ef valið keppni finnst ekki
+            # Skila tómu korti eða skilaboðum ef valin keppni finnst ekki
             fig = px.scatter_mapbox(
                 [],
                 lat=[],
@@ -830,27 +840,26 @@ def server(input, output, session):
             )
             return fig
 
-
-    # Reactive output for race content in "2021 Season Comparison" tab
+    # Reactive úttak fyrir keppnisefni í "Samanburður á 2021 Tímabili" flipanum
     @output
     @render.ui
     def race_content():
         race = input.race_select()
         if race == "2021 Season Overview":
-            # Display the driver statistics table along with images and title
+            # Birta ökumannatölfræðitöflu ásamt myndum og titli
             return ui.TagList(
-                # Integrated Title and 3D Models
+                # Samþættur titill og 3D módel
                 ui.page_fluid(
-                    # Centered title
+                    # Miðjaður titill
                     ui.tags.div(
                         ui.h2("Keppnisbílar Lewis Hamilton og Max Verstappen"),
                         style="text-align: center; font-family: Monaco, monospace; margin-top: 20px;"
                     ),
-                    # Row for the two 3D models and their captions
+                    # Röð fyrir tvö 3D módel og þeirra skýringar
                     ui.row(
-                        # Column for Lewis Hamilton's car
+                        # Dálkur fyrir bíl Lewis Hamilton
                         ui.column(
-                            6,  # Half the width
+                            6,
                             ui.div(
                                 ui.h3("Bíll Lewis Hamilton - Mercedes Benz W12"),
                                 style="text-align: center; font-family: Monaco, monospace; font-size: 12px; margin-top: 10px;"
@@ -869,9 +878,9 @@ def server(input, output, session):
                                 style="text-align: center;"
                             )
                         ),
-                        # Column for Max Verstappen's car
+                        # Dálkur fyrir bíl Max Verstappen
                         ui.column(
-                            6,  # Half the width
+                            6,
                             ui.div(
                                 ui.h3("Bíll Max Verstappen - Honda RB16B"),
                                 style="text-align: center; font-family: Monaco, monospace; font-size: 12px; margin-top: 10px;"
@@ -891,39 +900,39 @@ def server(input, output, session):
                             )
                         )
                     ),
-                    # Styling for the overall section
+                    # Stíll fyrir heildarkaflann
                     style="margin-bottom: 30px;"
                 ),
-                # Driver Statistics Table
-                ui.h3("2021 Season Overview"),
+                # Ökumannatölfræðitafla
+                ui.h3("Yfirlit 2021 Tímabils"),
                 ui.layout_columns(
-                ui.card(output_widget("vertical_points_chart")), # Sýna upprunalegu gögnin
-                ui.card(output_widget("hamilton_verstappen_cumulative_plot")),
-                ui.card(output_widget("hamilton_verstappen_position_plot")),
-                ui.card(output_widget("horizontal_bar_chart")), # Sýna lárétt súlurit
-                ui.card(output_widget("performance_map_3")), # Sýna töflu # Sýna töflu
-                col_widths=[4, 8, 6, 6, 12]
+                    ui.card(output_widget("vertical_points_chart")),
+                    ui.card(output_widget("hamilton_verstappen_cumulative_plot")),
+                    ui.card(output_widget("hamilton_verstappen_position_plot")),
+                    ui.card(output_widget("horizontal_bar_chart")),
+                    ui.card(output_widget("performance_map_3")),
+                    col_widths=[4, 8, 6, 6, 12]
                 )
             )
         else:
             race_details = get_race_details(race)
             if not race_details:
-                race_details_text = "No details available for this race."
+                race_details_text = "Engar upplýsingar til um þessa keppni."
             else:
                 race_details_text = f"""
-                Laps: {race_details['laps']}<br>
-                Distance: {race_details['distance']} km
+                Hringir: {race_details['laps']}<br>
+                Vegalengd: {race_details['distance']} km
                 """
 
             return ui.TagList(
-                ui.h3(f"Head-to-Head Comparison for {race}"),
+                ui.h3(f"Höfuð-á-Höfuð Samanburður fyrir {race}"),
                 ui.layout_columns(
-                    ui.card( 
-                        ui.layout_columns( ui.card(
+                    ui.card(
+                        ui.layout_columns(ui.card(
                             ui.output_image("track_image")),
                             ui.card(
                                 ui.div(
-                                    ui.h4("Race Details"),
+                                    ui.h4("Upplýsingar um Keppni"),
                                     ui.HTML(race_details_text),
                                     style="text-align: left; padding: 10px;"
                                 )
@@ -932,91 +941,97 @@ def server(input, output, session):
                         )
                     ),
                     ui.card(
-                        ui.h4("Head-to-Head Comparison"),
+                        ui.h4("Höfuð-á-Höfuð Samanburður"),
                         output_widget("performance_map_2")
                     ),
                     ui.card(output_widget("horizontal_pit_stop_comparison_chart")),
                     ui.card(output_widget("vertical_comparison_barplot")),
                     ui.card(output_widget("horizontal_race_time_comparison_chart")),
-                     ui.card(output_widget("start_vs_finish_positions_chart")),
-                    ui.card(output_widget("fastest_lap_chart")), 
+                    ui.card(output_widget("start_vs_finish_positions_chart")),
+                    ui.card(output_widget("fastest_lap_chart")),
                     ui.card(output_widget("positions_gained_bar_chart")),
-                    col_widths=[8, 4, 4, 8, 6, 6,6,6]
+                    col_widths=[8, 4, 4, 8, 6, 6, 6, 6]
                 ),
             )
-            
-    # Render driver statistics table
+
+    # Birta ökumannatölfræðitöflu
     @output
     @render.table
     def driver_table():
-        # For demonstration, return the sample data
+        # Fyrir sýnidæmi, skila sýnigögnum
         return transposed_data
-    
+
     # Sýna lárétt súlurit
     @output
     @render_widget
     def horizontal_bar_chart():
-        # Snúa gögnunum án 'Points'
-        melted_data = data.drop(columns=["Points"]).melt(
-            id_vars=["Driver"], var_name="Metric", value_name="Value"
+        # Snúa gögnunum án 'Stig'
+        melted_data = data.drop(columns=["Stig"]).melt(
+            id_vars=["Ökumaður"], var_name="Mæling", value_name="Gildi"
         )
 
         # Plotly súlurit
         fig = go.Figure()
 
         # Bæta við súlum fyrir hvern ökumann
-        for driver in data["Driver"]:
-            driver_data = melted_data[melted_data["Driver"] == driver]
+        for driver in data["Ökumaður"]:
+            driver_data = melted_data[melted_data["Ökumaður"] == driver]
             fig.add_trace(go.Bar(
-                y=driver_data["Metric"],  # Láréttar breytur
-                x=driver_data["Value"],  # Gildin fyrir hverja breytu
+                y=driver_data["Mæling"],  # Láréttar breytur
+                x=driver_data["Gildi"],  # Gildin fyrir hverja breytu
                 name=driver,
                 orientation='h'  # Lárétt súlurit
             ))
 
         # Uppsetning lárétta súluritsins
         fig.update_layout(
-            title="2021 Performance (Wins, Podiums, Poles)",
-            xaxis_title="Value",
-            yaxis_title="Metric",
+            title="Frammistaða 2021 (Sigur, Verðlaunapallur, Pól)",
+            xaxis_title="Gildi",
+            yaxis_title="Mæling",
             barmode="group",
             height=400,
-            legend_title="Driver",
+            legend_title="Ökumaður",
             template="plotly_white"
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
-    
+
     @output
     @render_widget
     def vertical_points_chart():
-        # Plotly lóðrétt súlurit fyrir Points
+        # Plotly lóðrétt súlurit fyrir Stig
         fig = go.Figure()
 
         # Bæta við súlum fyrir hvern ökumann
-        for driver in data["Driver"]:
-            driver_data = data[data["Driver"] == driver]
+        for driver in data["Ökumaður"]:
+            driver_data = data[data["Ökumaður"] == driver]
             fig.add_trace(go.Bar(
                 x=[driver],  # Ökumenn á X-ás
-                y=driver_data["Points"],  # Points gildi á Y-ás
+                y=driver_data["Stig"],  # Stig gildi á Y-ás
                 name=driver
             ))
 
         # Uppsetning lóðrétta súluritsins
         fig.update_layout(
-            title="Total Points in 2021 Season",
-            xaxis_title="Driver",
-            yaxis_title="Points",
+            title="Heildarstig á 2021 Tímabili",
+            xaxis_title="Ökumaður",
+            yaxis_title="Stig",
             barmode="group",
             height=400,
-            yaxis=dict(range=[350, 400]),  # Breyta hámarks gildi á Y-ás
-            legend_title="Driver",
+            yaxis=dict(range=[350, 400]),
+            legend_title="Ökumaður",
             template="plotly_white"
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
 
-    # Render race comparison table
+    # Birta keppnissamanburðartöflu
     @output
     @render.table
     def race_comparison_table():
@@ -1027,39 +1042,37 @@ def server(input, output, session):
             if comparison_df is not None:
                 return comparison_df
             else:
-                return pd.DataFrame({"Message": [f"No data available for {race}"]})
+                return pd.DataFrame({"Skilaboð": [f"Engin gögn til fyrir {race}"]})
         else:
-            return pd.DataFrame({"Message": [f"Race ID not found for {race}"]})
+            return pd.DataFrame({"Skilaboð": [f"Keppnisauðkenni fannst ekki fyrir {race}"]})
 
-    # Render track image based on selected race
+    # Birta mynd af brautinni miðað við valda keppni
     @output
     @render.image
     def track_image():
         race = input.race_select()
         if race == "2021 Season Overview":
-            return None  # No image for the overview
+            return None  # Engin mynd fyrir yfirlitið
         else:
-            # Generate the file name based on the race name
-            # Handle special characters and spaces
+            # Búa til skráarheiti byggt á keppnisheiti
+            # Meðhöndla sértákn og bil
             image_name = race.lower().replace(" ", "_").replace("-", "_") + ".png"
             img_path = Path(__file__).parent / "www" / image_name
             if img_path.exists():
                 img: ImgData = {
                     "src": str(img_path),
-                    "width": "700px",  # Adjust the width as needed
+                    "width": "700px",
                     "height": "auto",
                     "style": "display: block; margin-left: auto; margin-right: auto; margin-top: 20px;"
                 }
                 return img
             else:
-                # Optionally, return a default image or an error message
-                # Here, returning an alt text
                 return {
                     "src": "",
-                    "alt": f"Image for {race} not found."
+                    "alt": f"Mynd fyrir {race} fannst ekki."
                 }
 
-    # Render images for the 2021 Season Overview
+    # Birta myndir fyrir 2021 Tímabils Yfirlit
     @output
     @render.image
     def hamilton_car_image():
@@ -1076,7 +1089,7 @@ def server(input, output, session):
         else:
             return {
                 "src": "",
-                "alt": "Lewis Hamilton car image not found."
+                "alt": "Mynd af bíl Lewis Hamilton fannst ekki."
             }
 
     @output
@@ -1095,9 +1108,9 @@ def server(input, output, session):
         else:
             return {
                 "src": "",
-                "alt": "Max Verstappen car image not found."
+                "alt": "Mynd af bíl Max Verstappen fannst ekki."
             }
-            
+
     # Línurit fyrir uppsöfnuð stig
     @output
     @render_widget
@@ -1143,38 +1156,40 @@ def server(input, output, session):
         fig.add_trace(go.Scatter(
             x=data_wins[data_wins['driver'] == 'lewis-hamilton']['race_id'],
             y=data_points[data_points['driver'] == 'lewis-hamilton']['cumulative_points'].iloc[
-                data_wins[data_wins['driver'] == 'lewis-hamilton']['race_id'].index] - 5,  # Færa stjörnu aðeins nær grafinu
+                  data_wins[data_wins['driver'] == 'lewis-hamilton']['race_id'].index] - 5,
             mode='markers',
-            name='Hamilton Wins',
-            marker=dict(symbol='star', size=12, color='blue')  # Minni stjörnur fyrir Hamilton
+            name='Sigur Hamilton',
+            marker=dict(symbol='star', size=12, color='blue')
         ))
 
         # Bæta stjörnum við sigurstaði fyrir Verstappen
         fig.add_trace(go.Scatter(
             x=data_wins[data_wins['driver'] == 'max-verstappen']['race_id'],
             y=data_points[data_points['driver'] == 'max-verstappen']['cumulative_points'].iloc[
-                data_wins[data_wins['driver'] == 'max-verstappen']['race_id'].index] - 5,  # Færa stjörnu aðeins nær grafinu
+                  data_wins[data_wins['driver'] == 'max-verstappen']['race_id'].index] - 5,
             mode='markers',
-            name='Verstappen Wins',
-            marker=dict(symbol='star', size=12, color='red')  # Minni stjörnur fyrir Verstappen
+            name='Sigur Verstappen',
+            marker=dict(symbol='star', size=12, color='red')
         ))
 
         # Uppfæra ása og útlit
         fig.update_layout(
             xaxis_title="Keppni",
             yaxis_title="Uppsöfnuð Stig",
-            legend_title="Driver",
+            legend_title="Ökumaður",
             template="plotly_white"
         )
 
-        return fig
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
 
+        return fig
 
     # Línurit fyrir stöðu í keppnum
     @output
     @render_widget
     def hamilton_verstappen_position_plot():
-    # Sækja gögn úr töflunni 'hamilton_verstappen_race_data_2021' með 'type' = 'RACE_RESULT'
+        # Sækja gögn úr töflunni 'hamilton_verstappen_race_data_2021' með 'type' = 'RACE_RESULT'
         query = """
             SELECT race_id, driver_id, position_display_order
             FROM hamilton_verstappen_race_data_2021
@@ -1214,16 +1229,16 @@ def server(input, output, session):
             x=winner_data[winner_data['driver'] == 'lewis-hamilton']['race_id'],
             y=winner_data[winner_data['driver'] == 'lewis-hamilton']['position_display_order'],
             mode='markers+text',
-            name='Hamilton Wins',
-            marker=dict(symbol='star', size=15, color='blue'),  # Blá stjarna fyrir Hamilton
+            name='Sigur Hamilton',
+            marker=dict(symbol='star', size=15, color='blue'),
         ))
 
         fig.add_trace(go.Scatter(
             x=winner_data[winner_data['driver'] == 'max-verstappen']['race_id'],
             y=winner_data[winner_data['driver'] == 'max-verstappen']['position_display_order'],
             mode='markers+text',
-            name='Verstappen Wins',
-            marker=dict(symbol='star', size=15, color='red'),  # Rauð stjarna fyrir Verstappen
+            name='Sigur Verstappen',
+            marker=dict(symbol='star', size=15, color='red'),
         ))
 
         # Snúa y-ásnum svo 1. staður sé efst
@@ -1236,8 +1251,11 @@ def server(input, output, session):
             template="plotly_white"
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
-    
+
     # Nýir úttakshlutir fyrir framleiðenda frammistöðu
     @output
     @render_widget
@@ -1266,6 +1284,8 @@ def server(input, output, session):
             )
             fig.update_layout(xaxis_title=input.manufacturer_type(), yaxis_title="Meðaltal Stiga")
             fig.update_xaxes(tickangle=45)
+            # Bæta við hreinum hover effect
+            fig.update_traces(hoverinfo='name+x+y')
             return fig
 
     @output
@@ -1291,45 +1311,50 @@ def server(input, output, session):
             )
             fig.update_layout(xaxis_title=input.manufacturer_type(), yaxis_title="Samtala Stiga")
             fig.update_xaxes(tickangle=45)
+            # Bæta við hreinum hover effect
+            fig.update_traces(hoverinfo='name+x+y')
             return fig
-        
+
     # Sýna lóðrétt súlurit
     @output
     @render_widget
     def wins_bar_chart():
-        # Gögnin fyrir Wins
+        # Gögnin fyrir Sigur
         wins_data = pd.DataFrame({
-            "Driver": ["Lewis Hamilton", "Max Verstappen"],
-            "Wins": [hamilton_wins, verstappen_wins]  # Fastar tölur, getur breytt í breytur ef þær eru skilgreindar
+            "Ökumaður": ["Lewis Hamilton", "Max Verstappen"],
+            "Sigur": [hamilton_wins, verstappen_wins]
         })
 
         # Plotly súlurit
         fig = go.Figure()
 
         # Bæta við súlum fyrir hvern ökumann
-        for driver in wins_data["Driver"]:
-            driver_data = wins_data[wins_data["Driver"] == driver]
+        for driver in wins_data["Ökumaður"]:
+            driver_data = wins_data[wins_data["Ökumaður"] == driver]
             fig.add_trace(go.Bar(
-                x=[driver],  # Ökumenn á X-ás
-                y=driver_data["Wins"],  # Wins gildi á Y-ás
+                x=[driver],
+                y=driver_data["Sigur"],
                 name=driver,
-                text=driver_data["Wins"],  # Texti sem birtir Wins beint á súlunum
-                textposition="auto",  # Textinn birtist sjálfvirkt á réttum stað
+                text=driver_data["Sigur"],
+                textposition="auto",
             ))
 
         # Uppsetning lóðrétta súluritsins
         fig.update_layout(
-            title="2021 Wins Comparison",
-            xaxis_title="Driver",
-            yaxis_title="Wins",
-            barmode="group",  # Hópar saman súlur fyrir skýrleika
+            title="Sigur Samanburður",
+            xaxis_title="Ökumaður",
+            yaxis_title="Sigur",
+            barmode="group",
             height=400,
-            legend_title="Driver",
-            template="plotly_white"  # Hreint útlit
+            legend_title="Ökumaður",
+            template="plotly_white"
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
-    
+
     @output
     @render_widget
     def horizontal_race_bar_chart():
@@ -1338,26 +1363,30 @@ def server(input, output, session):
 
         # Ná í gögn fyrir valda keppni
         df = get_race_points(race)
-        
+
         # Búa til lóðrétt súlurit
         fig = px.bar(
             df,
             x="driver_id",
             y="race_points",
-            title=f"Race Points for {race}",
-            labels={"driver_id": "Driver", "race_points": "Points"},
-            color="driver_id",  # Litir eftir keppanda
+            title=f"Stig í Keppni fyrir {race}",
+            labels={"driver_id": "Ökumaður", "race_points": "Stig"},
+            color="driver_id",
             color_discrete_map={
-                'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',  # Smooth blátt fyrir Hamilton
-                'max-verstappen': 'rgba(255, 0, 0, 0.7)'   # Smooth rautt fyrir Verstappen
+                'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',
+                'max-verstappen': 'rgba(255, 0, 0, 0.7)'
             }
         )
         fig.update_layout(
-            xaxis_title="Driver",
-            yaxis_title="Race Points",
+            xaxis_title="Ökumaður",
+            yaxis_title="Stig í Keppni",
             template="plotly_white",
-            showlegend=False  # Fjarlægja legend ef ekki nauðsynlegt
+            showlegend=False
         )
+
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
 
     @output
@@ -1381,52 +1410,48 @@ def server(input, output, session):
             df,
             x="driver_id",
             y="fastest_lap",
-            title="Fastest Lap Comparison",
-            labels={"driver_id": "Driver", "fastest_lap": "Lap Time (s)"},
+            title="Samanburður á Hraðasta Hring",
+            labels={"driver_id": "Ökumaður", "fastest_lap": "Hringtími (s)"},
             color="driver_id",
         )
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
         return fig
-    
+
     @output
     @render_widget
     def horizontal_race_time_comparison_chart():
-        # Fá valið keppni
         race_id = race_mapping.get(input.race_select())
         if not race_id:
-            # Skila tómu grafi ef race_id er ekki gilt
             fig = go.Figure()
             fig.update_layout(
-                title="No data available for the selected race.",
-                xaxis_title="Race Time",
-                yaxis_title="Driver",
+                title="Engin gögn til fyrir valda keppni.",
+                xaxis_title="Keppnistími",
+                yaxis_title="Ökumaður",
                 template="plotly_white"
             )
             return fig
 
-        # SQL fyrirspurn til að ná í race_time fyrir hvern keppanda
         query = f"""
         SELECT driver_id, race_time
         FROM hamilton_verstappen_race_data_2021
         WHERE race_id = {race_id}
         """
         df = pd.read_sql_query(query, con)
-        # Fjarlægja None eða óþekkt gildi í dálknum
         df = df.dropna(subset=["race_time"])
 
         df["race_time"] = df["race_time"].apply(convert_time_to_seconds)
 
-
-        # Athuga hvort gögn séu til
         if df.empty:
             fig = go.Figure()
             fig.update_layout(
-                title="No data available for the selected race.",
-                xaxis_title="Race Time",
-                yaxis_title="Driver",
+                title="Engin gögn til fyrir valda keppni.",
+                xaxis_title="Keppnistími",
+                yaxis_title="Ökumaður",
                 template="plotly_white"
             )
             return fig
-        
+
         min_value = df["race_time"].min()
         max_value = df["race_time"].max()
         buffer = (max_value - min_value) * 0.25
@@ -1436,38 +1461,37 @@ def server(input, output, session):
             y="driver_id",
             x="race_time",
             orientation="h",
-            title="Race Time Comparison",
-            labels={"driver_id": "Driver", "race_time": "Race Time (s)"},
+            title="Samanburður á Keppnistíma",
+            labels={"driver_id": "Ökumaður", "race_time": "Keppnistími (s)"},
             color="driver_id",
             color_discrete_map={
-                'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',  # Smooth blátt fyrir Hamilton
-                'max-verstappen': 'rgba(255, 0, 0, 0.7)'   # Smooth rautt fyrir Verstappen
+                'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',
+                'max-verstappen': 'rgba(255, 0, 0, 0.7)'
             }
         )
 
-        # Fínstilla x-ás
-        min_value = df["race_time"].min()  # Minnsta gildið á x-ásnum
         fig.update_layout(
             xaxis=dict(
-                title="Race Time (s)",
-                range=[min_value - buffer, max_value + buffer],  # Lækka neðri mörk aðeins fyrir bil (2% minni)
+                title="Keppnistími (s)",
+                range=[min_value - buffer, max_value + buffer],
             ),
-            yaxis_title="Driver",
+            yaxis_title="Ökumaður",
             template="plotly_white",
             showlegend=False
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
-    
+
     @output
     @render_widget
     def vertical_comparison_barplot():
-        # Fá valið keppni
         race_id = race_mapping.get(input.race_select())
         if not race_id:
             return go.Figure()
 
-        # Fyrirspurn til að ná í race_points úr "hamilton_verstappen_race_data_2021"
         query_race_points = f"""
         SELECT driver_id, race_points, race_laps
         FROM hamilton_verstappen_race_data_2021
@@ -1475,7 +1499,6 @@ def server(input, output, session):
         """
         df_race_points = pd.read_sql_query(query_race_points, con)
 
-        # Fyrirspurn til að ná í laps og stops úr "race_data"
         query_race_data = f"""
         SELECT driver_id, stops
         FROM f1_race_data
@@ -1484,47 +1507,43 @@ def server(input, output, session):
         """
         df_race_data = pd.read_sql_query(query_race_data, con)
 
-        # Sameina gögnin í eina töflu
         df = pd.merge(df_race_points, df_race_data, on="driver_id", how="outer")
 
-        # Umbreyta gögnunum í long-form fyrir samanburð á flokkum
         df_long = df.melt(
-            id_vars=["driver_id"],  # Halda driver_id sem fastan dálk
-            value_vars=["race_points", "race_laps", "stops"],  # Flokkarnir sem á að bera saman
-            var_name="Category",  # Nafn dálks sem geymir flokkana
-            value_name="Value"  # Nafn dálks sem geymir gildin
+            id_vars=["driver_id"],
+            value_vars=["race_points", "race_laps", "stops"],
+            var_name="Flokkur",
+            value_name="Gildi"
         )
 
-        # Búa til lóðrétt súlurit
         fig = px.bar(
             df_long,
             x="driver_id",
-            y="Value",
-            color="Category",
-            barmode="group",  # Hópar saman flokkum fyrir skýrleika
-            title="Comparison of Race Points, Laps, and Stops",
-            labels={"driver_id": "Driver", "Value": "Value", "Category": "Category"}
+            y="Gildi",
+            color="Flokkur",
+            barmode="group",
+            title="Samanburður á Stig í Keppni, Hringjum og Pásum",
+            labels={"driver_id": "Ökumaður", "Gildi": "Gildi", "Flokkur": "Flokkur"}
         )
 
-        # Uppfæra útlit
         fig.update_layout(
-            xaxis_title="Driver",
-            yaxis_title="Value",
+            xaxis_title="Ökumaður",
+            yaxis_title="Gildi",
             template="plotly_white"
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
-    
-    
+
     @output
     @render_widget
     def horizontal_pit_stop_comparison_chart():
-        # Fá valið keppni
         race_id = race_mapping.get(input.race_select())
         if not race_id:
             return go.Figure()
 
-        # Fyrirspurn til að ná í pit_stop_time og pit_stop_time_sum úr gagnagrunninum
         query = f"""
         SELECT driver_id, 
             pit_stop_time, 
@@ -1534,58 +1553,53 @@ def server(input, output, session):
         """
         df = pd.read_sql_query(query, con)
 
-        # Umbreyta 'pit_stop_time' og 'pit_stop_time_sum' með fallinu
         df['pit_stop_time'] = df['pit_stop_time'].apply(convert_time_to_seconds_2)
         df['pit_stop_time_sum'] = df['pit_stop_time_sum'].apply(convert_time_to_seconds_2)
 
-        # Fjarlægja línur með NaN gildi eftir umbreytingu
         df = df.dropna(subset=['pit_stop_time', 'pit_stop_time_sum'])
 
-        # Umbreyta gögnunum í long-form fyrir samanburð
         df_long = df.melt(
-            id_vars=["driver_id"],  # Halda driver_id sem fastan dálk
-            value_vars=["pit_stop_time", "pit_stop_time_sum"],  # Flokkarnir sem á að bera saman
-            var_name="Category",  # Nafn dálks sem geymir flokkana
-            value_name="Value"  # Nafn dálks sem geymir gildin
+            id_vars=["driver_id"],
+            value_vars=["pit_stop_time", "pit_stop_time_sum"],
+            var_name="Flokkur",
+            value_name="Gildi"
         )
 
-        # Búa til lárétt súlurit
         fig = px.bar(
             df_long,
             y="driver_id",
-            x="Value",
-            color="Category",
-            orientation="h",  # Lárétt súlurit
-            barmode="group",  # Hópar saman flokkum fyrir skýrleika
-            title="Comparison of Pit Stop Time and Total Pit Stop Time Sum",
-            labels={"driver_id": "Driver", "Value": "Value (s)", "Category": "Category"}
+            x="Gildi",
+            color="Flokkur",
+            orientation="h",
+            barmode="group",
+            title="Samanburður á Pásutíma og Samtals Pásutíma",
+            labels={"driver_id": "Ökumaður", "Gildi": "Gildi (s)", "Flokkur": "Flokkur"}
         )
 
-        # Uppfæra útlit: Stillir x-ásinn á rétt bil
-        min_value = df_long["Value"].min()
-        max_value = df_long["Value"].max()
+        min_value = df_long["Gildi"].min()
+        max_value = df_long["Gildi"].max()
         buffer = (max_value - min_value) * 0.1
         fig.update_layout(
             xaxis=dict(
-                title="Value (s)",
-                range=[min_value - buffer, max_value + buffer]  # Stillir bil á x-ás
+                title="Gildi (s)",
+                range=[min_value - buffer, max_value + buffer]
             ),
-            yaxis_title="Driver",
+            yaxis_title="Ökumaður",
             template="plotly_white"
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
 
-    
     @output
     @render_widget
     def fastest_lap_chart():
-        # Fá valið keppni
         race_id = race_mapping.get(input.race_select())
         if not race_id:
             return go.Figure()
 
-        # Fyrirspurn til að ná í hraðasta hringinn
         query = f"""
         SELECT driver_id, lap_time
         FROM f1_race_data
@@ -1593,31 +1607,27 @@ def server(input, output, session):
         """
         df = pd.read_sql_query(query, con)
 
-        # Umbreyta 'lap_time' í float, ólögleg gildi verða NaN
         df['lap_time'] = df['lap_time'].apply(convert_lap_time_to_seconds)
 
-        # Fjarlægja línur með NaN
         df = df.dropna(subset=['lap_time'])
 
-        # Ef engin gögn eru eftir, skila tómum grafinu
         if df.empty:
             fig = go.Figure()
             fig.update_layout(
-                title="No valid data for the selected race.",
-                xaxis_title="Lap Time (s)",
-                yaxis_title="Driver",
+                title="Engin gild gögn fyrir valda keppni.",
+                xaxis_title="Hringtími (s)",
+                yaxis_title="Ökumaður",
                 template="plotly_white"
             )
             return fig
 
-        # Teikna graf
         fig = px.bar(
             df,
             y="driver_id",
             x="lap_time",
             orientation="h",
-            title="Fastest Lap Comparison",
-            labels={"driver_id": "Driver", "lap_time": "Lap Time (s)"},
+            title="Samanburður á Hraðasta Hring",
+            labels={"driver_id": "Ökumaður", "lap_time": "Hringtími (s)"},
             color="driver_id",
             color_discrete_map={
                 'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',
@@ -1625,31 +1635,31 @@ def server(input, output, session):
             }
         )
 
-        # Stilla x-ás dynamic
         min_value = df["lap_time"].min()
         max_value = df["lap_time"].max()
         buffer = (max_value - min_value) * 0.25
         fig.update_layout(
             xaxis=dict(
-                title="Lap Time (s)",
+                title="Hringtími (s)",
                 range=[min_value - buffer, max_value + buffer]
             ),
-            yaxis_title="Driver",
+            yaxis_title="Ökumaður",
             template="plotly_white",
             showlegend=False
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
-    
+
     @output
     @render_widget
     def start_vs_finish_positions_chart():
-        # Fá valið keppni
         race_id = race_mapping.get(input.race_select())
         if not race_id:
             return go.Figure()
 
-        # Fyrirspurn til að sækja gögn fyrir valda keppni
         query = f"""
         SELECT driver_id, 
             race_qualification_position_number, 
@@ -1660,69 +1670,66 @@ def server(input, output, session):
         """
         df = pd.read_sql_query(query, con)
 
-        # Hreinsa gögnin - tryggja að dálkar séu heiltölur
-        df['race_qualification_position_number'] = pd.to_numeric(df['race_qualification_position_number'], errors='coerce')
+        df['race_qualification_position_number'] = pd.to_numeric(df['race_qualification_position_number'],
+                                                                 errors='coerce')
         df['race_grid_position_number'] = pd.to_numeric(df['race_grid_position_number'], errors='coerce')
         df['race_positions_gained'] = pd.to_numeric(df['race_positions_gained'], errors='coerce')
 
-        # Fjarlægja línur með NaN gildum
-        df = df.dropna(subset=['race_qualification_position_number', 'race_grid_position_number', 'race_positions_gained'])
+        df = df.dropna(
+            subset=['race_qualification_position_number', 'race_grid_position_number', 'race_positions_gained'])
 
-        # Búa til dálk fyrir endanlega stöðu byggða á ráslínustöðu + unnin sæti
         df['race_finish_position_number'] = df['race_grid_position_number'] - df['race_positions_gained']
 
-        # Umbreyta í long-form til að búa til samanburð
         df_long = df.melt(
-            id_vars=["driver_id"],  # Halda driver_id sem fastan dálk
+            id_vars=["driver_id"],
             value_vars=[
-                "race_qualification_position_number", 
-                "race_grid_position_number", 
+                "race_qualification_position_number",
+                "race_grid_position_number",
                 "race_finish_position_number"
             ],
-            var_name="Category",  # Nafn dálks sem geymir flokkana
-            value_name="Position"  # Nafn dálks sem geymir stöðuna
+            var_name="Flokkur",
+            value_name="Staða"
         )
 
-        # Teikna línurit
         fig = px.line(
             df_long,
-            x="Category",
-            y="Position",
+            x="Flokkur",
+            y="Staða",
             color="driver_id",
-            markers=True,  # Sýna punkta fyrir hverja stöðu
-            title="Starting vs Finishing Positions",
+            markers=True,
+            title="Rás- vs Lokastöður",
             labels={
-                "driver_id": "Driver", 
-                "Position": "Position (Lower is Better)", 
-                "Category": "Category"
+                "driver_id": "Ökumaður",
+                "Staða": "Staða (Lægri er betri)",
+                "Flokkur": "Flokkur"
             },
-            line_shape="linear",  # Bein lína á milli punkta
+            line_shape="linear",
         )
 
-        # Sérstill litina fyrir keppendur
-        fig.update_traces(marker=dict(size=10))  # Stækka punktana fyrir skýrleika
+        fig.update_traces(marker=dict(size=10))
 
         fig.update_layout(
             yaxis=dict(
-                title="Position (Lower is Better)",
-                autorange="reversed",  # Snúa ásnum þannig að lægsta gildi (besta staða) er efst
+                title="Staða (Lægri er betri)",
+                autorange="reversed",
             ),
-            xaxis_title="Category (Qualification, Grid, Finish)",
+            xaxis_title="Flokkur (Kvarði, Ráslína, Lok)",
             template="plotly_white",
-            legend_title="Driver"
+            legend_title="Ökumaður"
         )
 
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
-    
+
     @output
     @render_widget
     def positions_gained_bar_chart():
-        # Fá valið keppni
         race_id = race_mapping.get(input.race_select())
         if not race_id:
             return go.Figure()
 
-        # Fyrirspurn til að sækja gögn fyrir valda keppni
         query = f"""
         SELECT driver_id, race_positions_gained
         FROM hamilton_verstappen_race_data_2021
@@ -1730,55 +1737,56 @@ def server(input, output, session):
         """
         df = pd.read_sql_query(query, con)
 
-        # Umbreyta í tölur og fjarlægja NaN gildi
         df['race_positions_gained'] = pd.to_numeric(df['race_positions_gained'], errors='coerce')
         df = df.dropna(subset=['race_positions_gained'])
 
-        # Teikna lóðrétt bar chart
         fig = px.bar(
             df,
             x="driver_id",
             y="race_positions_gained",
             color="driver_id",
-            title="Positions Gained or Lost",
+            title="Stöður Græddar eða Tapaðar",
             labels={
-                "driver_id": "Driver",
-                "race_positions_gained": "Positions Gained (+) or Lost (-)"
+                "driver_id": "Ökumaður",
+                "race_positions_gained": "Stöður Græddar (+) eða Tapaðar (-)"
             },
             color_discrete_map={
-                'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',  # Blátt fyrir Hamilton
-                'max-verstappen': 'rgba(255, 0, 0, 0.7)'   # Rautt fyrir Verstappen
+                'lewis-hamilton': 'rgba(0, 0, 255, 0.7)',
+                'max-verstappen': 'rgba(255, 0, 0, 0.7)'
             }
         )
 
-        # Uppfæra y-ás fyrir jákvæð og neikvæð gildi
         min_value = df["race_positions_gained"].min()
         max_value = df["race_positions_gained"].max()
-        buffer = (max_value - min_value)  # Gefa smá bil á ásnum
-        
-        # Bæta við þykkri núll-línu
+        buffer = (max_value - min_value)
+
         fig.add_shape(
             type="line",
-            x0=-0.5,  # Byrjar aðeins fyrir utan fyrsta dálkinn
-            x1=len(df['driver_id']) - 0.5,  # Eykur yfir alla dálka
+            x0=-0.5,
+            x1=len(df['driver_id']) - 0.5,
             y0=0,
             y1=0,
             line=dict(
                 color="black",
-                width=4  # Þykkt núll-línu
+                width=4
             )
         )
 
         fig.update_layout(
             yaxis=dict(
-                title="Positions Gained or Lost",
+                title="Stöður Græddar eða Tapaðar",
                 range=[min_value - buffer, max_value + buffer]
             ),
-            xaxis_title="Driver",
+            xaxis_title="Ökumaður",
             template="plotly_white",
-            showlegend=False  # Fjarlægja legend ef það er óþarfi
+            showlegend=False
         )
+
+        # Bæta við hreinum hover effect
+        fig.update_traces(hoverinfo='name+x+y')
+
         return fig
 
-# Create the Shiny app
+
+# Búa til Shiny appið
 app = App(app_ui, server)
