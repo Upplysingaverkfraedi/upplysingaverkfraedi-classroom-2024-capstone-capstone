@@ -38,7 +38,7 @@ def parse_html(html):
     beer_matches = re.findall(beer_pattern, html, re.DOTALL)
     
     # Bæta við, finna match fyrir volume
-    volume_match = re.search(volume_pattern, html, re.DOTALL)
+    volume_match = re.search(volume_pattern, html, re.DOTALL) # Bætti við rúmmáli ml seinna hér.
 
     if not beer_matches:
         print("No beer names or prices found in the HTML.")
@@ -63,7 +63,7 @@ def save_results(all_beers_data, output_dir):
     filename = "Bjor_Vinbudin.csv"  # Nafn á CSV skrá
     filepath = os.path.join(output_dir, filename)
 
-    df = pd.DataFrame(all_beers_data, columns=["Nafn", "Verð (Kr)", "ml"]) # Setja form .csv skjals þar sem efstu colums hafn merkingar
+    df = pd.DataFrame(all_beers_data, columns=["Bjór", "Verð (Kr)", "Stærð (ml)"]) # Setja form .csv skjals þar sem efstu colums hafn merkingar
     df.to_csv(filepath, index=False)
     print(f"Prices saved to {filepath}")
 
