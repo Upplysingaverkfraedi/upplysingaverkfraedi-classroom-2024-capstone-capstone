@@ -6,6 +6,14 @@
 
 ## Regex
 **Notið þetta til að keyra**
+Imports sem þarf
+
+import re
+import requests
+import pandas as pd
+from datetime import datetime
+import os
+
 
 1. Þarft að vera með skjalið 'REGEX_Linkar.txt'
 2. Þarft að vera með skjalið 'REGEX_Vinbudin.py'

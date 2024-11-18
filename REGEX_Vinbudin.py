@@ -4,7 +4,7 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# Load URLs from a GitHub file link
+# Load URL fyrir bjóra
 def load_urls_from_file(file_name):
 
     # lesa skrá 'REGEX_Linkar.txt' sem inniheldir linka að "vefsíðum"
@@ -19,13 +19,13 @@ def fetch_html(url):  # Nær í url
         html = response.text
         return html
     else:
-        print(f"Failed to retrieve data from {url}")
+        print(f"Náði ekki upplýsingum {url}")
         return None
 
 
-# Parse HTML using regex to extract beer names and prices separately
+# HTML
 def parse_html(html):
-    # Regex pattern fyrir beer name og price
+    # Regex pattern fyrir bjór, Verð og ml
     beer_pattern = (
         r'<span id="ctl00_ctl01_Label_ProductName" class="product-info-text">([^<]+)</span>.*?'
         r'<span id="ctl00_ctl01_Label_ProductPrice" class="money">([\d.,]+)</span>'
@@ -34,14 +34,14 @@ def parse_html(html):
     # Bæta við regex pattern fyrir volume in ml
     volume_pattern = r'<span[^>]*id="ctl00_ctl01_Label_ProductBottleVolumeMobile"[^>]*>(\d+)\s*ml</span>'
 
-    # Finna matches fyrir beer name and price
+    # Finna matches fyrir bjór, Verð og ml
     beer_matches = re.findall(beer_pattern, html, re.DOTALL)
     
-    # Bæta við, finna match fyrir volume
+    # Bæta við, finna match fyrir ml
     volume_match = re.search(volume_pattern, html, re.DOTALL) # Bætti við rúmmáli ml seinna hér.
 
     if not beer_matches:
-        print("No beer names or prices found in the HTML.")
+        print("Engin bjór, verð né ml fundið í HTML.")
         return []
 
     # Ef volume er fundið, extract it, otherwise set as 'Unknown'
@@ -65,10 +65,10 @@ def save_results(all_beers_data, output_dir):
 
     df = pd.DataFrame(all_beers_data, columns=["Bjór", "Verð (Kr)", "Stærð (ml)"]) # Setja form .csv skjals þar sem efstu colums hafn merkingar
     df.to_csv(filepath, index=False)
-    print(f"Prices saved to {filepath}")
+    print(f"Verð vistað í {filepath}")
 
 if __name__ == "__main__":
-    # GitHub raw URL for the file containing URLs
+    # URL
     url_file = 'REGEX_Linkar.txt' # Nafn skjal með linkum
     urls = load_urls_from_file(url_file) # Keyra/load linkana
 
