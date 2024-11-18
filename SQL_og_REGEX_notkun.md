@@ -1,31 +1,63 @@
+# SQL, REGEX og notkun þess til að setja upp gagnagrunn
+
+## SQLite
+SQL kóðinn: [Mælaborð.sql](Mælaborð.sql) býr til gagnagrunninn [Bjórgrunnur.db](Bjórgrunnur.db), býr til eftirfarandi 5 töflur:
+- Bjór_Vínbúðin úr csv-skránni:  [Bjor_Vinbudin.csv](Data/Bjor_Vinbudin.csv) þar sem kemur fram nafn bjórs, verð hans og stærð í mL.
+- Bjór úr csv-skránni:           [Bjor.csv](Data/Bjor.csv) þar sem kemur fram nafn bars, verð allra bjóra á dælu sem seldir eru á þeim stað og stærð þeirra í mL. Þar að auki kemur fram meðalverð á bjórum á hverjum stað ásamt meðal lítraverði. Einnig eru upplýsingar um staðsetningu hvers bars ásamt slóða af myndum.
+- Happy_Hour úr csv-skránni:     [Happy_Hour.csv](Data/Happy_Hour.csv) þar sem kemur fram nafn bars, byrjunar- og endatíma Happy Hour verð allra bjóra á dælu sem seldir eru á þeim stað og stærð þeirra í mL. Líkt og í töflunni að ofan kemur einnig fram meðalverð á bjórum á hverjum stað ásamt meðal lítraverði.
+- Lukkuhjól úr csv-skránni:      [Lukkuhjol.csv](Data/Lukkuhjol.csv) þar sem kemur fram verð hvers snúnings, allir möguleikir vinningar. Einnig kemur fram líkur þess að græða pening, tapa pening, enda á sléttu, vinna eitthvað eða vinna ekkert.
+- Bjórkort úr töflunni "Bjór" þar sem taflan er sett upp með unpivot-sniði. Þá er Ein lína fyrir hvern bjór á hverjum bar í stað þess að hver lína innihaldi alla bjóra á hverjum stað. Einnig voru línum með engum bjór teknar út. Þetta leiddi til þess að taflan er t.d. með 3 línur fyrir bar sem selur 3 bjóra o.s.frv.
+
+Loks voru bættir við dálkar fyrir meðalverð á hverjum bjór og meðal lítraverðum í miðbænum inn í Bjór_Vínbúðin töfluna ásamt lítraverðum á bjórum í vínbúðinni inn í Bjór_Vínbúðin töfluna.
+
 ## Regex
-**Notið þetta til að keyra**
-1. Imports sem þarf að hafa eru:
-
-import re
-import requests
-import pandas as pd
-from datetime import datetime
-import os
+Kóðinn les skrána: [REGEX_Linkar.txt](REGEX_Linkar.txt) sem inniheldur slóðir að bjórum í vínbúðinni.
+Þar næst sækir kóðinn html upplýsingar og notar REGEX skipun til að safna upplýsingum um nafn, verð og stærð bjóranna.
+Upplýsingarnar eru vistaðar í skrána: [Bjor_Vinbudin.csv](Data/Bjor_Vinbudin.csv) með dálkunum "Bjór", "Verð (Kr)" og "Stærð (ml)"
 
 
-2. Þarft að vera með skjalið 'REGEX_Linkar.txt'
-3. Þarft að vera með skjalið 'REGEX_Vinbudin.py'
-4. Fara í Terminal
-5. python3 REGEX_Vinbudin.py
-6. Run kóðan sem gefur þér skjal sem heitir 'Bjor_Vinbudin.csv'
+# Keyrsla kóðanna - Uppsetning gagnagrunns
+## Uppsetning
+Til að keyra kóðanna gaktu úr skugga að eftirfarandi sé sett upp á tölvunni þinni:
+- Python
+- SQLite3
 
+- Eftirfarandi pakka þarf að setja upp í python með:
+```python
+pip install re
+pip install requests
+pip install pandas
+pip install datetime
+pip install os
+```
 
-**Í þessu verkefni**
+### Gakktu úr skugga um að þú sért með eftirfarandi skrár:
+[REGEX_Linkar.txt](REGEX_Linkar.txt)
+Data möppu með:
+- [Bjor.csv](Data/Bjor.csv)
+- [Happy_Hour.csv](Data/Happy_Hour.csv)
+- [Lukkuhjol.csv](Data/Lukkuhjol.csv)
 
-Í þessu verkefni er verið að ná í upplýsingar um bjór, verð og stærð (ml) út úr HTML frá versýðunni vínbúðin.is
+## Keyrsla
+Keyrið í þessarri röð:
+- 1
+```bash
+python3 REGEX_Vinbudin.py
+```
+Gakktu úr skugga um að skráin [Bjor_Vinbudin.csv](Data/Bjor_Vinbudin.csv) hafi birtst í [Data](Data) möppuna.
 
-Þessi kóði var gerður með gömul verkefni -martell hóps við hlið
+- 2
+```bash
+sqlite3 Bjórgrunnur.db ".read Mælaborð.sql"
+```
+Gakktu úr skugga um að [Bjórgrunnur.db](Bjórgrunnur.db) hafi verið búinn til. 
 
-Stutt útskýring á kóðanum,
-Part 1. Imports,
-Part 2. Er "load_urls_from_file(file_name)" Þetta les skrá 'REGEX_Linkar.txt' sem inniheldir linka að "vefsíðum"
-Part 3. Er "fetch_html" Þetta leyfir okkur að ná í upplýsingar frá vefsýðum á netinu.
-Part 4. Er "parse_html" þetta safnar upplýsingar um nafn, verð og rúmmál bjóra sem teknar eru frá vefsýðunni "vínbúðin.is"
-Part 5. "save_results" vistar upplýsingarnar sem safnaðar voru úr vefsýðunni og setur þær í dálka "Bjór", "Verð (Kr)" og "Stærð (ml)"
-Part 6. Er "__name__" þetta er notað til keyra kóðan sem safna upplýsingum frá "REGEX_Linkar.txt", þannig allir ættu að geta keyrt kóðan og fengið upplýsingarnar.
+## Tengja gagnagrunn við PowerBI ()
+1. Opnaðu ODBC Data Sources (64-bit) forrtið (ætti að vera til staðar, annars þarf að downloada því)-
+   a. Veljið Add og finnið "SQLite3 ODBC Driver"
+   b. Skýrið gagnagrunninn einhverju nafni og veljið þrjá punktana hjá "Database" of finnið [Bjórgrunnur.db](Bjórgrunnur.db) skrána.
+   c. Veljið "Ok"
+2. Opnið Power BI og búið til "Blank Report" ef vilji er fyrir að byrja frá grunni, annars opnið [Mælaborð.pbix](Mælaborð.pbix)
+3. Veljið "Get Data" og leitið að "ODBC"
+4. Veljið gagnagrunnin sem þið skýrðuð í skrefi 1b
+5. Veljið Windows og "Use my current credentials" í ODBC driver 
