@@ -40,13 +40,13 @@ Data möppu með:
 
 ## Keyrsla
 Keyrið í þessarri röð:
-- 1
+#### 1
 ```bash
 python3 REGEX_Vinbudin.py
 ```
 Gakktu úr skugga um að skráin [Bjor_Vinbudin.csv](Data/Bjor_Vinbudin.csv) hafi birtst í [Data](Data) möppuna.
 
-- 2
+#### 2
 ```bash
 sqlite3 Bjórgrunnur.db ".read Mælaborð.sql"
 ```
@@ -54,7 +54,7 @@ Gakktu úr skugga um að [Bjórgrunnur.db](Bjórgrunnur.db) hafi verið búinn t
 
 ## Tengja gagnagrunn við PowerBI ()
 1. Opnaðu ODBC Data Sources (64-bit) forrtið (ætti að vera til staðar, annars þarf að downloada því)-
-   a. Veljið Add og finnið "SQLite3 ODBC Driver"
+   a. Veljið Add og finnið "SQLite3 ODBC Driver" (ætti að vera til staðar annars þarf að downloada driver [hér]([Bjórgrunnur.db](https://marketplace.visualstudio.com/items?itemName=DevartSoftware.SQLiteODBCDriver3264bit)) og nota hann.
    b. Skýrið gagnagrunninn einhverju nafni og veljið þrjá punktana hjá "Database" of finnið [Bjórgrunnur.db](Bjórgrunnur.db) skrána.
    c. Veljið "Ok"
 2. Opnið Power BI og búið til "Blank Report" ef vilji er fyrir að byrja frá grunni, annars opnið [Mælaborð.pbix](Mælaborð.pbix)
