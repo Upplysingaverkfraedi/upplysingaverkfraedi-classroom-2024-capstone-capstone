@@ -167,7 +167,7 @@ Hægt er að keyra forritið með skipuninni:
 ```
 python3 code/tengslanet3.py
 ```
-** Athugið: Python-forritið verður að vera í keyrslu á meðan mælaborðið er keyrt.**
+**Athugið: Python-forritið verður að vera í keyrslu á meðan mælaborðið er keyrt.**
 
 Þegar búið er að skoða mælaborðið er mikilvægt að hætta keyrslunni á `tengslanet3.py` með `Ctrl + C`, **Ekki hætta keyrslu með `Ctrl + Z`**. Ef það er gert, mun forritið áfram halda sambandi við port númerið, sem veldur því að portið verður óaðgengilegt næst þegar forritið er keyrt.
 
