@@ -1,9 +1,21 @@
+# Capstone verkefni 
+### Uppsetning
+- Downloadið PowerBI desktop
+- Hafið Python sett upp í tölvunni ykkar
+
+
+## Regex
 **Notið þetta til að keyra**
 
 Þarft að vera með skjalið 'REGEX_Linkar.txt'
 
-python REGEX_Vinbudin_kodi.py
+python3 REGEX_Vinbudin.py
 
+
+##  Mælaborð:
+Downloadið eftirfarandi skrám og opnið í PowerBI desktop (Mögulega hægt að opna á vefútgáfu)
+- Bjórkort.pbix
+- Hjól_Winrate.pbix
 
 **Í þessu verkefni**
 
@@ -11,8 +23,8 @@ python REGEX_Vinbudin_kodi.py
 
 Þessi kóði,
 1. Imports,
-2. Er "load_urls_from_github" Þetta nær í lista af url frá github frá "REGEX_Linkar.txt".
+2. Er "load_urls_from_file(file_name)" Þetta les skrá 'REGEX_Linkar.txt' sem inniheldir linka að "vefsíðum"
 3. Er "fetch_html" Þetta leyfir okkur að ná í upplýsingar frá vefsýðum á netinu.
-4. Er "parse_html" þetta safnar upplýsingar um bjór, sem teknar eru frá vefsýðu "vínbúðin.is"
-5.  "save_results" vistar upplýsingarnar sem safnaðar voru úr vefsýðunni og setur þær í dálka "Nafn", "Verð (Kr)" og "ml"
-6. Er "__name__" þetta er notað til að sýna hvaða versýður linka á að safna upplýsingum frá "REGEX_Linkar.txt" frá github main, þannig allir ættu að geta keyrt kóðan og fengið upplýsingarnar.
+4. Er "parse_html" þetta safnar upplýsingar um nafn, verð og rúmmál bjóra sem teknar eru frá vefsýðu "vínbúðin.is"
+5.  "save_results" vistar upplýsingarnar sem safnaðar voru úr vefsýðunni og setur þær í dálka "Bjór", "Verð (Kr)" og "Stærð (ml)"
+6. Er "__name__" þetta er notað til keyra kóðan sem safna upplýsingum frá "REGEX_Linkar.txt", þannig allir ættu að geta keyrt kóðan og fengið upplýsingarnar.
