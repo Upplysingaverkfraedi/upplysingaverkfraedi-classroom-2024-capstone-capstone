@@ -572,4 +572,3 @@ ALTER TABLE Bjór_Vínbúðin ADD COLUMN "Lítraverð (Kr)" INTEGER;
 UPDATE Bjór_Vínbúðin
 SET "Lítraverð (Kr)" = ("Verð (Kr)" / ("Stærð (mL)" / 1000.0))
 WHERE "Stærð (mL)" IS NOT NULL AND "Stærð (mL)" > 0;
-
