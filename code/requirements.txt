@@ -1,4 +1,5 @@
-imdbpy
+Cinemagoer
+IMDbPY
 pandas
 requests
 beautifulsoup4
