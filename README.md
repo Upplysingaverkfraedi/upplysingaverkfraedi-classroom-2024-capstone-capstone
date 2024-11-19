@@ -228,7 +228,7 @@ Eftir þetta ferli ættu töflurnar `rotten_tomatoes_movies`, `rotten_tomatoes_m
 
 ## Uppsetning mælaborðs
 
-Mælaborðið er hannað í R Markdown skjali, við notuðum Rstudios. Inni á main er skjal sem heitir Maelabord.rmd. Hlaðið því niður í tölvuna ykkar. 
+Mælaborðið er hannað í R Markdown skjali, við notuðum Rstudios. Í caps_docs möppunni er skjal sem heitir Maelabord.rmd. Hlaðið því niður í tölvuna ykkar. 
 
 Þið þurfið að breyta path to í viðeigandi heiti: 
 
