@@ -1,0 +1,753 @@
+---
+title: "Mælaborð"
+author: "The North"
+date: "2024-06-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Hlaða nauðsynlegum bókasöfnum
+library(shiny)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(DBI)
+library(RSQLite)
+library(stringr)
+library(bslib)
+library(plotly)
+library(lubridate)
+
+# Tengist SQLite gagnagrunninum
+conn <- dbConnect(SQLite(), "path/to/your/data/rotten_tomatoes.db")
+
+
+# Les öll gögnin úr gagnagrunninum
+rotten_tomatoes_movies <- dbReadTable(conn, "rotten_tomatoes_movies")
+rotten_tomatoes_leo_kate <- dbReadTable(conn, "rotten_tomatoes_movies_dicaprio_winslet")
+leo_movies <- dbReadTable(conn, "leo_movies")
+kate_movies <- dbReadTable(conn, "kate_movies")
+main_actors_in_info <- dbReadTable(conn, "main_actors_in_info")
+content_rating_count <- dbReadTable(conn, "content_rating_count")
+movie_actors <- dbReadTable(conn, "movie_actors")
+actors_info <- dbReadTable(conn, "actors_info")
+all_audience_movies <- dbReadTable(conn, "all_movies_audience_directors")    
+all_director_movies <- dbReadTable(conn, "all_movies_tomatometer_directors")  
+top10_audience_movies <- dbReadTable(conn, "top10_audience_movies")       
+top10_tomatometer_movies <- dbReadTable(conn, "top10_tomatometer_movies")
+
+
+
+# Lokar tengingu við gagnagrunn
+dbDisconnect(conn)
+
+# Fyrir texta um 
+# Hreinsar texta með því að bæta við bilum þar sem þau vantar
+clean_text <- function(text) {
+  text <- gsub("([a-z])([A-Z])", "\\1 \\2", text)  # Bætir bili á milli litla og stóra bókstafs
+  text <- gsub("([0-9])([A-Za-z])", "\\1 \\2", text)  # Bætir bili á milli talna og stafa
+  text <- gsub("([A-Za-z])([0-9])", "\\1 \\2", text)  # Bætir bili á milli stafa og talna
+  text <- gsub("([a-zA-Z])\\(", "\\1 (", text)       # Bætir bili á undan svigum
+  text <- gsub("\\)([a-zA-Z])", ") \\1", text)       # Bætir bili á eftir svigum
+  text <- gsub("(Winslet)([a-zA-Z])", "\\1 \\2", text)   # Bætir bili á eftir "Winslet" ef það er bókstafur strax á eftir
+
+  # Geri undantekningu fyrir nafnið DiCaprio
+  text <- gsub("\\bDi Caprio\\b", "DiCaprio", text)  # Breytir aftur í DiCaprio ef það var breytt í Di Caprio
+
+  # Lagfærir Di Caprioas í DiCaprio as
+  text <- gsub("\\bDi Caprioas\\b", "DiCaprio as", text)
+
+  return(text)
+}
+
+# Býr til sértækt gagnasett fyrir birtingu í Shiny (bara Leonardo DiCaprio og Kate Winslet)
+actors_display <- actors_info[actors_info$actor_name %in% c("Leonardo DiCaprio", "Kate Winslet"), ]
+actors_display$mini_biography <- sapply(actors_display$mini_biography, clean_text)
+actors_display$trivia_1 <- sapply(actors_display$trivia_1, clean_text)
+actors_display$trivia_2 <- sapply(actors_display$trivia_2, clean_text)
+
+
+# Búa til sérsniðið þema fyrir mælaborðið
+my_theme <- bs_theme(
+  bootswatch = "flatly",
+  primary = "#4A90E2",
+  secondary = "#50E3C2",
+  base_font = font_google("Roboto")
+)
+
+# SHINY MÆLABORÐ
+
+ui <- fluidPage(
+  theme = my_theme,
+  tags$head(
+    tags$style(HTML("
+      .header-title {
+        text-align: center;
+        font-size: 36px;
+        font-weight: bold;
+      }
+      .header-subtitle {
+        text-align: center;
+        font-size: 24px;
+        color: #666666;
+      }
+    "))
+  ),
+  
+  # Aðal fyrirsögn
+  div(class = "header-title", "Samanburður og yfirlit yfir kvikmyndir"),
+  # Undirfyrirsögn
+  div(class = "header-subtitle", "Leonardo DiCaprio vs Kate Winslet"),
+  
+  tabsetPanel(
+    tabPanel("Heim",
+             br(),
+             h4("Um síðu"),
+             p("Þetta mælaborð veitir upplýsingar um leikarana Kate Winslet og Leonardo DiCaprio, ásamt yfirliti yfir kvikmyndir þeirra. Gögnin eru frá Rotten Tomatoes og hefur allar upplýsingar þaðan fram til 31.10.2020 en kynningin um leikarana hér að neðan er frá IMDb og inniheldur nýrri gögn"),
+             br(),
+             h4("Um leikara"),
+             fluidRow(
+    lapply(1:nrow(actors_display), function(i) {
+      column(
+        width = 6,
+        div(
+          style = "margin-bottom: 30px; border: 1px solid #ccc; padding: 15px; border-radius: 5px;",
+          img(
+            src = actors_display$headshot[i],
+            alt = paste("Headshot of", actors_display$actor_name[i]),
+            style = "width: 140px; height: auto; margin-bottom: 15px;"
+          ),
+          h3(actors_display$actor_name[i]),
+          h4("Lítil ævisaga (Mini Biography):"),
+          p(actors_display$mini_biography[i]),
+          h4("Trivia 1:"),
+          p(ifelse(is.na(actors_display$trivia_1[i]), "Not Specified", actors_display$trivia_1[i])),
+          h4("Trivia 2:"),
+          p(ifelse(is.na(actors_display$trivia_2[i]), "Not Specified", actors_display$trivia_2[i])),
+          h4("Hæst launaða mynd:"),
+          p(ifelse(is.na(actors_display$highest_paid_movie[i]), "Not Specified", actors_display$highest_paid_movie[i])),
+          h4("Hæstu laun:"),
+          p(ifelse(is.na(actors_display$highest_salary[i]), "Not Specified",
+                   paste0("$", format(actors_display$highest_salary[i], big.mark = ","))))
+        )
+      )
+    })
+  )),
+    
+tabPanel("Tegund",
+      sidebarLayout(
+        sidebarPanel(
+          width = 3, 
+          tags$p(
+            "Upplýsingar",
+            style = "font-size: 16px; "
+          ),
+          tags$p(
+            "Gröfin sýna hversu margar myndir leikararnir hafa leikið í eftir tegund og hvaða einkunnir þær myndir eru að fá. Sumar myndir eru með fleiri en eina genre (t.d. drama og romance) og þá fara þær myndir í báða flokka",
+            style = "font-size: 14px; line-height: 1.5;"
+          )
+        ),
+        mainPanel(
+          width = 9, 
+          selectInput(
+            "genre",
+            "Veldu tegund (genre):",
+            choices = NULL,
+            selected = "Overall"
+          ),
+          br(),
+          fluidRow(
+            column(4, plotOutput("ratingPlot")),
+            column(4, plotOutput("winsletRatingHist")),
+            column(4, plotOutput("dicaprioRatingHist"))
+          ),
+          br()
+        )
+      )
+    ),
+    
+
+tabPanel("Flokkun efnis",
+      fluidRow(
+        column(
+          9, 
+          plotOutput("content_rating_plot")
+        ),
+        column(
+          3,
+          # Grár bakgrunnur fyrir "Upplýsingar um graf"
+          tags$div(
+            style = "background-color: #f0f0f0; padding: 10px; border-radius: 5px;",
+            tags$p("Upplýsingar", style = "font-size: 16px; "),
+            tags$p("Þetta graf sýnir hversu margar myndir leikararnir hafa leikið í eftir flokkun efnis (content rating) og hve mörg prósent af myndunum þeirra það er.", style = "font-size: 14px; ")
+          ),
+          # Skýring á hvítum bakgrunn
+          h4("Skýring á flokkun efnis"),
+          p(HTML(
+            "<b>G:</b> General Audience<br>
+             <b>NR:</b> Not Rated<br>
+             <b>PG:</b> Parental Guidance<br>
+             <b>PG-13:</b> Parents Strongly Cautioned (13+)<br>
+             <b>R:</b> Restricted (17+)"
+          ))
+        )
+      )
+    ),
+    
+    tabPanel("Einkunnir",
+             sidebarLayout(
+               sidebarPanel(width = 3, 
+                            tags$p("Upplýsingar", style = "font-size: 16px;"),
+                            tags$p("Gröfin sýna muninn á einkunn sem gagnrýnendur (tomatometer_rating) og áhorfendur (audience_rating) hafa gefið myndunum sem Winslet og Dicaprio hafa leikið í. Hægt er að fara yfir punktana og sjá nafn myndar. ", style = "font-size: 14px; line-height: 1.5;"),
+                            tags$p("Gagnrýnendur: Löggiltir meðlimir ýmissa rithöfunda eða kvikmyndagagnrýnendasamtaka.", style = "font-size: 14px;"),
+                            tags$p("Áhorfendur: Venjulegir notendur sem hafa gefið myndinni einkunn.", style = "font-size: 14px;"),
+                            ),
+               mainPanel(width = 9,
+                         plotlyOutput("rating_trend_plot_dicaprio"),
+                         br(),
+                         br(),
+                         plotlyOutput("rating_trend_plot_winslet"),
+                         br(),
+                         br(),
+                         ),
+             )),
+    
+tabPanel("Tímalengd",
+        sidebarLayout(
+          sidebarPanel(
+            width = 3, 
+            tags$p(
+              "Upplýsingar",
+              style = "font-size: 16px;"
+            ),
+            tags$p(
+              "Þetta graf sýnir hvort lengd myndar hefur áhrif á einkunn hennar. Hægt er að fara yfir punktana og þar sést m.a. lýsing á myndinni frá Rotten Tomatoes. ",
+              style = "font-size: 14px; line-height: 1.5;"
+            )
+          ),
+          mainPanel(
+            width = 9, 
+            plotlyOutput("rating_runtime_plot")
+          )
+        )),
+
+tabPanel(
+  "Áhorfendafjöldi",
+  sidebarLayout(
+    sidebarPanel(
+      width = 3,
+      tags$p("Upplýsingar", style = "font-size: 16px;"),
+      tags$p(
+        "Þetta graf sýnir tengslin milli áhorfendaeinkunna (audience_rating) og fjölda áhorfenda (audience_count). Áhorfendafjöldinn er í logaritmískum kvarða þar sem fjöldinn er mjög mismunandi milli mynda. Hægt er að sjá nákvæman áhorfendafjölda þegar maður fer yfir punktinn",
+        style = "font-size: 14px; line-height: 1.5;"
+      ),
+      tags$p("Áhorfendafjöldi: Sá fjöldi af almennum notendum sem hafa gefið myndinni einkunn", style = "font-size: 14px;")
+    ),
+    mainPanel(
+      width = 9,
+      plotlyOutput("audience_rating_plot", height = "500px"),
+      br()
+    )
+    
+  )
+),
+
+tabPanel(
+  "Leikstjórar",
+  fluidRow(
+    column(
+      3,
+      tags$div(
+        style = "background-color: #f0f0f0; padding: 10px; border-radius: 5px;",
+        tags$p("Upplýsingar", style = "font-size: 16px;"),
+        tags$p(
+          "Þetta graf sýnir dreifingu einkunna fyrir allar myndir þeirra leikstjóra sem hafa leikstýrt í topp 10 myndum Kate Winslet og Leonardo DiCaprio, byggt á gagnrýnendaeinkunn (tomatometer_rating) eða áhorfendaeinkunn.",
+          style = "font-size: 14px; line-height: 1.5;"),
+        tags$p(
+          "Gagnrýnendur: Löggiltir meðlimir ýmissa rithöfunda eða kvikmyndagagnrýnendasamtaka.",
+          style = "font-size: 14px; "),
+        tags$p(
+          "Áhorfendur: Venjulegir notendur sem hafa gefið myndinni einkunn.",
+          style = "font-size: 14px; "),
+        tags$p(
+          "Veldu tegund einkunnar hér að neðan til að sjá mismunandi niðurstöður.",
+          style = "font-size: 14px;"
+        ),
+        selectInput(
+          "rating_type",
+          "Veldu einkunn:",
+          choices = c(
+            "Gagnrýnendaeinkunn" = "tomatometer_rating",
+            "Áhorfendaeinkunn" = "audience_rating"
+          ),
+          selected = "tomatometer_rating"
+        )
+      )
+    ),
+    column(
+      9,
+      plotlyOutput("directorPlot", height = "500px"),
+      br()
+    )
+  )
+)
+,
+    
+tabPanel("Tengslanet",
+             h3("Tengslanet fyrir aðalleikara"),
+             tags$iframe(src = "http://127.0.0.1:8063/", height = "600", width = "100%")
+    )
+
+  )
+)
+
+
+server <- function(input, output, session) {
+  # Uppfæra tegundarvalkosti
+  observe({
+    genres <- unique(unlist(strsplit(as.character(rotten_tomatoes_leo_kate$genres), ",\\s*")))
+    genres <- c("Overall", genres)
+    updateSelectInput(session, "genre", choices = genres)
+  })
+  
+  #CONTENT RATING
+  output$content_rating_plot <- renderPlot({
+  # Tengjast gagnagrunninum og sækja gögn
+ 
+  
+  # Útskýringar fyrir skýringuna
+  rating_labels_long <- c(
+    "R" = "Restricted (17+)", 
+    "G" = "General Audience", 
+    "PG-13" = "Parents Strongly Cautioned (13+)", 
+    "NR" = "Not Rated", 
+    "PG" = "Parental Guidance"
+  )
+  
+  # Teikna grafið
+  ggplot(content_rating_count, aes(x = content_rating, y = count, fill = actor)) +
+    geom_bar(stat = "identity", position = position_dodge(width = 0.7), color = "black") +
+    geom_text(
+      aes(label = paste0(round(percentage, 1), "%")),
+      position = position_dodge(width = 0.7), vjust = -0.5, size = 4
+    ) +
+    scale_fill_manual(values = c("Leonardo DiCaprio" = "skyblue", "Kate Winslet" = "pink")) +
+    labs(
+      title = "Fjöldi mynda eftir flokkun efnis",
+      x = "Flokkun efnis",
+      y = "Fjöldi mynda",
+      fill = "Leikari"
+    ) +
+    ylim(0, max(content_rating_count$count) * 1.2) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(size = 12),
+      axis.text.y = element_text(size = 12),
+      axis.title.x = element_text(size = 14),
+      axis.title.y = element_text(size = 14),
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10),
+      legend.position = "right"
+    ) +
+    guides(fill = guide_legend(override.aes = list(color = NA), title = "Leikari"))
+})
+  
+  # SAMANBURÐUR EFTIR GENRE
+output$ratingPlot <- renderPlot({
+    req(input$genre)
+    
+    if (input$genre == "Overall") {
+      genre_data <- rotten_tomatoes_leo_kate %>%
+        mutate(actor = case_when(
+          grepl("Leonardo DiCaprio", actors) ~ "Leonardo DiCaprio",
+          grepl("Kate Winslet", actors) ~ "Kate Winslet",
+          TRUE ~ NA_character_
+        )) %>%
+        filter(!is.na(actor)) %>%
+        group_by(actor) %>%
+        summarize(movie_count = n_distinct(movie_title))
+    } else {
+      genre_data <- rotten_tomatoes_leo_kate %>%
+        separate_rows(genres, sep = ",\\s*") %>%
+        filter(genres == input$genre) %>%
+        mutate(actor = case_when(
+          grepl("Leonardo DiCaprio", actors) ~ "Leonardo DiCaprio",
+          grepl("Kate Winslet", actors) ~ "Kate Winslet",
+          TRUE ~ NA_character_
+        )) %>%
+        filter(!is.na(actor)) %>%
+        group_by(actor) %>%
+        summarize(movie_count = n_distinct(movie_title))
+    }
+    
+    ggplot(genre_data, aes(x = actor, y = movie_count, fill = actor)) +
+      geom_bar(stat = "identity") +
+      geom_text(aes(label = paste0("Fjöldi: ", movie_count)), vjust = -0.3, size = 5) +
+      ylim(0, max(genre_data$movie_count) * 1.2) +
+      labs(title = paste("Fjöldi mynda:", input$genre), x = "Leikari", y = "Fjöldi mynda") +
+      theme_minimal() +
+      guides(fill = "none") + # Þetta fjarlægir skýringuna 
+      scale_fill_manual(values = c("Kate Winslet" = "pink", "Leonardo DiCaprio" = "skyblue"))+
+      theme(plot.title = element_text(face = "bold"))
+  })
+  
+  # Histogram fyrir dreifingu áhorfendaeinkunna fyrir Kate Winslet
+output$winsletRatingHist <- renderPlot({
+    req(input$genre)
+    
+    if (input$genre == "Overall") {
+      rating_data <- rotten_tomatoes_leo_kate %>%
+        filter(grepl("Kate Winslet", actors), !is.na(audience_rating))
+    } else {
+      rating_data <- rotten_tomatoes_leo_kate %>%
+        separate_rows(genres, sep = ",\\s*") %>%
+        filter(genres == input$genre, grepl("Kate Winslet", actors), !is.na(audience_rating))
+    }
+    
+    ggplot(rating_data, aes(x = audience_rating)) +
+      geom_histogram(binwidth = 5, fill = "pink", color = "black", alpha = 0.7) +
+      labs(title = paste("Kate Winslet: Dreifing einkunna"), x = "Áhorfendaeinkunn", y = "Fjöldi mynda") +
+      xlim(0, 100) + ylim(0, 6) + theme_minimal() +
+      theme(plot.title = element_text(face = "bold"))
+})
+  
+  # Histogram fyrir dreifingu áhorfendaeinkunna fyrir Leonardo DiCaprio
+  output$dicaprioRatingHist <- renderPlot({
+    req(input$genre)
+    
+    if (input$genre == "Overall") {
+      rating_data <- rotten_tomatoes_leo_kate %>%
+        filter(grepl("Leonardo DiCaprio", actors), !is.na(audience_rating))
+    } else {
+      rating_data <- rotten_tomatoes_leo_kate %>%
+        separate_rows(genres, sep = ",\\s*") %>%
+        filter(genres == input$genre, grepl("Leonardo DiCaprio", actors), !is.na(audience_rating))
+    }
+    
+    ggplot(rating_data, aes(x = audience_rating)) +
+      geom_histogram(binwidth = 5, fill = "skyblue", color = "black", alpha = 0.7) +
+      labs(title = paste("Leonardo DiCaprio: Dreifing einkunna"), x = "Áhorfendaeinkunn", y = "Fjöldi mynda") +
+      xlim(0, 100) + ylim(0,6) + theme_minimal()+
+      theme(plot.title = element_text(face = "bold"))
+  })
+  
+ 
+  
+  #EINKUNNIR GAGNRÝNENDA VS ÁHORFENDA
+  
+  # Gögn fyrir Leonardo DiCaprio
+  trend_data_dicaprio <- reactive({
+    leo_movies %>%
+      mutate(
+        original_release_date = as.Date(original_release_date),
+        critics_label = paste("Mynd:", movie_title, "<br>Einkunn gagnrýnenda:", tomatometer_rating, "<br>Útgáfudagur:", original_release_date),
+        audience_label = paste("Mynd:", movie_title, "<br>Einkunn áhorfenda:", audience_rating, "<br>Útgáfudagur:", original_release_date)
+      ) %>%
+      filter(!is.na(original_release_date))
+  })
+  
+  # Gögn fyrir Kate Winslet
+  trend_data_winslet <- reactive({
+    kate_movies %>%
+      mutate(
+        original_release_date = as.Date(original_release_date),
+        critics_label = paste("Mynd:", movie_title, "<br>Einkunn gagnrýnenda:", tomatometer_rating, "<br>Útgáfudagur:", original_release_date),
+        audience_label = paste("Mynd:", movie_title, "<br>Einkunn áhorfenda:", audience_rating, "<br>Útgáfudagur:", original_release_date)
+      ) %>%
+      filter(!is.na(original_release_date))
+  })
+  
+  # Graf fyrir Leonardo DiCaprio
+  output$rating_trend_plot_dicaprio <- renderPlotly({
+    trend_comparison_plot_dicaprio <- ggplot(trend_data_dicaprio(), aes(x = original_release_date)) +
+      # Lóðréttar línur á milli gagnrýnenda- og áhorfendaeinkunna
+      geom_segment(aes(x = original_release_date, xend = original_release_date,
+                       y = tomatometer_rating, yend = audience_rating),
+                   color = "grey", size = 0.5, alpha = 0.5) +
+      # Punktar fyrir gagnrýnenda- og áhorfendaeinkunnir
+      geom_point(aes(y = tomatometer_rating, color = "Gagnrýnendur ", text = critics_label), size = 2, alpha = 0.7) +
+      geom_point(aes(y = audience_rating, color = "Áhorfendur ", text = audience_label), size = 2, alpha = 0.7) +
+      # Trendlínur fyrir gagnrýnenda- og áhorfendaeinkunnir
+      geom_smooth(aes(y = tomatometer_rating, color = "Gagnrýnendur ", linetype = "Trendline"), 
+                  method = "lm", size = 0.5, se = FALSE) +
+      geom_smooth(aes(y = audience_rating, color = "Áhorfendur ", linetype = "Trendline"), 
+                  method = "lm", size = 0.5, se = FALSE) +
+      # Stillir táknskýringu fyrir liti og línutegundir
+      scale_color_manual(values = c("Gagnrýnendur " = "magenta", "Áhorfendur " = "seagreen1")) +
+      scale_linetype_manual(values = c("Trendline" = "dashed")) +
+      labs(title = "Leonardo DiCaprio: Einkunnir gagnrýnenda vs áhorfenda",
+           x = "Útgáfudagur",
+           y = "Einkunn",
+           color = "",
+      linetype = "") +
+      theme_minimal(base_size = 12) +
+      theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+    
+    ggplotly(trend_comparison_plot_dicaprio, tooltip = "text")
+  })
+  
+  # Graf fyrir Kate Winslet
+  output$rating_trend_plot_winslet <- renderPlotly({
+  trend_comparison_plot_winslet <- ggplot(trend_data_winslet(), aes(x = original_release_date)) +
+    # Lóðréttar línur á milli gagnrýnenda- og áhorfendaeinkunna
+    geom_segment(aes(x = original_release_date, xend = original_release_date,
+                     y = tomatometer_rating, yend = audience_rating),
+                 color = "grey", size = 0.5, alpha = 0.5) +
+    # Punktar fyrir gagnrýnenda- og áhorfendaeinkunnir
+    geom_point(aes(y = tomatometer_rating, color = "Gagnrýnendur ", text = critics_label), size = 2, alpha = 0.7) +
+    geom_point(aes(y = audience_rating, color = "Áhorfendur ", text = audience_label), size = 2, alpha = 0.7) +
+    # Trendlínur fyrir gagnrýnenda- og áhorfendaeinkunnir
+    geom_smooth(aes(y = tomatometer_rating, color = "Gagnrýnendur ", linetype = "Trendline"), 
+                method = "lm", size = 0.5, se = FALSE) +
+    geom_smooth(aes(y = audience_rating, color = "Áhorfendur ", linetype = "Trendline"), 
+                method = "lm", size = 0.5, se = FALSE) +
+    # Stillir táknskýringu fyrir liti og línutegundir
+    scale_color_manual(values = c("Gagnrýnendur " = "magenta", "Áhorfendur " = "seagreen1")) +
+    scale_linetype_manual(values = c("Trendline" = "dashed")) +
+    labs(
+      title = "Kate Winslet: Einkunnir gagnrýnenda vs áhorfenda",
+      x = "Útgáfudagur",
+      y = "Einkunn",
+      color = "",
+      linetype = ""  # Breytir linetype í "Skýring"
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+  
+  ggplotly(trend_comparison_plot_winslet, tooltip = "text")
+})
+
+  
+  #RUNTIME
+  # Audience Rating vs Runtime plot
+output$rating_runtime_plot <- renderPlotly({
+  plot_data <- rotten_tomatoes_leo_kate %>%
+    mutate(
+      both_actors = grepl("Leonardo DiCaprio", actors) & grepl("Kate Winslet", actors),
+      actor = case_when(
+        both_actors ~ "Both",
+        grepl("Leonardo DiCaprio", actors) ~ "Leonardo DiCaprio",
+        grepl("Kate Winslet", actors) ~ "Kate Winslet",
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    filter(!is.na(actor))
+  
+  plot_data <- plot_data %>%
+    mutate(
+      hover_text = paste(
+        "<b>Title:</b>", movie_title,
+        "<br><b>Lengd:</b>", runtime, " mín", 
+        "<br><b>Áhorfendaeinkunn:</b>", audience_rating,
+        "<br><br><b>Info:</b>", str_wrap(movie_info, width = 50) %>% str_replace_all("\n", "<br>")
+      )
+    )
+  
+  p <- ggplot(plot_data, aes(x = audience_rating, y = runtime)) +
+    geom_point(
+      aes(color = actor, shape = actor, text = hover_text),
+      size = 2
+    ) +
+    scale_color_manual(
+      values = c("Leonardo DiCaprio" = "skyblue", 
+                 "Kate Winslet" = "pink", 
+                 "Both" = "gold")
+    ) +
+    scale_shape_manual(
+      values = c("Leonardo DiCaprio" = 16, "Kate Winslet" = 16, "Both" = 8)
+    ) +
+    geom_smooth(
+      aes(group = 1, linetype = "Overall Trend"),  # Skýrari lýsing
+      method = "lm", 
+      color = "grey", 
+      size = 0.5,
+      se = FALSE,
+      show.legend = TRUE  # Virkja skýringu fyrir línutegund
+    ) +
+    scale_linetype_manual(
+      values = c("Overall Trend" = "dashed"), 
+      labels = c("Overall Trend" = "Trendline (All Movies)")
+    ) +
+    labs(
+      title = "Áhrif lengdar á mynd",
+      x = "Áhorfendaeinkunn",
+      y = "Lengd myndar í mínútum",
+      color = "Leikari",
+      shape = "Leikari",
+      linetype = NULL  # Fjarlægir `linetype` sem titil í skýringum
+    ) +
+    guides(
+      linetype = guide_legend(order = 2)  # Stýrir röð trendlínu í skýringunni
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold")
+    )
+  
+  # Breytum ggplot í plotly
+  ggplotly(p, tooltip = "text") %>%
+    layout(hoverlabel = list(align = "left")) 
+})
+
+
+
+
+# ÁHORFENDAFJÖLDI
+output$audience_rating_plot <- renderPlotly({
+  plot_data <- rotten_tomatoes_leo_kate %>%
+    mutate(
+      both_actors = grepl("Leonardo DiCaprio", actors) & grepl("Kate Winslet", actors),
+      actor = case_when(
+        both_actors ~ "Bæði",
+        grepl("Leonardo DiCaprio", actors) ~ "Leonardo DiCaprio",
+        grepl("Kate Winslet", actors) ~ "Kate Winslet",
+        TRUE ~ NA_character_
+      )
+    )
+  
+  p <- ggplot(plot_data, aes(x = audience_rating, y = audience_count)) +
+    geom_point(
+      aes(
+        color = actor,
+        text = paste(
+          "Movie:", movie_title,
+          "<br>Áhorfendafjöldi:", audience_count,
+          "<br>Áhorfendaeinkunn:", audience_rating
+        )
+      ),
+      alpha = 0.7,
+      size = 2
+    ) +
+    scale_y_log10() +  # Logaritmískur kvarði á y-ás
+    scale_color_manual(
+      values = c(
+        "Leonardo DiCaprio" = "skyblue",
+        "Kate Winslet" = "pink",
+        "Bæði" = "gold"
+      )
+    ) +
+    labs(
+      title = "Einkunn vs. fjöldi áhorfenda",
+      x = "Áhorfendaeinkunn",
+      y = "Áhorfendafjöldi(Log Scale)",
+      color = "Leikari"
+    ) +
+    theme_minimal(base_size = 12) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      axis.title = element_text(size = 12),
+      axis.text = element_text(size = 10)
+    )
+  
+  ggplotly(p, tooltip = "text")
+})
+
+
+# LEIKSTJÓRAR
+
+graph_data <- reactive({
+  rating_type <- input$rating_type
+  
+  if (rating_type == "tomatometer_rating") {
+    all_director_movies %>%
+      mutate(
+        actor_category = case_when(
+          grepl("Kate Winslet", actors) & grepl("Leonardo DiCaprio", actors) ~ "Bæði",
+          grepl("Kate Winslet", actors) ~ "Kate",
+          grepl("Leonardo DiCaprio", actors) ~ "Leo",
+          TRUE ~ "None"
+        ),
+        avg_tomatometer = mean(tomatometer_rating, na.rm = TRUE),
+        original_release_year = year(as.Date(original_release_date)),
+        directors = gsub(" ", "\n", directors)
+      )
+  } else {
+    all_audience_movies %>%
+      mutate(
+        actor_category = case_when(
+          grepl("Kate Winslet", actors) & grepl("Leonardo DiCaprio", actors) ~ "Bæði",
+          grepl("Kate Winslet", actors) ~ "Kate",
+          grepl("Leonardo DiCaprio", actors) ~ "Leo",
+          TRUE ~ "None"
+        ),
+        avg_audience_rating = mean(audience_rating, na.rm = TRUE),
+        original_release_year = year(as.Date(original_release_date)),
+        directors = gsub(" ", "\n", directors)
+      )
+  }
+})
+
+# LEIKSTJÓRAR
+# Búa til graf
+output$directorPlot <- renderPlotly({
+  rating_type <- input$rating_type
+  data <- graph_data()
+  
+  # Reikna meðaleinkunn fyrir hvern leikstjóra og raða þeim í röð
+  data <- data %>%
+    group_by(directors) %>%
+    summarize(avg_rating = mean(get(rating_type), na.rm = TRUE)) %>%
+    arrange(desc(avg_rating)) %>%
+    left_join(data, by = "directors") # Sameina til að halda öllum upplýsingum
+  
+  # Setja röð á leikstjóra fyrir x-ásinn
+  data$directors <- factor(data$directors, levels = unique(data$directors))
+  
+  p <- ggplot(data, aes_string(x = "directors", y = rating_type)) +
+    geom_boxplot(
+      aes(text = paste(
+        "Leikstjóri:", directors,
+        ifelse(rating_type == "tomatometer_rating", 
+               "<br>Meðal Gagnrýnendaeinkunn:", "<br>Meðal Áhorfendaeinkunn:"),
+        round(ifelse(rating_type == "tomatometer_rating", avg_tomatometer, avg_audience_rating), 1)
+      )),
+      fill = ifelse(rating_type == "tomatometer_rating", "white", "white"), 
+      outlier.shape = NA
+    ) +
+    geom_point(
+      data = subset(data, actor_category != "None"),
+      aes(color = actor_category,
+          text = paste(
+            "Mynd:", movie_title,
+            "<br>Útgáfuár:", original_release_year,
+            ifelse(rating_type == "tomatometer_rating", "<br>Gagnrýnendaeinkunn:", "<br>Áhorfendaeinkunn:"),
+            get(rating_type)
+          )),
+      size = 3
+    ) +
+    labs(
+      title = ifelse(rating_type == "tomatometer_rating", 
+                     "Gagnrýnendaeinkunnir leikstjóra topp 10 Kate/Leo mynda", 
+                     "Áhorfendaeinkunnir leikstjóra topp 10 Kate/Leo mynda"),
+      x = NULL, 
+      y = ifelse(rating_type == "tomatometer_rating", "Gagnrýnendaeinkunn", "Áhorfendaeinkunn"),
+      color = NULL
+    ) +
+    theme_minimal(base_size = 10) +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 16), # Centered and bold title
+      axis.title.y = element_text(size = 12), # Adjust y-axis title size
+      axis.text.x = element_text(angle = 0, hjust = 0.5), # Align x-axis text
+      axis.text.y = element_text(size = 10) # Adjust y-axis text size
+    ) +
+    scale_color_manual(values = c("Bæði" = "gold", "Leo" = "skyblue", "Kate" = "lightpink"))
+  
+  ggplotly(p, tooltip = "text")
+})
+
+}
+
+
+
+
+
+# Keyra Shiny appið
+shinyApp(ui = ui, server = server)
+```
+
+
