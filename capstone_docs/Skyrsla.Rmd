@@ -1,0 +1,584 @@
+---
+title: "Skýrsla - Capstone"
+author: "Ásdís Halla Guðmundsdóttir, Ásdís Guðmundsdóttir, Gígja Marín Þorsteinsdóttir, Guðný Lilja Alísa Gashi"
+date: November 18, 2024
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: cerulean
+    highlight: tango
+    code_folding: hide
+    number_sections: false # Fjarlægir númerun
+    df_print: paged
+  pdf_document:
+    toc: true
+    toc_depth: '3'
+    number_sections: false # Fjarlægir númerun
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Samantekt
+
+Í þessari skýrslu er borið saman feril og vinsældir Leonardo DiCaprio og Kate Winslet út frá gögnunum á Rotten Tomatoes og IMDb. Markmiðið var að greina þróun ferils þeirra, árangur út frá gagnrýnenda- og áhorfenda einkunnum, og aðra mælikvarða eins og tegundir kvikmynda, leikstjóra og áhorfendafjölda.
+Gögnin voru sótt frá Rotten Tomatoes og IMDb, unnin með SQL og Python, og sett fram á mælaborði í RStudio Shiny. Myndrænar greiningar sýna að DiCaprio hefur hækkað í áliti bæði gagnrýnenda og áhorfenda með árunum, á meðan Winslet sýnir meiri sveiflur og lægri meðaleinkunn. Báðir leikarar leika að mestu í dramatískum myndum og eru vinsælastir í kvikmyndum með strangari aldurstakmörk (R og PG-13).
+Mælaborðið, ásamt tengslaneti fyrir kvikmyndir, auðveldaði greiningu og framsetningu. Í verkefninu voru notuð SQL, RegEx, og önnur greiningartól sem tengjast námsefninu, sem skilaði bæði dýpri innsýn á gögnin og dró fram áhugaverðar niðurstöður. Skýrslan varpar ljósi á hvernig gögn má nýta til að svara spurningum um feril leikara og þróun þeirra.
+
+
+# 1. Inngangur
+
+Leonardo DiCaprio og Kate Winslet eru tvær af helstu stjörnum kvikmyndaiðnaðarins og hafa átt farsælan feril í gegnum árin. Þrátt fyrir að hafa bæði leikið saman í kvikmyndunum Titanic og Revolutionary Road, hafa ferlar þeirra þróast á mismunandi vegu. Spurningin er því: Hvernig er hægt að meta hver þeirra stendur sig betur út frá gagnadrifnum upplýsingum? Að auki vekur það áhuga hvort ferlar þeirra hafa þróast til betri eða verri vegar með tímanum.
+Í kvikmyndaheiminum eru vinsældir og árangur leikara metin út frá ýmsum mælikvörðum, svo sem gagnrýnenda- og áhorfenda einkunnum, tekjum kvikmynda og áhorfendafjölda. Einnig er athugavert að skoða hvort að val þeirra á kvikmyndaefni, út frá tegund (e. genre), leikstjórum og efnisflokkun (e. content rating) hafi áhrif á áhorf og gagnrýnenda- og áhorfendaeinkunnir. Vandamálið sem verkefnið beinist að er hvernig hægt er að nýta stór gagnasöfn og greiningartól til að svara spurningum um þróun og árangur leik.
+Markmið skýrslunnar er að nýta gögn til að bera saman þessa tvo leikara á hlutlægan hátt. Fyrirliggjandi gögn úr Rotten Tomatoes og IMDb verða greind og sett fram með myndrænum hætti til að varpa ljósi á þróun ferla þeirra og svara rannsóknarspurningunum. Skýrslan mun ekki aðeins sýna fram á niðurstöður heldur einnig fjalla um áskoranir og lærdóma í greiningarferlinu. Með þessu vonumst við til að leggja áhugaverðan grunn að frekari notkun gagna við að meta árangur og þróun í kvikmyndaiðnaðinum.
+
+
+
+# 2. Aðferðafræði
+
+# 2.1 Lýsing á Gagnaöflun
+
+Gögnin fyrir verkefnið voru fengin úr Rotten Tomatoes Movies Dataset á [Kaggle](https://www.kaggle.com/datasets/stefanoleone992/rotten-tomatoes-movies-and-critic-reviews-dataset?select=rotten_tomatoes_movies.csv&fbclid=IwY2xjawGlbC9leHRuA2FlbQIxMAABHdNEiQ4DwHmoYFigkTLROvipAZrINU1eMDoWuvWjDzRg4iIl3DYz9h-VbQ_aem_9jsfD3H_06EEzvG5aXG65A). Fyrir þetta verkefni var rotten_tomatoes_movies.csv skráin notuð en hún inniheldur helstu upplýsingar um kvikmyndir sem eru á vefsíðunni rottentomatoes.com til og með 31. október 2020. Gögnin eru aðgengileg undir leyfisskilmálunum CC0 1.0 Universal (Public Domain), sem þýðir að gögnin eru opinber eign og leyfilegt er að nota, breyta og dreifa þeim,  án þess að þurfa að leita leyfis. Frekari upplýsingar um leyfisskilmálana má finna [hér](https://creativecommons.org/publicdomain/zero/1.0/).
+
+Gögnin voru sótt í formi CSV-skráar sem innihélt ýmsar breytur eins og kvikmyndatitla, leikstjóra, leikaralista, lengd kvikmynda og einkunnir frá áhorfendum og gagnrýnendum. CSV-skráin var nýtt til að byggja upp SQL-gagnagrunn með viðeigandi töflum. Að auki notuðum við IMDb-gögn í gegnum Cinemagoer-pakkann til að sækja frekari upplýsingar um leikarana, þar á meðal IMDb-auðkenni þeirra og fleiri smáatriði.
+
+#### 2.1.1 Áskoranir tengdar gagnaöfluninni
+Við gagnaöflun og vinnslu komu eftirfarandi áskoranir upp:
+
+- Notað var Cinemagoer-pakkann til að sækja upplýsingar um leikarana eins og IMDb ID og nafn. Hins vegar býður Cinemagoer aðeins upp á takmarkaða dálka, svo ekki var hægt að fá gögn eins og mini biography með þeim hætti. Þess í stað var notað requests bókasafnið til að skrapa mini biography gögn handvirkt af IMDb-vefnum. Þetta reyndist vera smá áskorun í byrjun, en tókst með því að skrifa sérsniðinn kóða til að ná í og vinna úr þessum gögnum.
+
+- Þegar búið var að skrapa gögnin af IMDb-vefnum kom upp sú áskorun að vinna með óstöðluð gögn, sérstaklega þegar unnið var með gögn sótt beint frá IMDb. Þau voru oft í ólíkum sniðum og gjarnan vantaði bil milli texta. Til að leysa þetta þurfti að beita RegEx (regular expressions), sem hjálpaði til við að hreinsa gögnin. Með RegEx var hægt að einangra viðeigandi upplýsingar eins og ævisögu, trivia og fleira.
+
+Þrátt fyrir þessar áskoranir reyndust gögnin gagnleg og auðveld í meðförum. Gögnin úr Rotten Tomatoes gáfu góðan grunn fyrir SQL-gagnagrunninn og með tengingum við IMDb-gögn var hægt að útvíkka greiningu okkar á leikaralistum og tengslum þeirra við kvikmyndir. 
+
+
+# 2.2 Gagnavinnsla 
+
+Við gagnaúrvinnslu var markmiðið að byggja upp skipulegan gagnagrunn úr stórum gögnum til að einfalda úrvinnslu gagna. Upphaflega var taflan `rotten_tomatoes_movies` búin til úr csv skránni sem var gert með SQL-forriti. Þessi tafla var grunnur að frekari vinnslu og hreinsun gagna sem fól í sér að bæta við einkvæmum auðkennum fyrir hverja kvikmynd, aðgreina leikarana í sértöflur og flokka gögn með því að nýta SQL, Python og Regex
+
+Áhersla var lögð á að einfalda gagnasafnið með því að vinna aðeins með kvikmyndir sem Leonardo DiCaprio og Kate Winslet höfðu tekið þátt í. Það var einnig lagt upp með að fá frekari upplýsingar um leikarana úr IMDB gagnagrunninum með því að nota `Cinemagoer` pakka. 
+
+## 2.2.1 Notkun SQL við uppbyggingu gagnagrunns
+
+Við uppbyggingu gagnagrunnsins fyrir þetta verkefni var SQL notað til að tryggja skipulagt gagnasafn, rétt tengsl milli taflna og auðvelt aðgengi að upplýsingum. Í þessum kafla verður farið yfir hvernig SQL var notað til að búa til gagnagrunninn og hvernig gögn voru skráð og unnin.
+
+#### Grunntaflan: `rotten_tomatoes_movies`
+
+Taflan var búin til með því að nota SQL skipanir til flytja inn öll gögn úr CSV-skránni. Þessi tafla þjónar sem grunnur fyrir frekari gagnavinnslu. 
+
+```{r, eval=FALSE}
+drop table if EXISTS rotten_tomatoes_movies;
+
+-- Búa til töfluna fyrir CSV gögnin
+CREATE TABLE IF NOT EXISTS rotten_tomatoes_movies (
+    rotten_tomatoes_link TEXT,
+    movie_title TEXT,
+    movie_info TEXT,
+    critics_consensus TEXT,
+    content_rating TEXT,
+    genres TEXT,
+    directors TEXT,
+    authors TEXT,
+    actors TEXT,
+    original_release_date TEXT,
+    streaming_release_date TEXT,
+    runtime INTEGER,
+    production_company TEXT,
+    tomatometer_status TEXT,
+    tomatometer_rating REAL,
+    tomatometer_count INTEGER,
+    audience_status TEXT,
+    audience_rating REAL,
+    audience_count INTEGER,
+    tomatometer_top_critics_count INTEGER,
+    tomatometer_fresh_critics_count INTEGER,
+    tomatometer_rotten_critics_count INTEGER
+);
+
+.mode csv 
+.import --skip 1 data/rotten_tomatoes_movies2.csv rotten_tomatoes_movies # skip 1 til að dálkaheiti séu ekki í 1. línu
+.headers on 
+.mode col 
+select count(*) from rotten_tomatoes_movies limit 10;
+
+```
+
+Einnig var bætt við dálkinum movie_id, sem gefur hverri kvikmynd einkvæmt auðkenni, sem gagnast til að byggja tengingar á milli taflna. Kóðinn var útfærður í R þar sem ID var bætt við, og gögnin aftur skrifuð í gagnagrunninn. 
+
+```{r, eval=FALSE}
+library(DBI)
+library(RSQLite)
+
+# Tengist SQLite gagnagrunninum
+conn <- dbConnect(RSQLite::SQLite(), "Path/to/your/data/rotten_tomatoes.db")
+
+# Les gögnin inn úr töflunni í gagnagrunninum 
+rotten_tomatoes_data <- dbReadTable(conn, "rotten_tomatoes_movies")
+
+# Býr til nýjan dálk með einkvæmum ID fyrir hverja mynd
+rotten_tomatoes_data$movie_id <- seq.int(nrow(rotten_tomatoes_data))
+
+# Fjarlægir gömla útgáfuna 
+if ("rotten_tomatoes_movies" %in% dbListTables(conn)) {
+  dbRemoveTable(conn, "rotten_tomatoes_movies")
+}
+
+# Setur uppfærðu gögnin með movie_id dálknum aftur inn í gagnagrunninn
+dbWriteTable(conn, "rotten_tomatoes_movies", rotten_tomatoes_data, overwrite = TRUE)
+
+dbDisconnect(conn)
+
+```
+
+Við frekari athugun hefði verið hentugra að nota AUTOINCREMENT við uppsetningu dálksins movie_id. Þar sem það er einfaldara í framkvæmd og krefst þess ekki að þurfa að skrifa gögn aftur inní töfluna. Þar sem töflur og tengingar höfðu þegar verið útfærðar var ekki mögulegt að nýta þessa aðferð án þess að skapa óvissu í tengslum við gögn og virkni gagnagrunnsins. 
+
+#### Síun gagna: `rotten_tomatoes_movies_dicaprio_winslet`
+
+Taflan `rotten_tomatoes_movies_dicaprio_winslet` var bætt við sem inniheldur einungis myndir með Kate Winslet eða Leonardo DiCpario. Þetta var gert með SQL forritinu leo_kate.sql þar sem gögn voru síuð eftir leikaranafni.
+
+```{r, eval=FALSE}
+CREATE TABLE leo_kate.movies AS
+SELECT * 
+FROM rotten_tomatoes_movies
+WHERE actors LIKE '%Leonardo DiCaprio%' 
+   OR actors LIKE '%Kate Winslet%';
+```
+
+Til að bæta yfirlit mælaborðsins var `genres`dálkurinn hreinsaður með Python forritinu `genres.py`. Óalgengar tegundir þar sem annar hvor leikarinn kom minna en þrisvar sinnum fram í voru flokkaðar undir "Other".
+
+```{r, eval=FALSE}
+
+valid_genres = ['Drama', 'Mystery & Suspense', 'Action & Adventure', 'Romance', 'Documentary']
+
+# Function til að hreinsa genres dálkinn
+def clean_genres(genres):
+    # Finnur viðeigandi flokka í genres dálknum
+    found_genres = [genre for genre in valid_genres if genre in genres]
+    
+    # Ef það eru aðrir flokkar, flokkum við það sem "Other"
+    if len(found_genres) < len(genres.split(', ')):
+        found_genres.append("Other")
+    
+    return ', '.join(found_genres)
+
+```
+
+Út frá töflunni `rotten_tomatoes_movies_dicaprio_winslet` var gagnasafninu skipt niður í tvær sértækar töflur, leo_movies og kate_movies. Þetta var gert til að einfalda vinnslu á mælaborðinu. 
+
+```{r, eval=FALSE}
+cursor.execute("DROP TABLE IF EXISTS leo_movies")
+cursor.execute("""
+    CREATE TABLE leo_movies AS
+    SELECT *
+    FROM rotten_tomatoes_movies_dicaprio_winslet
+    WHERE actors LIKE '%Leonardo DiCaprio%'
+""")
+```
+
+Til þess að auðvelda greiningu á dreifingu kvikmynda eftir content rating, eins og R, PG, og PG-13, var búin til sérstök tafla, `content_rating_count`. Taflan inniheldur fjölda kvikmynda í hverjum flokki fyrir Leonardo DiCaprio og Kate Winslet ásamt prósentudreifingar. Þessi tafla var gerð til að halda kóðanum á mælaborðinu stílhreinum og gera framsetningu gagna einfaldari.
+
+```{r, eval=FALSE}
+# Vinna úr gögnum fyrir Leonardo DiCaprio
+leo_movies_count = leo_movies \
+    .groupby("content_rating") \ # gögn hópuð saman eftir gildum í einum eða fleiri dálkum.
+    .size() \ # telur hversu margar kvikmyndur eru í hverjum hópi.
+    .reset_index(name="count") \ #count dálkurinn inniheldur fjöldann af kvikmyndum í hverjum flokki.
+    .assign(actor="Leonardo DiCaprio") 
+leo_movies_count["percentage"] = (leo_movies_count["count"] / leo_movies_count["count"].sum()) * 100 # count fyrir hóp / Heildarsumma allra raða í count x 100
+
+# Vinna úr gögnum fyrir Kate Winslet
+kate_movies_count = kate_movies \
+# - || - 
+
+# Sameina gögnin í eitt DataFrame
+content_rating_count = pd.concat([leo_movies_count, kate_movies_count], ignore_index=True)
+
+# Búa til nýja töflu í gagnagrunninum fyrir content_rating_count ef hún er ekki þegar til
+with conn:
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS content_rating_count (
+            content_rating TEXT,
+            count INTEGER,
+            percentage REAL,
+            actor TEXT
+        )
+    ''')
+    # Hreinsa eldri gögn ef þau eru til
+    conn.execute("DELETE FROM content_rating_count")
+
+# Setja gögnin úr content_rating_count í SQLite töfluna
+content_rating_count.to_sql('content_rating_count', conn, if_exists='append', index=False)
+
+```
+
+
+#### Tengitöflur og notkun Cinemagoer: movie_actors og actors_info
+
+Til að aðgreina leikarana í actors dálkinum í töflunni `rotten_tomtaoes_movie_dicaprio_winslet` var búið til tengitöfluna, `movie_actors` sem gefur leikurunum einkvæm actor_id. Taflan inniheldur dálkana movie_id, actor_name og actor_id Þetta var útfært með forritinu `create_actor.py`. Til að byrja með eru aðeins NA gildi í actor_id dálkinum.  
+
+Þegar búið var að gera töfluna `movie_actors` var búið til töfluna `actors_info` með forritinu `createactors_info.py`. Forritið vinnur með gögn úr töflunni `rotten_tomatoes_movies_dicaprio_winslet` og IMDb gagnagrunni til að bæta upplýsingum um leikara og tengja þær við réttar kvikmyndir. Processed dálki var bætt við rotten_tomatoes_movies_dicaprio_winslet til að fylgjast með vinnslustöðu kvikmynda og koma í veg fyrir að sama mynd væri unnin oftar en einu sinni. Fyrst eru allar óunnar kvikmyndir (processed = 0) sóttar úr töflunni og fyrir hverja kvikmynd er leitað að samsvarandi IMDb ID út frá titlinum með Cinemagoer. Þegar IMDb ID hefur verið fundið, er cast-listi kvikmyndarinnar sóttur úr IMDb. 
+
+Næst eru nöfn leikara úr töflunni movie_actors tengd við nöfn úr cast-listanum með því að bera saman nöfn með aðstoð get_close_matches. Ef leikaranöfn passa, er dálkurinn actor_id í movie_actors uppfærður með IMDb ID viðeigandi leikara. Jafnframt eru frekari upplýsingar um leikara sóttar úr IMDb og skráðar í töfluna actors_info. Að lokum er kvikmyndin merkt sem unnin með því að uppfæra dálkinn processed í töflunni `rotten_tomatoes_movies_dicaprio_winslet`. 
+
+```{r, eval=FALSE}
+# 1. Búa til töfluna actors_info og bæta við processed dálki
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS actors_info (
+    actor_name TEXT NOT NULL,
+    imdb_id TEXT NOT NULL PRIMARY KEY,
+    headshot TEXT,
+    canonical_name TEXT,
+    long_imdb_name TEXT,
+    long_imdb_canonical_name TEXT,
+    full_size_headshot TEXT
+);
+""")
+
+cursor.execute("PRAGMA table_info(rotten_tomatoes_movies_dicaprio_winslet);")
+columns = [row[1] for row in cursor.fetchall()]
+if 'processed' not in columns:
+    cursor.execute("ALTER TABLE rotten_tomatoes_movies_dicaprio_winslet ADD COLUMN processed INTEGER DEFAULT 0;")
+    print("Dálkurinn 'processed' bætt við.")
+conn.commit()
+
+# 2. Hreinsa og normalísera leikaranöfn
+def normalize_name(name):
+    """Hreinsar nafn með því að fjarlægja sérstafi, bil, sviga og breyta í lágstafi."""
+    name = unicodedata.normalize('NFD', name)
+    name = ''.join([c for c in name if unicodedata.category(c) != 'Mn'])
+    name = re.sub(r'\s*\(.*?\)', '', name)  # Fjarlægir sviga
+    return name.strip().lower()
+
+# 3. Sækja IMDb ID og cast-lista
+def process_movie(movie_id, movie_title):
+    print(f"\nVinnsla kvikmyndar með ID: {movie_id}, Titill: {movie_title}")
+
+    # Sækja IMDb ID fyrir kvikmynd
+    movie = ia.search_movie(movie_title)
+    if not movie:
+        print(f"IMDb mynd fannst ekki fyrir titil: {movie_title}")
+        return
+    imdb_movie_id = movie[0].movieID
+    print(f"IMDb ID fundið fyrir {movie_title}: {imdb_movie_id}")
+
+    # Sækja cast-lista
+    movie_details = ia.get_movie(imdb_movie_id)
+    if not movie_details or 'cast' not in movie_details:
+        print(f"Enginn cast listi fundinn fyrir {movie_title}")
+        return
+    cast = movie_details['cast']
+
+    # Sækja leikaranöfn úr movie_actors og bera saman við IMDb
+    cursor.execute("SELECT actor_name FROM movie_actors WHERE movie_id = ?", (movie_id,))
+    actor_names = [row[0] for row in cursor.fetchall()]
+    normalized_actor_names = [normalize_name(name) for name in actor_names]
+
+    for cast_member in cast:
+        imdb_name = normalize_name(cast_member['name'])
+        matches = get_close_matches(imdb_name, normalized_actor_names, n=1, cutoff=0.8)
+        if matches:
+            matched_name = matches[0]
+            actor_imdb_id = cast_member.personID
+
+            # Uppfæra movie_actors með IMDb ID
+            cursor.execute("""
+                UPDATE movie_actors
+                SET actor_id = ?
+                WHERE movie_id = ? AND LOWER(actor_name) = ?
+            """, (actor_imdb_id, movie_id, matched_name))
+            conn.commit()
+
+            # Fjarlægja nafn úr listanum
+            normalized_actor_names.remove(matched_name)
+
+    # Merkja mynd sem unna
+    cursor.execute("""
+        UPDATE rotten_tomatoes_movies_dicaprio_winslet
+        SET processed = 1
+        WHERE movie_id = ?
+    """, (movie_id,))
+    conn.commit()
+
+# 4. Fá óunnar kvikmyndir og vinna þær
+cursor.execute("""
+    SELECT DISTINCT ma.movie_id, rtm.movie_title
+    FROM movie_actors ma
+    JOIN rotten_tomatoes_movies_dicaprio_winslet rtm
+    ON ma.movie_id = rtm.movie_id
+    WHERE ma.movie_id IS NOT NULL AND rtm.processed = 0
+""")
+movies = cursor.fetchall()
+
+for movie_id, movie_title in movies:
+    process_movie(movie_id, movie_title)
+
+# Loka tengingu
+conn.close()
+print("Gögn hafa verið uppfærð.")
+```
+
+
+![Mynd 1: Tengingar á milli taflna í gagnagrunni](Desktop/caps2/tengimynd2.jpg)
+
+
+
+
+## 2.2.2 Notkun regex
+
+Regex var notað í nokkrum tilfellum við uppsetningu gagnagrunns. Meðal annars til að greina, sækja og umbreyta textagögnum. 
+
+#### Frekari upplýsingar um leikara í `actors_info`
+
+Þar sem að Cinemagoer pakkinn bauð upp á takmarkað af upplýsingum um leikara, var útfært forritið, `get_biography.py` sem að sækir mini_biography, trivia, hæst launuðustu mynd leikaranna og hver launin voru og setur það í `actors_info` töfluna. 
+
+Með því að nota IMDb ID leikarana úr gagnagrunninum byggir forritið upp slóð að IMDb-síðunni þeirra. 
+```{r, eval=FALSE}
+https://www.imdb.com/name/nm{imbd_id}/bio/?ref_=nm_ov_bio_sm#mini_bio
+```
+
+HTMl efni er sótt með requests og BeautifulSoup er notað til að vinna með það.  
+
+Áður en forritið var gert þurfti að skoða uppsetningu IMDb-slóðanna og greina HTML-strúktúrinn. Þetta var gert með því að nota curl til að sækja efnið og vista HTML-uppbyggingu. 
+
+```{r, eval=FALSE}
+# skipun til að skoða strúktur og sækja efnið
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36" \
+--url "https://www.imdb.com/name/nm0000138/bio/?ref_=nm_ov_bio_sm" \
+--output imdb_bio.html
+```
+
+Þetta gerði okkur kleift að skoða HTML-strúktúrinn og nýta data-testid til að auðkenna og sækja rétta hluta af vefsíðunni. Síðan var notað regex til að laga textana til.
+
+Regex var meðal annars notað til að:
+
+- Hreinsa texta, t.d með því að laga bil. 
+
+```{r, eval=FALSE}
+def clean_text_for_db(text):
+    if not text:
+        return None
+    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+  # Bætir bili á milli lítilla og stórra stafa
+    text = re.sub(r'([0-9])([A-Za-z])', r'\1 \2', text)
+  # Bætir bili á milli talna og stórra stafa
+    text = re.sub(r'([A-Za-z])([0-9])', r'\1 \2', text)
+  # Bætir bili milli talna og bókstafa
+    text = re.sub(r'([a-zA-Z])\(', r'\1 (', text)
+  # Ef bókstafur og opinn svigi er límdir saman þá bætir það bil á milli
+    text = re.sub(r'\)([a-zA-Z])', r') \1', text)
+  # Ef lokaður svigi og bókstafur eru límdir saman bætir það bil á milli
+    text = re.sub(r'([a-zA-Z])and', r'\1 and', text)
+  # Bætir bili á milli bókstafs og orðsins "and" ef það er hluti af setningu
+    text = re.sub(r'\bDi Caprio\b', 'DiCaprio', text)
+  # Exception fyrir DiCaprio, þannig ef það er Di Caprio, þá verður það DiCaprio
+    text = re.sub(r'\bDi Caprioas\b', 'DiCaprio as', text)
+  # Smá fínpússun, ef það er "Di Caprioas" þá verður það "DiCaprio as"
+    return text
+```
+
+
+- Mini Biography: skipta ævisögunni í stakar setningar.
+```{r, eval=FALSE}
+sentences = re.findall(r'[^.!?]+[.!?]', mini_bio_text)
+# Skiptir löngum texta í stakar setningar. Gerum þetta til að við getum tekið bara fyrstu 5 setningarnar.
+mini_bio_text = ' '.join(sentences[:5])
+# Síðan eru aðeins fyrstu 5 setningarnar valdar til að stytta textann.
+```
+
+- Salary: Notum regex til að finna kvikmyndir og laun úr texta
+
+```{r, eval=FALSE}
+match = re.search(r'^(.*) - [\$£€]?([\d,]+)', salary_text)
+
+# Þetta regex finnur línu sem:
+# 1. Hefst á texta (t.d., kvikmyndanafn).
+# 2. Er fylgt eftir með bandstriki og valfrjálsu gjaldmiðilstákni.
+# 3. Endar með tölu (sem gæti innihaldið kommur).
+# Gæti fundið t.d "Titanic - $20,000,000"
+```
+
+Þetta forrit hjálpaði við að draga fram áhugaverðari upplýsingar í actors_info töfluna, sem gerði það að verkum að hægt væri að nota actors_info fyrir frekari greiningu og samanburð á leikurum. 
+
+
+#### Finna aðalleikara: `main_actors_in_info`
+
+Tekið var eftir því að aðalleikarar voru gjarnan tilgreindir í movie_info dálkinum í töflunni `rotten_tomatoes_movies_dicaprio_winslet`. Því var útbúin tafla, `main_actors_in_info` sem notar Regex til að sækja nöfn aðalleikara. Hér má til dæmis sjá movie info fyrir myndina "The Man in the Iron Mask": 
+
+*"The former musketeer Athos (John Malkovich) swears vengeance after despotic King Louis XIV (Leonardo DiCaprio) causes the death of his son. Summoning his old comrades Porthos (Gérard Depardieu) and Aramis (Jeremy Irons), he hatches a plan to liberate a shackled prisoner rumored to be the king's twin brother, and then install him on the throne. But the three musketeers must also contend with their old friend D'Artagnan (Gabriel Byrne), who has remained in the king's service."*
+ 
+```{r, eval=FALSE}
+# r"\(([^)]+)\): finnur allar strengi sem eru innan sviga í textanum
+    actors_in_parentheses = re.findall(r"\(([^)]+)\)", movie_info
+    for actors_group in actors_in_parentheses:
+        for actor in actors_group.split(","):
+  # ef fleiri en einn leikari er innan í sviga er "splittað" með kommu (",")
+            cleaned_actor = actor.strip()
+            if cleaned_actor:
+                movie_dict["actor_in_info"] = cleaned_actor
+                cursor.execute(f"""
+                    INSERT INTO main_actors_in_info ({', '.join(columns)})
+                    VALUES ({', '.join(['?' for _ in columns])})
+                """, tuple(movie_dict[col] for col in columns))
+
+```
+
+Ef enginn leikari finnst í movie_info, sækir það fyrstu fimm nöfnin úr actors dálkinum. Þetta tryggir að aðalleikarar séu skráðir, jafnvel þótt þeir finnist ekki í movie_info.
+
+```{r, eval=FALSE}
+else:
+    actors_list = movie_dict["actors"].split(",")
+    first_five_actors = [actor.strip() for actor in actors_list[:5]]
+    for actor in first_five_actors:
+        if actor:
+            movie_dict["actor_in_info"] = actor
+            cursor.execute(f"""
+                INSERT INTO main_actors_in_info ({', '.join(insert_columns)})
+                VALUES ({', '.join(['?' for _ in insert_columns])})
+            """, tuple(movie_dict[col] if col != 'actor_in_info' else actor for col in insert_columns))
+
+```
+
+Kate Winslet og Leonardo Dicaprio voru ekki nefnd í movie_info fyrir myndirnar Romeo+Juliet, Triple 9 og Christmas Carol, þó að þau höfðu verið í aðalhlutverki.  Þessum upplýsingum var því bætt við í töfluna með handvirkum hætti (e. hard-coding). Þessi aðferð er almennt ekki hentug þegar unnið er með stór gagnasöfn, þar sem hún getur verið tímafrek og óhagkvæm. Hins vegar, þar sem aðeins var um örfá gildi var að ræða, þótti þessi lausn vera nægileg.
+
+Gagnavinnsla þessa verkefnis beindist að því að skapa skýran og aðgengilegan gagnagrunn sem gerir frekari greiningu og úrvinnslu mögulega. Með notkun SQL, Python og Regex tókst að umbreyta óskipulögðum gögnum í vel skipulagt gagnasafn með áherslu á Leonardo DiCaprio og Kate Winslet. Þetta tryggði að öll gögn væru hrein, rétt flokkuð og auðvelt væri að nálgast nauðsynlegar upplýsingar til greiningar. Þessi grunnur gerði það mögulegt að framkvæma ítarlegar greiningar, s.s. samanburð á kvikmyndum, leikurum og efnisflokkun, auk þess að draga fram áhugaverðar upplýsingar á notendavænan hátt. 
+
+
+
+## 3.3 Myndræn framsetning
+
+Við gerð mælaborðsins var lögð áhersla á að hanna gröf sem svara rannsóknarspurningum okkar. Til að ná því markmiði ákváðum við að einbeita okkur að því að búa til gagnvirk gröf og tengslanet sem sýna lykilatriði úr gagnasafninu á skýran og aðgengilegan hátt.
+Við nýttum Rstudio og shiny til að búa til mælaborðið. Shiny gerði okkur kleift að þróa notendavænt og gagnvirkt umhverfi þar sem hægt er að skoða gögnin frá mismunandi sjónarhornum. Gögnin voru geymd í SQLite-gagnagrunni og síðan var notað DBI og RSQLite til að sækja þau inn í R. Með ggplot2 og plotly voru gögnin síðan framsett í formi myndrita, línurita, súlna og punkta til að auðvelda samanburð og greiningu. Við hönnun myndrita var lögð áhersla á að þau væru einföld og læsanleg.
+Einnig var hannað tengslanet sem sýnir í hvaða kvikmyndum leikarar hafa leikið saman í aðalhlutverki. Til þess nýttum við gögn úr töflunni `main_actors_in_info og unnum þau með Python og bókasafninu `NetworkX`. Tengslanetið var síðan sett fram með `Dash`, þar sem notendur geta valið hnúta milli tveggja leikara og séð hvaða kvikmyndir þeir hafa unnið saman að.
+
+Með þessari nálgun náðist að skapa mælaborð sem ekki aðeins auðveldar notendum að skilja gögnin heldur styður einnig við framsetningu niðurstaðna. Þetta leiddi til betri skilnings á þróun og árangri leikaranna og gerði okkur kleift að draga fram góðar niðurstöður.
+
+
+
+# 4. Niðurstöður
+
+Niðurstöðukaflinn einblínir á að draga saman helstu upplýsingar úr greiningu okkar á ferlum Leonardo DiCaprio og Kate Winslet. Með því að nýta gögn frá Rotten Tomatoes og IMDb var leitast við að greina þróun á ferli þeirra og bera saman vinsældir og árangur út frá fjölda kvikmynda, tegundum, einkunnum frá gagnrýnendum og áhorfendum, ásamt áhrifum ýmissa þátta á gæði mynda. Hér verður farið yfir niðurstöðurnar með aðstoð mynda og greiningartóla til að svara rannsóknarspurningunni: Hver hefur náð betri árangri á ferli sínum og hvernig hefur þróunin verið fyrir hvorn leikara?
+
+
+Til að byrja með var fjöldi mynda sem leikararnir hafa leikið í skoðaður og síðan greint skiptingu eftir tegundum og dreifingu einkunna skoðuð. Á mynd 2 og mynd 3 má sjá hvernig þetta var framsett. Helstu niðurstöður eru þær að Winslet hefur leikið í aðeins fleiri myndum en DiCaprio og bæði hafa þau leikið langmest í drama myndum. Á milli tegunda er erfitt að sjá hvort dreifing einkunna sé mikið að breytast vegna fárra mynda í flestum tegundum, hins vegar virðast einkunnir Winslet dreifast meira til vinstri (lægri einkunnir) heldur en hjá DiCaprio 
+
+
+![*Mynd 2:  Allar myndir og dreifing einkunna* ](Desktop/caps2/mynd2.jpg)
+
+![*Mynd 3: Fjöldi mynda fyrir tegundina drama og dreifing einkunna fyrir það*](Desktop/caps2/mynd3.jpg)
+
+
+
+
+
+
+Á mynd 4 var verið að skoða fjölda mynda eftir flokkun efnis (e. content rating). Það er mjög svipuð skipting á þessu hjá Winslet og DiCaprio en bæði hafa þau leikið langt mest í myndum sem eru flokkaðar sem R en það eru myndir sem bannaðar börnum undir 17 ára og næst mest í myndum sem eru PG-13.
+
+
+![*Mynd 4: Fjöldi mynda eftir flokkun efnis* ](Desktop/caps2/mynd4.jpg)
+
+
+
+
+
+Þegar einkunnir mynda fyrir báða leikara eru skoðaðar þá sést að með árunum fara bæði gagnrýnenda- og áhorfenda einkunnir hjá DiCaprio hækkandi (sjá mynd 5) en þær fara lækkandi hjá Winslet (sjá mynd 6). Einnig sést að gagnrýnendur gefa iðulega lægri einkunn en áhorfendur en svo virðist vera að gagnrýnendur og áhorfendur verði meira sammála með árunum hjá Dicaprio en meira ósammála hjá Winslet. 
+
+
+![*Mynd 5: Einkunnir gagnrýnenda vs áhorfenda fyrir Leonardo DiCaprio*](Desktop/caps2/mynd5.jpg)
+
+
+
+![*Mynd 6: Einkunnir gagnrýnenda vs áhorfenda fyrir Kate Winslet*](Desktop/caps2/mynd6.jpg)
+
+
+
+
+Þegar áhrif lengdar á myndirnar hjá DiCaprio og Winslet eru skoðuð (sjá mynd 7),  þá sést að það er ekkert mjög mikill munur á einkunn eftir lengd en það er frekar þannig að ef mynd er mjög stutt (undir 50 mín) eða mjög löng (yfir 150 mín) fær hún góða einkunn. Trend Línan sýnir einnig að eftir því sem mynd er örlítið lengri þá fær hún betri einkunn.
+
+![*Mynd 7: Áhrif lengdar á mynd* ](Desktop/caps2/mynd7.jpg)
+
+
+
+
+
+Þegar fjöldi áhorfenda var skoðaður (sjá mynd 8), þá kom í ljós að DiCaprio er með fleiri myndir með mörgum áhorfendum en Winslet. Fjöldi áhorfenda er þó langmestur Í Titanic en þau léku í saman í henni enda þurfti að notast við logaritmískan kvarða til að ná yfirsýn yfir allar myndirnar.  Einkunn myndanna var skoðuð miðað við fjölda áhorfenda og það eru ekki skýrar niðurstöður en alla jafna fá myndir sem eru með mikinn áhorfendafjölda hærri einkunn. 
+
+
+![*Mynd 8: Einkunn vs. fjöldi áhorfenda * ](Desktop/caps2/mynd88.jpg)
+
+
+
+
+
+Þegar leikstjórar þeirra mynda sem Kate og/eða Leo léku í og fengu hæstu einkunnir voru skoðaðir, kom í ljós að dreifing einkunna annarra mynda eftir þá leikstjóra var mjög breið í flestum tilvikum. Skoðuð var bæði dreifing gagnrýnenda einkunna (sjá mynd 9) og dreifing áhorfenda einkunna (sjá mynd 10) og bentu einkunnir mynda Kate og Leo til þess að þær væru almennt á hærra stigi en flestar aðrar myndir leikstjóranna. 
+
+![*Mynd 9: Leikstjórar miðað við gagnrýnenda einkunn* ](Desktop/caps2/mynd9.jpg)
+
+
+![*Mynd 10: Leikstjórar miðað við áhorfenda einkunn* ](Desktop/caps2/mynd10.jpg)
+
+
+
+
+Þegar rannsóknarspurningunni er svarað má álykta að ferill Leonardo DiCaprio hefur þróast meira til betri vegar en hjá Kate Winslet. Þrátt fyrir að hún hafi leikið í fleiri myndum, hefur DiCaprio hækkað í áliti meðal gagnrýnenda og áhorfenda með tímanum, á meðan einkunnir hjá Winslet hafa verið óstöðugri og sýna lækkandi þróun. Báðir leikarar eiga þó margt sameiginlegt, svo sem áherslu á dramatískar myndir og hlutverk í myndum með strangari aldurstakmörk.
+
+Niðurstöður benda til þess að DiCaprio hafi tekist að byggja upp sterkari feril, bæði hvað varðar gæði og fjölda áhorfenda. Þessar niðurstöður leggja áherslu á gildi gagnaúrvinnslu við að varpa ljósi á þróun og árangur í kvikmyndaiðnaðinum og vekja jafnframt áhuga á frekari rannsóknum með fleiri breytum eða öðrum leikurum til samanburða
+
+
+
+# 5. Umræða 
+
+### 5.1 Túlkun niðurstaðna
+Markmið verkefnisins var að bera saman árangur Leonardo DiCaprio og Kate Winslet með því að búa til gagnagrunn og draga úr honum upplýsingar. Með því að greina gögn úr Rotten Tomatoes og IMDb gagnasöfnum var skoðað ítarlega hvernig starfsferlar þeirra hafa þróast yfir árin.
+
+Niðurstöður sýna að þrátt fyrir að stjörnurnar, DiCaprio og Winslet hafi átt farsælan feril og leikið í svipuðum tegundum kvikmynda, þá hafa ferlar þeirra þróast á ólíkan hátt. Kate Winslet hefur leikið í töluvert fleiri kvikmyndum en á móti, hefur DiCaprio fengið hærri einkunnir frá bæði almenningi og gagnrýnendum yfir árin. Þetta bendir til þess að hann hefur tekið að sér hlutverk sem skiluðu betri árangri og jafnvel verið vandasamari við val sitt á kvikmyndum. Á sama tíma virðist sem einkunnir Winslet hafa lækkað töluvert með árunum, þar sem nýrri myndir hennar hafi ekki fengið jafn góðar viðtökur, sem gæti stafað af því að með aldrinum hefur Winslet tekið að sér minni hlutverk í kvikmyndum.
+
+Þegar litið er á tegundir kvikmynda, þá kemur í ljós að báðir leikararnir hafa leikið mest í drama myndum, sem oft innihalda krefjandi hlutverk. Hins Vegar sýnir dreifing einkunna að Winslet fær almennt lægri einkunnir í þessum flokki, ef borið er saman við DiCaprio. Þetta gæti verið vegna þess að hún hefur tekið áhættusamari verkefni sem höfða til strengi áhorfendahóps, eða að nýrri myndir hennar hafi ekki hitt í mark hjá gagnrýnendum og þar með dregið niður meðaleinkun hennar. 
+Einnig var skoðað flokkun mynda eftir aldurstakmarki og þar kemur í ljós að báðir leikarar hafa mest tekið að sér hlutverk í R-flokkuðum kvikmyndum, sem eru bannaðar undir 17 ára aldri. Þetta bendir til þess að þau kjósi að takast á við alvarlegri og flóknari efni sem ekki eru áætluð yngri áhorfendum. Slíkar myndir hafa töluvert minni aðsókn meðal yngri áhorfenda, sem gæti haft áhrif á áhorfendafjölda og einkunnir.
+
+Áhrif lengdar kvikmynda á einkunir var skoðað og þær niðurstöður sýna að lengd kvikmyndar hefur töluverð áhrif á einkunnir þar sem árangur þeirra fer hækkandi eftir því hversu langar myndirnar eru. Þetta gæti stafað af því að lengri myndir geta innihaldið dýpri söguþræði.
+
+Í heildina svaraði verkefnið spurningunni sem sett var fram í innganginum, með því að nota gagnamiðaða mælikvarða til að bera saman árangur leikarana Leonardo DiCaprio og Kate Winslet. Niðurstöður gefa betri innsýn í hvernig val á hlutverkum, tegundir kvikmynda og önnur atriði geta haft áhrif á ferla leikarana yfir tíma.  
+
+### 5.2 Tenging við námsefnið
+
+Verkefnið tengist beint við námsefnið sem við höfum unnið með í námskeiðinu. Við uppbyggingu gagnagrunnsins var afar gagnlegt að nota SQLite. Við lærðum hvernig á að skipuleggja gögn í tengdar töflur, sem gerði okkur kleift að framkvæma flóknar fyrirspurnir og greiningar. 
+
+Að auki var notast við reglulegar segðir til að hreinsa og umbreyta gögnum, sérstaklega þegar unnið var með gögn frá IMDb. Þetta tengist námsefninu um gagnavinnslu og textagreiningu, þar sem RegEx er öflugt verkfæri til að vinna með texta og strengi.
+Verkefnið gaf okkur einnig tækifæri til að vinna með raunveruleg gögn og hæfni til að takast við verkefni tengd því, eins og að hreinsa gögn og vinna með óskýrar upplýsingar. Þetta hjálpaði okkur að skilja betur mikilvægi gagnavinnslu og hvernig hægt er að beita þeirri þekkingu í raunverulegum verkefnum.
+
+### 5.3 Lærdómur
+Við lærðum mikið af þessu verkefni, bæði hvað varðar tæknilega hæfni og hagnýta þekkingu. Við skiljum núna betur hvernig á að byggja upp og vinna með gagnagrunna, hreinsa, umbreyta gögnum og framkvæma greiningar til að sýna ákveðnar niðurstöður. Þetta mun nýtast okkur vel í framtíðinni, sérstaklega í verkefnum, sem tengjast gagnavinnslu, gagnagreiningu og upplýsingatækni almennt.
+Í heildina hefur þetta verkefnið aukið skilning okkar á því hvernig hægt er að nota gögn til að greina og skilja flóknar gögn um ferla leikara á kvikmyndasviðinu. Við teljum að þessi reynsla muni nýtast okkur vel í framtíðinni og hvetja okkur til að halda áfram að læra og þróa hæfni okkar í gagnavinnslu og greiningu.
+
+
+# 6. Samantekt
+
+Þetta verkefni sýndi fram á hvernig hægt er að nýta gögn og greiningartól til að bera saman og meta feril og vinsældir leikara á hlutlægan hátt. Helstu niðurstöður benda til þess að Leonardo DiCaprio hefur náð stöðugri hækkun í áliti gagnrýnenda og áhorfenda með árunum, á meðan Kate Winslet er í smávægilegri niðurleið. Báðir leikarar hafa byggt feril sinn á dramatískum myndum og eru vinsælastir í myndum sem flokkaðar eru með strangari aldurstakmörkunum (R og PG-13).
+Mælaborðið og tengslanetið auðvelduðu framsetningu niðurstaðna og gerðu notendum kleift að greina þróun og lykilatriði í ferlum leikara. Aðferðir eins og notkun SQL til gagnavinnslu, Python fyrir flóknari úrvinnslu, og RStudio Shiny til myndrænnar framsetningar reyndust nauðsynleg við gerðar verkefnisins.
+
+### 6.1 Takmarkanir og möguleikar til úrbóta
+
+Þrátt fyrir áhugaverðar niðurstöður voru nokkrar takmarkanir í verkefninu. Gögnin buðu upp á takmarkaðar upplýsingar, sem útilokar dýpri greiningu á breytum eins og alþjóðlegri útbreiðslu kvikmynda eða jafnvel við að skoða áhrif markaðssetningar. Einnig voru gögnin ekki uppfærð 
+lengra en til ársins 2020, sem gæti haft einhver áhrif á samanburð.
+
+Til framtíðar mætti bæta verkefnið með því að innleiða fleiri gagnasöfn, til dæmis frá Box Office Mojo fyrir frekari greiningu á tekjum leikara og til að skoða útbreiðslu kvikmynda þeirra á alþjóðlegum vettvangi. Framtíðarverkefni gæti einnig falið í sér að bæta við fleiri upplýsingum, eins og verðlaunum, tilnefningum og samfélagsáhrifum, til að fá heildstæðari mynd af ferlum beggja leikara. Að auki gæti aukin sjálfvirkni í gagnaöflun og greiningu, eins og með betri skröpunum eða dýpri tengingu við API, stuðlað að nákvæmari og fjölbreyttari greiningu.
+
+Einnig hefði verið áhugavert að kafa dýpra í tengslanetið og greina hvernig tengslanet leikaranna þróast yfir feril þeirra. Til dæmis mætti skoða hvort ákveðin mynstur eða samvinna við ákveðna leikara hafi haft áhrif á vinsældir eða einkunnir mynda þeirra. Þetta gæti jafnvel byggt góðan grunn fyrir viðbótarverkefni
+
+Með þessari vinnu var lagt áhugavert framlag til gagnagreiningar í kvikmyndaiðnaðinum og sýnt fram á hvernig gögn og tækni geta hjálpað við að svara spurningum um þróun og árangur í ferli leikara.
+
+
+
+
+
+
+
+
+
+
+
+
+
