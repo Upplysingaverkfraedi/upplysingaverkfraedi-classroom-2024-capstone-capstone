@@ -1,0 +1,8 @@
+Cinemagoer
+IMDbPY
+pandas
+requests
+beautifulsoup4
+networkx
+dash
+plotly
