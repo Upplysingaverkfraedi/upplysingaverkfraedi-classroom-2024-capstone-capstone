@@ -688,6 +688,16 @@ output$directorPlot <- renderPlotly({
   rating_type <- input$rating_type
   data <- graph_data()
   
+  # Reikna meðaleinkunn fyrir hvern leikstjóra og raða þeim í röð
+  data <- data %>%
+    group_by(directors) %>%
+    summarize(avg_rating = mean(get(rating_type), na.rm = TRUE)) %>%
+    arrange(desc(avg_rating)) %>%
+    left_join(data, by = "directors") # Sameina til að halda öllum upplýsingum
+  
+  # Setja röð á leikstjóra fyrir x-ásinn
+  data$directors <- factor(data$directors, levels = unique(data$directors))
+  
   p <- ggplot(data, aes_string(x = "directors", y = rating_type)) +
     geom_boxplot(
       aes(text = paste(
