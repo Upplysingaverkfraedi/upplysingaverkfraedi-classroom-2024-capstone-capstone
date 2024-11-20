@@ -1,58 +1,34 @@
-# Capstone verkefni 
+# README
 
-## Verkefni
-Verkefnið er tvíþætt:
+Ég var að skoða database-ið. Prófaði að gera app með gröfum, alls ekki fullkomið hægt að sjá gróflega hvernig gögnin lýta út og hvernig þau eru upp sett.
 
-- **Skýrsla** – Þið þurfið að skila tæknilegri skýrslu þar sem þið útskýrið hvernig þið nálguðust gagnaöflun, meðhöndlun gagna, og hvaða niðurstöður þið teljið markverðastar. Þetta þarf að vera á `HTML` formi, t.d. með [RPubs](https://rpubs.com/) fyrir RMarkdown.
-- **Mælaborð og kynning** – Þið þurfið að hanna mælaborð og halda kynningu þar sem þið útskýrið mælaborðið og niðurstöðurnar fyrir bekknum. Mælaborðið getur t.d. verið hýst á [shinyapps.io](https://www.shinyapps.io/).
+## Keyrsla
 
-## Mælaborð
-Mælaborðið er hannað fyrir samnemendur ykkar í upplýsingaverkfræði. Munið að það þarf að:
-- **Sannfæra áhorfendur**: Sýnið þeim hvernig það gagnast.
-- **Skýrt viðmót**: Þið þurfið að tryggja að það sé auðvelt í notkun og framsetningin á gögnum sé skýr.
+Keyrðu eftirfarandi skipun til þess að vera í réttu umhverfi:
 
-## Skipulag
-Það eru ný teymi með 3-4 einstaklingum. Þið þurfið að skrá ykkur í Canvas og samþykkja GitHub Classroom verkefni með því að nota teymisnafnið ykkar.
+```bash
+pip install -r requirements.txt
+```
+síðan getur keyrt annað hvort `appdb.p`' eða `appgogn.db` með eftirfarandi skipun:
 
-Í tímanum þann 21. október voru lyfturæður um möguleg capstone verkefni. Þið þurfið að velja eitt þeirra verkefna til að vinna með (aðeins eitt teymi má vinna með hvert efni).
+```bash
+shiny run appdb.py
+```
 
-## Skil og kynning
-- **Skil á skýrslu**: `PDF` (eða `html`) þarf að vera komið inn á Canvas og GitHub repo fyrir lok dags 18. nóvember (mánudagur).
-- **Kynning á mælaborði**: Þið kynnið mælaborðið í tíma þann 21. nóvember (fimmtudagur). **Skyldumæting**.
+## `appgogn.py`
+Þetta er app sem ég gerði til þess að geta séð gögnin í gagnagrunninum betur. Getið keyrt og séð uppsetningu á gögnunum
 
-## Frjálst val á framsetningu
-Þið getið verið skapandi með framsetningu. Það er mikilvægt að myndirnar og mælaborðið hjálpi til við að segja sögu um gögnin sem fangar athygli áhorfenda.
+## `appdb.py`
+Þetta app er bara ég að fikt og búa til gröf.  getið skoðað þetta en veit að dálkurinn fyrir 'liðframmistaða' virkar ekki alveg.
+Þetta er semsagt 3 dálkar
+- **Ökumannsframmistaða** 
+Hægt að velja ökumann og sjá stig yfir keppnir
+- **Liðframmistaða**
+Hægt að velja lið og sjá frammistöðu
+*ATH. einhvað bilað*
+- **Brautarframmistaða**
+Hægt að velja braut og sjá frammistöðu keppanda
+*Frekar óskýrt*
 
-### Atriði sem skýrslan þarf að innihalda:
-- **Lýsing á gagnaöflun** – Hvaðan komu gögnin og hvernig voru þau fengin?
-- **Gagnavinnsla** – Hvernig voru gögnin meðhöndluð? Notið REGEX til að laga texta.
-- **Markverðustu niðurstöður** – Hverjar voru helstu niðurstöður?
-- **Mælaborðið** – Hvað gerðuð þið og hver var tilgangur þess?
-
-## GitHub Repo
-Þið þurfið að skila öllum skrám í GitHub repo teymisins. 
-
-Munið að `README` skráin þarf að innihalda: 
-- **TL;DR** – Stutt lýsing á verkefninu og niðurstöðum.
-- **Strúktur** – Lýsing á möppum og mikilvægum skrám.
-- **Keyrsluuppsetning** – Hvernig kóði og gagnagrunnur eru settir upp á öðrum tölvum. Öll lykilorð og notendanöfn skulu vera geymd með umhverfisbreytum.
-
-## Einkunnagjöf
-Einkunn verður byggð á:
-- **Gagnafrásögn** – Hversu skýr og aðgengileg er kynningin?
-- **Mælaborðið** – Hversu notendavænt og skýrt er það?
-
----
-
-## Viðvörun: Ekki vista lykilorð í GitHub repo
-
-Að vista lykilorð, notendanöfn eða aðrar viðkvæmar upplýsingar í GitHub repo sem er opinber (public)
-er mjög alvarlegt öryggisbrot. Hér eru nokkrar ástæður fyrir því að það má aldrei gera þetta:
-
-1. **Öryggisbrestur** – Opnar fyrir öryggisbrot.
-2. **Kostnaður** – Þriðji aðili gæti misnotað gögnin.
-3. **Git útgáfusaga** – Það er erfitt að fjarlægja viðkvæmar upplýsingar úr útgáfusögunni.
-4. **Orðspor** – Slíkar villur geta skaðað orðspor þitt sem forritari.
-
-
-  
+Eins og ég sagði þá er þetta bara ég að fikta með gögnin. Þið getið prófað að keyra og koma með hugmyndir af endurbótum.
+Síðan getum við notað einhvað af þessu ef við viljum í aðal mælaborðið okkar.
