@@ -221,7 +221,7 @@ server <- function(input, output, session) {
     if (!is.null(click$id)) {
       selected_municipality <- click$id
       
-      # Gögn fyrir póstnúmer graf
+      # Gögn fyrir póstnúmer stöplarit
       filtered_postnr <- postnr_data %>%
         filter(sveitarfelag == selected_municipality, year == input$year, property_type == input$property_type)
       
@@ -236,7 +236,7 @@ server <- function(input, output, session) {
           theme_minimal()
       })
       
-      # Gögn fyrir herbergjafjölda graf
+      # Gögn fyrir herbergjafjölda stöplarit
       filtered_rooms <- herbergi_data %>%
         filter(sveitarfelag == selected_municipality, year == input$year, property_type == input$property_type)
       
@@ -251,7 +251,7 @@ server <- function(input, output, session) {
           theme_minimal()
       })
       
-      # Gögn fyrir mannfjölda graf
+      # Gögn fyrir mannfjölda línurit
       filtered_population <- mannfjoldi_data %>%
         filter(sveitarfelag == selected_municipality)
       
@@ -268,7 +268,7 @@ server <- function(input, output, session) {
           scale_y_continuous(labels = scales::comma)
       })
       
-      # Sía gögn fyrir valið sveitarfélag og ár
+      # Sía gögn fyrir kökurit af hlutfalli tegunda eigna
       filtered_pie_data <- property_type_data %>%
         filter(sveitarfelag == selected_municipality, year == input$year) %>%
         group_by(property_type) %>%
@@ -306,8 +306,8 @@ server <- function(input, output, session) {
           )
       })
     }
-  }) # Þetta lokar observeEvent
-} # Þetta lokar server fallinu
+  }) 
+} 
 
 # Keyra Shiny App
 shinyApp(ui = ui, server = server)
